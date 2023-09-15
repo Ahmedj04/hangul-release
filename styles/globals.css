@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+  @import url('https://fonts.googleapis.com/css2?family=Raleway+Dots&display=swap');
+
+
+.hotelLogo {
+  /* font-family: 'Raleway Dots', cursive; */
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+  
+}
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* price calendar css */
+.fc .fc-col-header-cell-cushion {
+  display: inline-block;
+  padding: 2px 4px;
+  color: #888888;
+}
+
+.fc .fc-daygrid-day-number {
+  padding: 4px;
+  position: relative;
+  z-index: 4;
+  color:#888888;
+  font-weight: bolder;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.75em;
+  margin: 0;
+  color:#888888;
+}
+
+.bg-custom-brown{
+  background-color: #EAE7E3;
+}
+.hover\:bg-custom-hover-brown:hover {
+  background-color:  #EAE7E3;
+}
+
+@keyframes slideInFromBottom {
+  0% {
+      /* transform: translateX(-100%); */
+      transform: translateY(100%);
+      opacity: 0;
+  }
+  100% {
+      /* transform: translateX(0); */
+      transform: translateY(0);
+      opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideInFromBottom 2s ease-in-out forwards;
+}
+
+/* .searchBox#css_custom_input option { color: yellowgreen; } */
+/* .chip { background: #414141; padding : "5px 10px"}  */
+/* .multiselectContainer searchBox { border: "none"; border-bottom: "none"; border-radius: "0px" } */
