@@ -25,7 +25,7 @@ function Home({ allHotelDetails, menu, setMenu, hotelDetailLoader, lang, setLang
         findCoverPhoto();
     }, [allHotelDetails])
     return (
-        <section className="relative h-screen md:h-screen z-40">
+        <section className="relative h-screen md:h-screen z-10">
             <div className="absolute inset-0">
                 {/* <div className="absolute inset-0 bg-[url('https://themewagon.github.io/sogo/images/slider-7.jpg')] bg-no-repeat bg-cover bg-center"></div> */}
                 <div className="absolute h-full w-full">

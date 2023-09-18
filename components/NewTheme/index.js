@@ -32,15 +32,17 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
     const [privacyPolicy, setPrivacyPolicy] = useState()
     const [termsConditions, setTermsConditions] = useState()
 
+    const[displayWidget, setDisplayWidget] = useState(-1)
+
 
     useEffect(() => {
         getLanguage();
         getHotelDetails();
         getRoomDetails();
-        
+
     }, []);
     console.log("this is the hotel details: ", allHotelDetails)
-        console.log("this is the rooms details: ", rooms)
+    console.log("this is the rooms details: ", rooms)
 
     function getLanguage() {
 
@@ -70,121 +72,122 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
 
     return (
         <main>
+            <div>
 
-            <Home
-                allHotelDetails={allHotelDetails}
-                setMenu={setMenu}
-                menu={menu}
-                lang={lang}
-                setLang={setLang}
-                hotelDetailLoader={hotelDetailLoader}
-                setShowContactUs={(e) => setShowContactUs(e)}
-            />
-            <About
-                allHotelDetails={allHotelDetails}
-                hotelDetailLoader={hotelDetailLoader}
-                lang={lang}
-            />
-
-            <Rooms
-                rooms={rooms}
-                showRoom={showRoom}
-                setShowRoom={setShowRoom}
-                roomDetailLoader={roomDetailLoader}
-                lang={lang}
-            />
-
-
-            <CarousalComponent
-                id="photos"
-                type='photos'
-                data={allHotelDetails?.images}
-                title={lang?.photos}
-                hotelDetailLoader={hotelDetailLoader}
-            />
-
-            <Services
-                services={services}
-                hotelDetailLoader={hotelDetailLoader}
-                lang={lang}
-            />
-
-            <CarousalComponent
-                id="reviews"
-                type='review'
-                data={allHotelDetails?.Reviews}
-                title={lang?.peopleSays}
-                hotelDetailLoader={hotelDetailLoader}
-            />
-            <div className='hidden lg:flex  lg:sticky lg:bottom-0'>
-                <BookingForm color={Color?.light}  rooms={rooms}  allHotelDetails={allHotelDetails}/>
-            </div>
-
-
-            <Footer
-                setShowModalPrivacy={setShowModalPrivacy}
-                setShowModalTC={setShowModalTC}
-                allHotelDetails={allHotelDetails}
-                hotelDetailLoader={hotelDetailLoader}
-                lang={lang}
-            />
-
-
-
-
-            {/* ------------------- modal view for footer-------------------------- */}
-
-            <div className={showModalTC === 1 ? "block" : "hidden"}>
-                <Modal
-                    title={`Terms & Conditions`}
-                    description={termsConditions}
-                    setShowModal={(e) => setShowModalTC(e)}
+                <Home
+                    allHotelDetails={allHotelDetails}
+                    setMenu={setMenu}
+                    menu={menu}
+                    lang={lang}
+                    setLang={setLang}
+                    hotelDetailLoader={hotelDetailLoader}
+                    setShowContactUs={(e) => setShowContactUs(e)}
                 />
-            </div>
-
-            <div className={showModalPrivacy === 1 ? "block" : "hidden"}>
-                <Modal
-                    title={`Privacy Policy`}
-                    description={privacyPolicy}
-                    setShowModal={(e) => setShowModalPrivacy(e)}
+                <About
+                    allHotelDetails={allHotelDetails}
+                    hotelDetailLoader={hotelDetailLoader}
+                    lang={lang}
                 />
-            </div>
 
-            <div className={showContactUs === 1 ? "block" : "hidden"}>
-                <Modal
-                    description={<Contactus color={Color?.light} language={lang} property_id={HotelDetails?.property_id} />}
-                    setShowModal={(e) => setShowContactUs(e)}
+                <Rooms
+                    rooms={rooms}
+                    showRoom={showRoom}
+                    setShowRoom={setShowRoom}
+                    roomDetailLoader={roomDetailLoader}
+                    lang={lang}
                 />
-            </div>
-
-            {/*-------------------- menu bar for small and medium screen----------- */}
-
-            {menu === true ?
-                <React.Fragment>
-                    <div className='absolute inset-0 w-full h-72 md:h-80 bg-white opacity-75 rounded-bl-3xl rounded-br-3xl  md:rounded-br-full z-50'>
-                        <i onClick={() => setMenu(false)} className='flex justify-end pt-5 pr-5 cursor-pointer hover:text-slate-500'><CloseIcon /></i>
-                        <div className='text-center text-black pt-10 md:pt-12'>
-                            <ul className='inline-block font-bold'>
-                                {[{ "label": lang?.about, "id": "#about" },
-                                { "label": lang?.rooms, "id": "#rooms" },
-                                { "label": lang?.photos, "id": "#photos" },
-                                { "label": lang?.services, "id": "#services" },
-                                { "label": lang?.reviews, "id": "#reviews" },
-                                { "label": lang?.contactUs, "id": "#footer" }
-                                ].map((item, index) => {
-                                    return (
-                                        <a href={`${item?.id}`} key={index} onClick={() => setMenu(false)}><li className='pb-1 md:pb-2 hover:text-slate-500'>{item?.label}</li></a>
-                                    )
-                                })}
 
 
-                            </ul>
+                <CarousalComponent
+                    id="photos"
+                    type='photos'
+                    data={allHotelDetails?.images}
+                    title={lang?.photos}
+                    hotelDetailLoader={hotelDetailLoader}
+                />
+
+                <Services
+                    services={services}
+                    hotelDetailLoader={hotelDetailLoader}
+                    lang={lang}
+                />
+
+                <CarousalComponent
+                    id="reviews"
+                    type='review'
+                    data={allHotelDetails?.Reviews}
+                    title={lang?.peopleSays}
+                    hotelDetailLoader={hotelDetailLoader}
+                />
+                <div className='hidden lg:flex  lg:sticky lg:bottom-0'>
+                    <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} 
+                    // displayWidget={displayWidget} setDisplayWidget={(value)=>setDisplayWidget(value)}
+
+                    />
+                </div>
+
+
+                <Footer
+                    setShowModalPrivacy={setShowModalPrivacy}
+                    setShowModalTC={setShowModalTC}
+                    allHotelDetails={allHotelDetails}
+                    hotelDetailLoader={hotelDetailLoader}
+                    lang={lang}
+                />
+
+                {/* ------------------- modal view for footer-------------------------- */}
+
+                <div className={showModalTC === 1 ? "block" : "hidden"}>
+                    <Modal
+                        title={`Terms & Conditions`}
+                        description={termsConditions}
+                        setShowModal={(e) => setShowModalTC(e)}
+                    />
+                </div>
+
+                <div className={showModalPrivacy === 1 ? "block" : "hidden"}>
+                    <Modal
+                        title={`Privacy Policy`}
+                        description={privacyPolicy}
+                        setShowModal={(e) => setShowModalPrivacy(e)}
+                    />
+                </div>
+
+                <div className={showContactUs === 1 ? "block" : "hidden"}>
+                    <Modal
+                        description={<Contactus color={Color?.light} language={lang} property_id={HotelDetails?.property_id} />}
+                        setShowModal={(e) => setShowContactUs(e)}
+                    />
+                </div>
+
+                {/*-------------------- menu bar for small and medium screen----------- */}
+
+                {menu === true ?
+                    <React.Fragment>
+                        <div className='absolute inset-0 w-full h-72 md:h-80 bg-white opacity-75 rounded-bl-3xl rounded-br-3xl  md:rounded-br-full z-50'>
+                            <i onClick={() => setMenu(false)} className='flex justify-end pt-5 pr-5 cursor-pointer hover:text-slate-500'><CloseIcon /></i>
+                            <div className='text-center text-black pt-10 md:pt-12'>
+                                <ul className='inline-block font-bold'>
+                                    {[{ "label": lang?.about, "id": "#about" },
+                                    { "label": lang?.rooms, "id": "#rooms" },
+                                    { "label": lang?.photos, "id": "#photos" },
+                                    { "label": lang?.services, "id": "#services" },
+                                    { "label": lang?.reviews, "id": "#reviews" },
+                                    { "label": lang?.contactUs, "id": "#footer" }
+                                    ].map((item, index) => {
+                                        return (
+                                            <a href={`${item?.id}`} key={index} onClick={() => setMenu(false)}><li className='pb-1 md:pb-2 hover:text-slate-500'>{item?.label}</li></a>
+                                        )
+                                    })}
+
+
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                </React.Fragment>
-                : <></>
-            }
-
+                    </React.Fragment>
+                    : <></>
+                }
+            </div>
         </main>
     )
 }

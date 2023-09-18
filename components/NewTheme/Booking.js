@@ -7,7 +7,7 @@ import Modal from '../NewTheme/modal';
 import BookingModal from './BookingModal'
 
 
-function BookingForm({ color , rooms, allHotelDetails }) {
+function BookingForm({ color, rooms, allHotelDetails }) {
 
     const [showBookingEngine, setShowBookingEngine] = useState(0);
 
@@ -96,14 +96,15 @@ function BookingForm({ color , rooms, allHotelDetails }) {
                     </div>
                     <div className='flex justify-center items-center'>
                         <button className='bg-cyan-700 hover:bg-cyan-900 h-8 w-2/6 md:w-1/6 text-white border rounded-2xl border-none '
-                            onClick={() => { setShowBookingEngine(1) }}
+                            onClick={() => {
+                                // setDisplayWidget(1)
+                                setShowBookingEngine(1);
+                            }}
                         >Search</button>
                     </div>
                 </div>
 
-                <div>
 
-                </div>
             </div>
 
 
@@ -114,8 +115,19 @@ function BookingForm({ color , rooms, allHotelDetails }) {
                     setShowModal={(e) => setShowBookingEngine(e)}
                    
                 />
-                {/* <BookingEngine /> */}
             </div>
+            {/* <div className={displayWidget === 1 ? 'block' : 'hidden'}>
+                <BookingEngine
+                    rooms={rooms}
+                    allHotelDetails={allHotelDetails}
+                    displayWidget={displayWidget}
+                    setDisplayWidget={setDisplayWidget}
+
+                />
+            </div> */}
+
+
+
         </div>
     )
 }

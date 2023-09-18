@@ -4,7 +4,7 @@ function BookingModal({ description, setShowModal }) {
     return (
         <div className="overflow-x-hidden  overflow-y-scroll fixed top-0 left-0 right-0 backdrop-blur-3xl h-screen bg-black/30 md:inset-0 z-50 flex justify-center items-center">
 
-            <div className="relative w-full max-w-full px-4 h-auto mt-0 md:pt-0 md:h-auto ">
+            <div className="relative w-full max-w-full px-4 h-auto mt-72 md:pt-0 md:h-auto " style={{marginTop:"2000px"}}>
                 <div className='bg-white rounded shadow relative'>
                     <div className=''>
                         <p className='text-sm text-slate-500 '>
@@ -18,8 +18,8 @@ function BookingModal({ description, setShowModal }) {
                     </div>
                 </div>
 
-
             </div>
+            
         </div>
     )
 }
