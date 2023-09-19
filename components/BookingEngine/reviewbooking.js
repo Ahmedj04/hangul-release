@@ -204,11 +204,11 @@ function Reviewbooking({ setDisplay }) {
                 <div id="price-breakup" className=' bg-gray-700 p-4 text-white h-fit w-full lg:w-4/12 border-white rounded-2xl' >
                     <div className='border border-white rounded-lg w-full h-1/2 my-2'>
                         <h1 className="font-extrabold p-2 text-xl">Price Breakup</h1>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>1 Room x for 1 Night<br /> <div className='text-sm font-extralight px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.final_rate}</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.tax_amount}</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.otherfees_amount}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>1 Room x for 1 Night<br /> <div className='text-sm font-extralight px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div>
                         <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Coupon Discounts</div> <div className='mx-2 flex justify-end w-full'>200.00 Rupees</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.final_rate + rate?.otherfees_amount + rate?.tax_amount}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div>
                     </div>
                     <div className='border border-white rounded-lg w-full h-1/2 my-2 py-2 px-4'>
                         <h2 className='h-12 w-fit mx-3 p-2'>Coupon Codes</h2>

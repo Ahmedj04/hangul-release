@@ -97,7 +97,6 @@ function BookingForm({ color, rooms, allHotelDetails }) {
                     <div className='flex justify-center items-center'>
                         <button className='bg-cyan-700 hover:bg-cyan-900 h-8 w-2/6 md:w-1/6 text-white border rounded-2xl border-none '
                             onClick={() => {
-                                // setDisplayWidget(1)
                                 setShowBookingEngine(1);
                             }}
                         >Search</button>
@@ -113,21 +112,9 @@ function BookingForm({ color, rooms, allHotelDetails }) {
                     // title="booking engine"
                     description={<BookingEngine  rooms={rooms}  allHotelDetails={allHotelDetails}/>}
                     setShowModal={(e) => setShowBookingEngine(e)}
-                   
                 />
             </div>
-            {/* <div className={displayWidget === 1 ? 'block' : 'hidden'}>
-                <BookingEngine
-                    rooms={rooms}
-                    allHotelDetails={allHotelDetails}
-                    displayWidget={displayWidget}
-                    setDisplayWidget={setDisplayWidget}
-
-                />
-            </div> */}
-
-
-
+            
         </div>
     )
 }

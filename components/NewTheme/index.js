@@ -32,9 +32,6 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
     const [privacyPolicy, setPrivacyPolicy] = useState()
     const [termsConditions, setTermsConditions] = useState()
 
-    const[displayWidget, setDisplayWidget] = useState(-1)
-
-
     useEffect(() => {
         getLanguage();
         getHotelDetails();
@@ -119,11 +116,9 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
                     title={lang?.peopleSays}
                     hotelDetailLoader={hotelDetailLoader}
                 />
+                
                 <div className='hidden lg:flex  lg:sticky lg:bottom-0'>
-                    <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} 
-                    // displayWidget={displayWidget} setDisplayWidget={(value)=>setDisplayWidget(value)}
-
-                    />
+                    <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} />
                 </div>
 
 

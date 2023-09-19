@@ -7,6 +7,168 @@ function RoomCalenderView({ rooms, allRoomRateDetails, setDisplay, color }) {
 
     const [selectedDate, setSelectedDate] = useState([]);
 
+    const data = {
+        "2023-09-19": [
+            {
+                "room_id": "r004",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-19",
+                "final_rate": 1499,
+                "tax_amount": 248,
+                "otherfees_amount": 209
+            },
+            {
+                "room_id": "r005",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-19",
+                "final_rate": 1200,
+                "tax_amount": 230,
+                "otherfees_amount": 200
+            },
+            {
+                "room_id": "r006",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-19",
+                "final_rate": 2999,
+                "tax_amount": 301,
+                "otherfees_amount": 256
+            },
+            {
+                "room_id": "r0011",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-19",
+                "final_rate": 999,
+                "tax_amount": 199,
+                "otherfees_amount": 100
+            },
+            {
+                "room_id": "r003",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-19",
+                "final_rate": 2000,
+                "tax_amount": 240,
+                "otherfees_amount": 110
+            }
+        ],
+        "2023-09-20": [
+            {
+                "room_id": "r004",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-20",
+                "final_rate": 1499,
+                "tax_amount": 248,
+                "otherfees_amount": 209
+            },
+            {
+                "room_id": "r005",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-20",
+                "final_rate": 1200,
+                "tax_amount": 230,
+                "otherfees_amount": 200
+            },
+            {
+                "room_id": "r006",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-20",
+                "final_rate": 2999,
+                "tax_amount": 301,
+                "otherfees_amount": 256
+            },
+            {
+                "room_id": "r0011",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-20",
+                "final_rate": 999,
+                "tax_amount": 199,
+                "otherfees_amount": 100
+            },
+            {
+                "room_id": "r003",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-20",
+                "final_rate": 2000,
+                "tax_amount": 240,
+                "otherfees_amount": 110
+            }
+        ],
+        "2023-09-21": [
+            {
+                "room_id": "r004",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-21",
+                "final_rate": 1499,
+                "tax_amount": 248,
+                "otherfees_amount": 209
+            },
+            {
+                "room_id": "r005",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-21",
+                "final_rate": 1200,
+                "tax_amount": 230,
+                "otherfees_amount": 200
+            },
+            {
+                "room_id": "r006",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-21",
+                "final_rate": 2999,
+                "tax_amount": 301,
+                "otherfees_amount": 256
+            },
+            {
+                "room_id": "r0011",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-21",
+                "final_rate": 999,
+                "tax_amount": 199,
+                "otherfees_amount": 100
+            },
+            {
+                "room_id": "r003",
+                "property_id": "t2k004",
+                "rate_date": "2023-09-21",
+                "final_rate": 2000,
+                "tax_amount": 240,
+                "otherfees_amount": 110
+            }
+        ]
+    }
+
+    console.log("this is rooms",rooms)
+
+    // Create an object to group room rates by room_id and calculate the total final rate for each room
+    const roomData = {};
+
+    Object.values(data).forEach((roomRates) => {
+        roomRates.forEach((rate) => {
+            const { room_id, property_id, final_rate, tax_amount, otherfees_amount } = rate;
+            if (!roomData[room_id]) {
+                roomData[room_id] = {
+                    room_id,
+                    property_id,
+                    total_final_rate: final_rate,
+                    total_tax_amount: tax_amount,
+                    total_otherfees_amount: otherfees_amount
+                };
+            } else {
+                roomData[room_id].total_final_rate += final_rate;
+                roomData[room_id].total_tax_amount += tax_amount;
+                roomData[room_id].total_otherfees_amount += otherfees_amount;
+            }
+        });
+    });
+
+    // Convert the grouped data into an array of rooms
+    const roomsArray = Object.values(roomData);
+    console.log("this is rooms array ",roomsArray)
+
+    // Sort the roomsArray in ascending order based on total_final_rate
+    const sortedFinalRate = roomsArray.slice().sort((room1, room2) =>room1.total_final_rate - room2.total_final_rate);
+    console.log("this is the sorted final rate", sortedData)
+
+
     useEffect(() => {
         groupingByDate()
         findingLowestRate()
@@ -57,7 +219,6 @@ function RoomCalenderView({ rooms, allRoomRateDetails, setDisplay, color }) {
 
     console.log("this is the sorted filtered data", sortedData)
 
-
     function findingLowestRate() {
         // Loop through the grouped data
         for (const rate_date in groupedByDate) {
@@ -80,7 +241,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, setDisplay, color }) {
         return lowestRatesArray;
     }
 
-    
+
     return (
         <div
             id="main-content"
@@ -89,7 +250,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, setDisplay, color }) {
 
             {/* price info */}
 
-            <Carousel cols={9} rows={1} gap={0} autoPlay={false} loop={false}
+            {/* <Carousel cols={9} rows={1} gap={0} autoPlay={false} loop={false}
                 responsiveLayout={[
                     {
                         breakpoint: 480,
@@ -155,11 +316,29 @@ function RoomCalenderView({ rooms, allRoomRateDetails, setDisplay, color }) {
                         </Carousel.Item>
                     )
                 })}
-            </Carousel>
+            </Carousel> */}
 
 
             {/* Basic Details Form */}
-            {selectedDate.length != 0 ?
+
+            <div className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
+                <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
+                    Rooms For Booking
+                </h6>
+
+                {sortedFinalRate.map((room, index) => {
+                    return <RoomCard
+                        key={index}
+                        roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
+                        filteredRoomData={rooms?.filter((item) => item.room_id == room.room_id)[0]}
+                        roomRates={room}
+                        setDisplay={(e) => setDisplay(e)}
+                    />
+                })}
+
+            </div>
+
+            {/* {selectedDate.length != 0 ?
                 <div className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
                     <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
                         Rooms For Booking
@@ -180,7 +359,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, setDisplay, color }) {
                 </div>
 
                 : <> </>
-            }
+            } */}
 
 
         </div>
