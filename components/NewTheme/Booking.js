@@ -109,8 +109,8 @@ function BookingForm({ color, rooms, allHotelDetails }) {
 
             <div className={showBookingEngine == "1" ? "block z-50" : "hidden"}>
                 <BookingModal
-                    // title="booking engine"
-                    description={<BookingEngine  rooms={rooms}  allHotelDetails={allHotelDetails}/>}
+                    title="Booking Engine"
+                    description={<BookingEngine  rooms={rooms}  allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout}/>}
                     setShowModal={(e) => setShowBookingEngine(e)}
                 />
             </div>

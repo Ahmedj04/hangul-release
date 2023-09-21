@@ -18,18 +18,25 @@ let currentLogged;
 let language = english;
 let visible = 1;
 
-function BookingEngine({ allHotelDetails, rooms }) {
+function BookingEngine({ allHotelDetails, rooms, checkinDate, checkoutDate }) {
 
     // const [basicDetails, setBasicDetails] = useState({})
-    const [display,setDisplay]=useState(0);
+    const [display, setDisplay] = useState(0);
 
-    const[room, setRoom] = useState([])
+    const [room, setRoom] = useState([])
 
     const [allRoomRateDetails, setAllRoomRateDetails] = useState([]);
 
+    const [dataAsPerDate, setDataAsPerDate] = useState([]);
+
     useEffect(() => {
         getRoomDetails()
+
     }, [])
+
+    useEffect(() => {
+        getRatesForTheSelectedDate()
+    }, [checkinDate, checkoutDate])
 
     function getRoomDetails() {
         let url = "/api/rates/t2k004";
@@ -43,18 +50,29 @@ function BookingEngine({ allHotelDetails, rooms }) {
             })
     }
     console.log("room rate details:- ", allRoomRateDetails)
-    
-    
 
+    function getRatesForTheSelectedDate() {
+        let url2 = `/api/rates/t2k004/${checkinDate}/${checkoutDate}`
+        axios.get(url2).then((response) => {
+            setDataAsPerDate(response.data)
+            console.log("rooms as per date selected loaded successfully")
+
+        }).catch((err) => {
+            console.log(JSON.stringify(err))
+        })
+    }
+
+    console.log("this is ", checkinDate, checkoutDate)
+    console.log("this is data of rooms as per date selected", dataAsPerDate)
     
     return (
         <>
             <Title name={`Engage | Booking Engine`} />
-            
-             {display===0?<RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} rooms={rooms} setDisplay={(e)=>setDisplay(e)}/>:undefined}
-             {display===1?<RoomPriceDetails setDisplay={(e)=>setDisplay(e)}/>:undefined}
-             {display===2?<Reviewbooking setDisplay={(e)=>setDisplay(e)}/>:undefined}
-             {/* {display===3?<payNow/>:undefined}  */}
+
+            {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
+            {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} /> : undefined}
+            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} /> : undefined}
+            {/* {display===3?<payNow/>:undefined}  */}
 
         </>
     )

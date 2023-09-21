@@ -41,7 +41,7 @@ function RoomPriceDetails({ setDisplay }) {
 
 
     return (
-        <div className="md:block lg:block md:-mx-auto md:mt-8 md:pt-5 md:mb-10 rounded shadow-lg bg-slate-100">
+        <div className="md:block lg:block md:-mx-auto md:mt-0 md:pt-5 md:mb-10 rounded shadow-lg bg-slate-100">
 
             <div className="flex px-1">
 

@@ -1,8 +1,15 @@
 // import { red } from '@mui/material/colors'
 import React from 'react'
 
-function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates }) {
-  
+function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinDate, checkoutDate }) {
+
+  const startDate = new Date(checkinDate); // Booking start date
+  const endDate = new Date(checkoutDate); // Booking end date
+
+  // Calculate the number of days for the booking
+  const oneDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+  const numberOfDays = Math.round((endDate - startDate) / oneDay) + 1; // Add 1 to include the start date
+
   function redirectToRoom(room_data, room_rates) {
     localStorage.setItem('room_data', JSON.stringify(room_data))
     localStorage.setItem('room_rate', JSON.stringify(room_rates))
@@ -30,7 +37,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates }) {
           onClick={() => redirectToRoom(filteredRoomData, roomRates)}
           className='px-4 py-2 bg-cyan-700 hover:bg-cyan-900 text-white'
         >Learn More</button>
-        <h3 className='text-sm py-2'>{roomRates.total_final_rate}+ tax and other fees</h3>
+        <h3 className='text-sm py-2 text-center'>{roomRates.total_final_rate}+ tax and other fees <br /> For {numberOfDays} Days</h3>
       </div>
 
 
