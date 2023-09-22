@@ -37,7 +37,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
           onClick={() => redirectToRoom(filteredRoomData, roomRates)}
           className='px-4 py-2 bg-cyan-700 hover:bg-cyan-900 text-white'
         >Learn More</button>
-        <h3 className='text-sm py-2 text-center'>{roomRates.total_final_rate}+ tax and other fees <br /> For {numberOfDays} Days</h3>
+        <h3 className='text-base py-2 text-center'>₹ {roomRates.total_final_rate}+ tax  For {numberOfDays} Days</h3>
       </div>
 
 

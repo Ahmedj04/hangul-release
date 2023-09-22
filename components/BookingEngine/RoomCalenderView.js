@@ -376,7 +376,6 @@ function RoomCalenderView({ rooms, allRoomRateDetails,dataOfRoomsAsPerDateSelect
                     })}
 
                 </div>
-
                 : <> </>
             } */}
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import InputText from '../utils/InputText'
 import DateInput from '../utils/DateInput'
 import DropDown from '../utils/DropDown'
@@ -11,6 +11,10 @@ function BookingForm({ color, rooms, allHotelDetails }) {
 
     const [showBookingEngine, setShowBookingEngine] = useState(0);
 
+    const [maxDate, setMaxDate] = useState('');
+
+    const [err, setErr] = useState(false);
+
     const [enquiry, setEnquiry] = useState({
         "checkin": "",
         "checkout": "",
@@ -20,6 +24,27 @@ function BookingForm({ color, rooms, allHotelDetails }) {
         "child_below_six": 0,
         "child_above_six": 0
     })
+
+    useEffect(() => {
+        const dtToday = new Date();
+        const month = (dtToday.getMonth() + 1).toString().padStart(2, '0');
+        const day = dtToday.getDate().toString().padStart(2, '0');
+        const year = dtToday.getFullYear();
+        const formattedMaxDate = `${year}-${month}-${day}`;
+        setMaxDate(formattedMaxDate);
+    }, []);
+
+    useEffect(() => {
+        if (enquiry.checkin && enquiry.checkout) {
+            if (enquiry.checkin > enquiry.checkout) {
+                setErr(true)
+            }
+            else{
+                setErr(false)
+            }
+        }
+    }, [enquiry.checkin, enquiry.checkout]);
+
     return (
         <div className='mx-auto rounded-2xl  bg-slate-200'>
             <div className={`pt-3 pb-1`} >
@@ -32,7 +57,9 @@ function BookingForm({ color, rooms, allHotelDetails }) {
                             req={true}
                             initialValue={new Date()}
                             visible={1}
+                            min={maxDate}
                             onChangeAction={(e) => setEnquiry({ ...enquiry, checkin: e.target.value })}
+                            error={err===true?'Checkin date cannot be ahead of the checkout date.':''}
                         />
 
 
@@ -43,7 +70,10 @@ function BookingForm({ color, rooms, allHotelDetails }) {
                             req={true}
                             initialValue={new Date() + 10}
                             visible={1}
+                            min={maxDate}
                             onChangeAction={(e) => setEnquiry({ ...enquiry, checkout: e.target.value })}
+                            error={err===true?'Checkout date cannot be earlier then the checkin date.':''}
+
                         />
 
                         <DropDown
@@ -95,7 +125,7 @@ function BookingForm({ color, rooms, allHotelDetails }) {
 
                     </div>
                     <div className='flex justify-center items-center'>
-                        <button className='bg-cyan-700 hover:bg-cyan-900 h-8 w-2/6 md:w-1/6 text-white border rounded-2xl border-none '
+                        <button disabled={err === true} className='bg-cyan-700  hover:bg-cyan-900 h-8 w-2/6 md:w-1/6 text-white border rounded-2xl border-none '
                             onClick={() => {
                                 setShowBookingEngine(1);
                             }}
@@ -110,11 +140,11 @@ function BookingForm({ color, rooms, allHotelDetails }) {
             <div className={showBookingEngine == "1" ? "block z-50" : "hidden"}>
                 <BookingModal
                     title="Booking Engine"
-                    description={<BookingEngine  rooms={rooms}  allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout}/>}
+                    description={<BookingEngine rooms={rooms} allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
                     setShowModal={(e) => setShowBookingEngine(e)}
                 />
             </div>
-            
+
         </div>
     )
 }

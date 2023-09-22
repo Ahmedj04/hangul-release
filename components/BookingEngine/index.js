@@ -53,6 +53,7 @@ function BookingEngine({ allHotelDetails, rooms, checkinDate, checkoutDate }) {
 
     function getRatesForTheSelectedDate() {
         let url2 = `/api/rates/t2k004/${checkinDate}/${checkoutDate}`
+        console.log(url2)
         axios.get(url2).then((response) => {
             setDataAsPerDate(response.data)
             console.log("rooms as per date selected loaded successfully")

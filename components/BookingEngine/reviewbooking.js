@@ -23,9 +23,13 @@ function Reviewbooking({ setDisplay }) {
 
 
     const [rate, setRate] = useState({})
+    const [selectedRoom, setSelectedRoom] = useState({})
+
 
     useEffect(() => {
+        let room = localStorage.getItem("room_data")
         let room_rates = localStorage.getItem("room_rate")
+        setSelectedRoom(JSON.parse(room))
         setRate(JSON.parse(room_rates))
     }, [])
 
@@ -108,7 +112,7 @@ function Reviewbooking({ setDisplay }) {
         <div className=' min-h-screen'>
             <div className='flex py-12 border-b-2 border-black bg-gray-700  h-32 w-screen text-white font-extrabold '>
                 <div className='flex cursor-pointer pl-2 pr-10 my-auto ' onClick={() => setDisplay(1)}>
-                    <i className='my-auto'><BiArrowBack size={30} color='white'/></i>
+                    <i className='my-auto'><BiArrowBack size={30} color='white' /></i>
                     <span className='my-auto pl-1 font-medium'>Back</span>
                 </div>
                 <h1 className=' pb-4 text-3xl'>Review Booking</h1>
@@ -116,6 +120,35 @@ function Reviewbooking({ setDisplay }) {
             <div id="main-content" className='h-fit text-white flex flex-wrap justify-around gap-2 mx-4 mt-10'>
                 {/* left side div  */}
                 <div id="guest-detail-review" className='bg-gray-700 h-fit w-full lg:w-7/12 border-white rounded-2xl'>
+                    <div className=' border-b-2 border-white justify-start mt-2 p-4'>
+
+                        <div className='flex justify-between'>
+                            <h6 className={`text-white text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
+                                Rooms Summary
+                            </h6>
+                            <button onClick={() => { alert('Add Rooms') }} className='my-2 ml-auto px-4 py-1 bg-cyan-700 rounded-md text-white'>Add More Rooms</button>
+
+                        </div>
+
+                        <table className='mx-4' cellPadding={15}>
+                            <thead>
+                                <th>Room Name</th>
+                                <th>Room Type</th>
+                                <th>Number Of Rooms</th>
+                            </thead>
+                            <tr>
+                                <td>{selectedRoom?.room_name}</td>
+                                <td>{selectedRoom?.room_type}</td>
+                                <td className='text-center'>1</td>
+                            </tr>
+                           
+                        </table>
+
+
+
+                    </div>
+
+
                     <div className='flex justify-start mt-2 p-4'>
                         <h6
                             className={`text-white text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
