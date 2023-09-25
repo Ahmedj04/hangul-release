@@ -1,4 +1,5 @@
 // import { red } from '@mui/material/colors'
+
 import React from 'react'
 
 function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinDate, checkoutDate }) {

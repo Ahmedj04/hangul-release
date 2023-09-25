@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import RoomCard from '../BookingEngine/RoomCard';
 import Carousel from 'better-react-carousel';
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
 
-function RoomCalenderView({ rooms, allRoomRateDetails,dataOfRoomsAsPerDateSelected, setDisplay, color, checkinDate, checkoutDate}) {
+import { useSelector } from 'react-redux';
+
+
+function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, color, checkinDate, checkoutDate }) {
 
     const [selectedDate, setSelectedDate] = useState([]);
+
+    const addMoreRooms = useSelector(state => state.addMoreRoom)
+    const roomsSelected = useSelector(state => state.roomsSelected)
+    console.log("boolean value for add more rooms: ", addMoreRooms)
 
     // const data = {
     //     "2023-09-19": [
@@ -136,7 +144,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails,dataOfRoomsAsPerDateSelect
     //     ]
     // }
 
-    console.log("this is rooms",rooms)
+    console.log("this is rooms", rooms)
 
     // Create an object to group room rates by room_id and calculate the total final rate for each room
     const roomData = {};
@@ -179,12 +187,18 @@ function RoomCalenderView({ rooms, allRoomRateDetails,dataOfRoomsAsPerDateSelect
 
     // Convert the grouped data into an array of rooms
     const roomsArray = Object.values(roomData);
-    console.log("this is rooms array ",roomsArray)
+    console.log("this is rooms array ", roomsArray)
 
     // Sort the roomsArray in ascending order based on total_final_rate
-    const sortedFinalRate = roomsArray.slice().sort((room1, room2) =>room1.total_final_rate - room2.total_final_rate);
+    const sortedFinalRate = roomsArray.slice().sort((room1, room2) => room1.total_final_rate - room2.total_final_rate);
     console.log("this is the sorted final rate", sortedData)
 
+
+    // only those rooms whose room_id is not in roomsSelected state
+    const roomsToDisplay = sortedFinalRate.filter((room) => {
+        // Check if the room_id is not in the roomsSelected array
+        return !roomsSelected.includes(room.room_id);
+    });
 
     useEffect(() => {
         groupingByDate()
@@ -258,15 +272,12 @@ function RoomCalenderView({ rooms, allRoomRateDetails,dataOfRoomsAsPerDateSelect
         return lowestRatesArray;
     }
 
-
     return (
         <div
             id="main-content"
             className={`${color?.greybackground} px-4 pt-2 pb-2 `}
         >
-
             {/* price info */}
-
             {/* <Carousel cols={9} rows={1} gap={0} autoPlay={false} loop={false}
                 responsiveLayout={[
                     {
@@ -339,21 +350,51 @@ function RoomCalenderView({ rooms, allRoomRateDetails,dataOfRoomsAsPerDateSelect
             {/* Basic Details Form */}
 
             <div className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
-                <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
-                    Rooms For Booking
-                </h6>
 
-                {sortedFinalRate.map((room, index) => {
-                    return <RoomCard
-                        key={index}
-                        roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
-                        filteredRoomData={rooms?.filter((item) => item.room_id == room.room_id)[0]}
-                        roomRates={room}
-                        setDisplay={(e) => setDisplay(e)}
-                        checkinDate={checkinDate}
-                        checkoutDate={checkoutDate}
-                    />
-                })}
+                {addMoreRooms === true ?
+                    <div className='flex justify-between'>
+                        <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
+                            Rooms For Booking
+                        </h6>
+                        <i onClick={()=>{setDisplay(2)}}><AiOutlineShoppingCart color='white' size={20} /></i>
+                    </div> :
+                    <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
+                        Rooms For Booking
+                    </h6>}
+
+
+                {addMoreRooms === true ?
+                    <> {
+                        roomsToDisplay.map((room, index) => {
+                            return (
+                                <RoomCard
+                                    key={index}
+                                    roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
+                                    filteredRoomData={rooms?.find((item) => item.room_id === room.room_id)}
+                                    roomRates={room}
+                                    setDisplay={(e) => setDisplay(e)}
+                                    checkinDate={checkinDate}
+                                    checkoutDate={checkoutDate}
+                                />
+                            );
+                        })
+                    }
+                    </> :
+                    <>{
+                        sortedFinalRate.map((room, index) => {
+                            return <RoomCard
+                                key={index}
+                                roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
+                                filteredRoomData={rooms?.filter((item) => item.room_id == room.room_id)[0]}
+                                roomRates={room}
+                                setDisplay={(e) => setDisplay(e)}
+                                checkinDate={checkinDate}
+                                checkoutDate={checkoutDate}
+                            />
+                        })
+                    }</>}
+
+
 
             </div>
 

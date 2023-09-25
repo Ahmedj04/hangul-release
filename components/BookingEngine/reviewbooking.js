@@ -5,9 +5,14 @@ import Modal from "../NewTheme/modal";
 import { RxCross2 } from "react-icons/rx";
 import { BiArrowBack } from "react-icons/bi";
 
+// redux libraries
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { setRoomsSelected, removeRoomFromSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 
-function Reviewbooking({ setDisplay }) {
+function Reviewbooking({ setDisplay, rooms }) {
+
     let guestTemplate = {
         "guest_name": "",
         "guest_email": "",
@@ -25,6 +30,16 @@ function Reviewbooking({ setDisplay }) {
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
 
+    
+    const roomsSelected = useSelector(state => new Set(state.roomsSelected))
+    console.log("this is roomSelected array using redux", roomsSelected)
+
+    // Create an array of rooms that match the room_ids in roomsSelected
+    const selectedRoomsArray = rooms.filter((room) => roomsSelected.has(room.room_id));
+   
+    console.log("Selected rooms:", selectedRoomsArray);
+   
+    const dispatch = useDispatch();
 
     useEffect(() => {
         let room = localStorage.getItem("room_data")
@@ -54,7 +69,6 @@ function Reviewbooking({ setDisplay }) {
         const updatedGuests = guest.filter((i, index) => i.index !== indexToRemove);
         setGuest(updatedGuests); //list of guest not removed
     };
-
 
     // ui of add gst form 
     function AddGstForm() {
@@ -126,7 +140,14 @@ function Reviewbooking({ setDisplay }) {
                             <h6 className={`text-white text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
                                 Rooms Summary
                             </h6>
-                            <button onClick={() => { alert('Add Rooms') }} className='my-2 ml-auto px-4 py-1 bg-cyan-700 rounded-md text-white'>Add More Rooms</button>
+                            <button
+                                className='my-2 ml-auto px-4 py-1 bg-cyan-700 rounded-md text-white'
+                                onClick={() => {
+                                    setDisplay(3);
+                                    dispatch(setAddMoreRoom(true))
+                                }}
+
+                            >Add More Rooms</button>
 
                         </div>
 
@@ -135,16 +156,41 @@ function Reviewbooking({ setDisplay }) {
                                 <th>Room Name</th>
                                 <th>Room Type</th>
                                 <th>Number Of Rooms</th>
+
                             </thead>
-                            <tr>
-                                <td>{selectedRoom?.room_name}</td>
-                                <td>{selectedRoom?.room_type}</td>
-                                <td className='text-center'>1</td>
-                            </tr>
-                           
+
+                            {selectedRoomsArray?.map((room, index) => {
+                                return <tr key={index}>
+                                    <td>{room?.room_name}</td>
+                                    <td>{room?.room_type}</td>
+                                    <td className='text-center'>1</td>
+                                    <td className='text-red-800'>
+                                        <button
+                                            className="text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"
+                                            onClick={() => {
+                                                dispatch(removeRoomFromSelected(room?.room_id))
+                                            }}
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="w-6 h-6"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                                />
+                                            </svg>
+                                        </button></td>
+                                </tr>
+                            })}
+
+
                         </table>
-
-
 
                     </div>
 

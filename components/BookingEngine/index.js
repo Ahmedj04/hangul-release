@@ -62,9 +62,6 @@ function BookingEngine({ allHotelDetails, rooms, checkinDate, checkoutDate }) {
             console.log(JSON.stringify(err))
         })
     }
-
-    console.log("this is ", checkinDate, checkoutDate)
-    console.log("this is data of rooms as per date selected", dataAsPerDate)
     
     return (
         <>
@@ -72,7 +69,9 @@ function BookingEngine({ allHotelDetails, rooms, checkinDate, checkoutDate }) {
 
             {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
             {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} /> : undefined}
-            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} /> : undefined}
+            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms}/> : undefined}\
+            {display === 3 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
+
             {/* {display===3?<payNow/>:undefined}  */}
 
         </>

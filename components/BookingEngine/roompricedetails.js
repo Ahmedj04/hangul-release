@@ -8,7 +8,9 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
 import axios from 'axios';
 
-
+// redux imports
+import { useDispatch } from 'react-redux';
+import { setRoomsSelected } from '../redux/hangulSlice';
 
 function RoomPriceDetails({ setDisplay }) {
 
@@ -18,6 +20,8 @@ function RoomPriceDetails({ setDisplay }) {
     const [lang, setLang] = useState(english)
 
     const [inventoryDetail, setInventoryDetail] = useState({})
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         let room = localStorage.getItem("room_data")
@@ -56,7 +60,13 @@ function RoomPriceDetails({ setDisplay }) {
                 <h2 className='text-blue-900 border-t border-black '>Other Fees: ₹ {rate?.total_otherfees_amount}</h2>
                 <h2 className='text-blue-900 border-t border-black '>Total Price: ₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</h2>
                 <div className='border-t border-black  md:pt-8 relative pt-4'>
-                    <button onClick={() => { setDisplay(2) }} className='w-full mt-auto px-1 py-2 bg-cyan-700 text-white rounded-md'>
+                    <button
+                        className='w-full mt-auto px-1 py-2 bg-cyan-700 text-white rounded-md'
+                        onClick={() => {
+                            setDisplay(2);
+                            dispatch(setRoomsSelected([selectedRoom?.room_id]))
+                        }}
+                    >
                         Book Now
                     </button>
                 </div>
@@ -77,7 +87,7 @@ function RoomPriceDetails({ setDisplay }) {
                     {/* {selectedRoom?.unconditional_rates?.map((resource, index) => {
                         return <p key={index} className="text-lg text-gray-500 font-medium">{resource?.baserate_currency.toUpperCase() + " " + resource?.baserate_amount}</p>
                     })} */}
-                    <div className='my-auto mr-10 text-base italic flex'> 
+                    <div className='my-auto mr-10 text-base italic flex'>
                         <p>Available Inventory: {inventory_available}</p>
                     </div>
                 </div>
