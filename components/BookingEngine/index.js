@@ -18,10 +18,9 @@ let currentLogged;
 let language = english;
 let visible = 1;
 
-function BookingEngine({ allHotelDetails, rooms, checkinDate, checkoutDate }) {
+function BookingEngine({ allHotelDetails, rooms, display, setDisplay, checkinDate, checkoutDate }) {
 
     // const [basicDetails, setBasicDetails] = useState({})
-    const [display, setDisplay] = useState(0);
 
     const [room, setRoom] = useState([])
 

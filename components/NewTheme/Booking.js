@@ -15,6 +15,9 @@ function BookingForm({ color, rooms, allHotelDetails }) {
 
     const [err, setErr] = useState(false);
 
+    // display for different modal views based on display values
+    const [display, setDisplay] = useState(0);
+
     const [enquiry, setEnquiry] = useState({
         "checkin": "",
         "checkout": "",
@@ -140,8 +143,9 @@ function BookingForm({ color, rooms, allHotelDetails }) {
             <div className={showBookingEngine == "1" ? "block z-50" : "hidden"}>
                 <BookingModal
                     title="Booking Engine"
-                    description={<BookingEngine rooms={rooms} allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
+                    description={<BookingEngine display={display}  setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
                     setShowModal={(e) => setShowBookingEngine(e)}
+                    setDisplay={(e) => setDisplay(e)}
                 />
             </div>
 
