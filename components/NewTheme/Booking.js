@@ -39,13 +39,14 @@ function BookingForm({ color, rooms, allHotelDetails }) {
 
     useEffect(() => {
         if (enquiry.checkin && enquiry.checkout) {
-            if (enquiry.checkin > enquiry.checkout) {
+            if (enquiry.checkin > enquiry.checkout ) {
                 setErr(true)
             }
             else{
                 setErr(false)
             }
         }
+
     }, [enquiry.checkin, enquiry.checkout]);
 
     return (
@@ -130,7 +131,12 @@ function BookingForm({ color, rooms, allHotelDetails }) {
                     <div className='flex justify-center items-center'>
                         <button disabled={err === true} className='bg-cyan-700  hover:bg-cyan-900 h-8 w-2/6 md:w-1/6 text-white border rounded-2xl border-none '
                             onClick={() => {
-                                setShowBookingEngine(1);
+                                // if( enquiry.checkin==="" || enquiry.checkout===""){
+                                //     setErr(true)
+                                // }else{
+                                    setShowBookingEngine(1);
+
+                                // }
                             }}
                         >Search</button>
                     </div>

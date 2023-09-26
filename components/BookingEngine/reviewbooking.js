@@ -8,7 +8,7 @@ import { BiArrowBack } from "react-icons/bi";
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { setRoomsSelected, removeRoomFromSelected, setAddMoreRoom } from '../redux/hangulSlice';
+import { removeRoomFromSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 
 function Reviewbooking({ setDisplay, rooms }) {
@@ -30,15 +30,19 @@ function Reviewbooking({ setDisplay, rooms }) {
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
 
-    
+
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
     console.log("this is roomSelected array using redux", roomsSelected)
 
     // Create an array of rooms that match the room_ids in roomsSelected
     const selectedRoomsArray = rooms.filter((room) => roomsSelected.has(room.room_id));
-   
     console.log("Selected rooms:", selectedRoomsArray);
-   
+
+    const inventoryDetail = useSelector(state => state.inventoryDetail)
+    // console.log("available inventory using  redux :", inventoryDetail)
+
+    let inventory_available = inventoryDetail?.[0]?.inventory_available;
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -163,7 +167,24 @@ function Reviewbooking({ setDisplay, rooms }) {
                                 return <tr key={index}>
                                     <td>{room?.room_name}</td>
                                     <td>{room?.room_type}</td>
-                                    <td className='text-center'>1</td>
+                                    <td className=' text-black text-center'>
+                                        <select
+                                            className=' pl-3 pr-10'
+                                        // value={room?.selectedQuantity || 1}
+                                        // onChange={(e) => {
+                                        //     const selectedQuantity = parseInt(e.target.value);
+                                        //     // You can handle the selected quantity here as needed
+                                        //     // For example, you can update it in your state or dispatch an action
+                                        // }}
+                                        >
+                                            {/* Generate options for the dropdown based on inventory_available */}
+                                            {Array.from({ length: inventory_available || 1 }, (_, index) => index + 1).map((quantity) => (
+                                                <option key={quantity} value={quantity}>
+                                                    {quantity}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
                                     <td className='text-red-800'>
                                         <button
                                             className="text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"

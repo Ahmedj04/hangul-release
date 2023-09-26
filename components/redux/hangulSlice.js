@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     roomsSelected: [],
     addMoreRoom: false,
+    inventoryDetail:{}
 }
 
 
@@ -19,25 +20,24 @@ export const hangulSlice = createSlice({
             const roomToAdd = action.payload;
             // Add the room_id(s) to roomsSelected
             state.roomsSelected = [...state.roomsSelected, ...roomToAdd];
-
         },
-
         removeRoomFromSelected: (state, action) => {
             const roomIdToRemove = action.payload;
             state.roomsSelected = state.roomsSelected.filter(roomId => roomId !== roomIdToRemove);
         },
-
         // Add a reducer case to handle clearing roomsSelected
         clearRoomsSelected: (state) => {
             state.roomsSelected = [];
         },
-
         setAddMoreRoom: (state, action) => {
             state.addMoreRoom = action.payload
+        },
+        addInventoryDetail:(state, action)=>{
+            state.inventoryDetail = (action.payload)
         }
     }
 })
 
-export const { setRoomsSelected,removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } = hangulSlice.actions  //to be used in component files
+export const { setRoomsSelected,removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, addInventoryDetail } = hangulSlice.actions  //to be used in component files
 
 export default hangulSlice.reducer //this will be used to put in store

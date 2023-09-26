@@ -9,8 +9,8 @@ import { BiArrowBack } from "react-icons/bi";
 import axios from 'axios';
 
 // redux imports
-import { useDispatch } from 'react-redux';
-import { setRoomsSelected } from '../redux/hangulSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setRoomsSelected, addInventoryDetail } from '../redux/hangulSlice';
 
 function RoomPriceDetails({ setDisplay }) {
 
@@ -19,9 +19,12 @@ function RoomPriceDetails({ setDisplay }) {
 
     const [lang, setLang] = useState(english)
 
-    const [inventoryDetail, setInventoryDetail] = useState({})
-
     const dispatch = useDispatch();
+
+    const inventoryDetail = useSelector(state => state.inventoryDetail)
+    // console.log("this is inventory details", inventoryDetail)
+
+    let inventory_available = inventoryDetail?.[0]?.inventory_available;
 
     useEffect(() => {
         let room = localStorage.getItem("room_data")
@@ -34,21 +37,15 @@ function RoomPriceDetails({ setDisplay }) {
     function getInventoryDetail() {
 
         let roomID = selectedRoom?.room_id;
-
         let url = `/api/inv_data/:${roomID}`;
-
         axios.get(url).then((response) => {
-            setInventoryDetail(response.data.inventory)
+            // setting value to inventory detail using redux reducer function
+            dispatch(addInventoryDetail(response.data.inventory))
             console.log("inventory data loaded successfully")
         }).catch((err) => {
             console.log("error in loading inventory data", err)
         })
-
     }
-
-    console.log("this is inventory details", inventoryDetail)
-
-    let inventory_available = inventoryDetail?.[0]?.inventory_available;
 
     function Booknow() {
         return (<>
