@@ -356,7 +356,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                         <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
                             Rooms For Booking
                         </h6>
-                        <i onClick={()=>{setDisplay(2)}}><AiOutlineShoppingCart color='white' size={20} /></i>
+                        <i onClick={()=>{setDisplay(2)}}> <AiOutlineShoppingCart color='white' size={20} /> </i>
                     </div> :
                     <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
                         Rooms For Booking

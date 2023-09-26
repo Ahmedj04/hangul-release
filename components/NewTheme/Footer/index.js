@@ -24,8 +24,6 @@ function Footer({ setShowModalPrivacy, setShowModalTC, allHotelDetails, hotelDet
                         </ul>
                     </div>
 
-
-
                     <div className="pb-10">
                         <div>
                             <div className="text-gray-400 pb-5">

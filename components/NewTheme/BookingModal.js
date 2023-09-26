@@ -2,14 +2,18 @@ import React from 'react'
 import { useDispatch } from 'react-redux';
 import { setRoomsSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
 
-function BookingModal({ title, description, setShowModal , setDisplay}) {
+function BookingModal({ title, description, setShowModal, setDisplay, setSearched }) {
 
     const dispatch = useDispatch();
 
     return (
-        <div className="overflow-x-hidden  overflow-y-scroll fixed top-0 left-0 right-0 backdrop-blur-3xl h-screen bg-black/30 md:inset-0 z-50 flex justify-center items-center">
+        // <div className="overflow-x-hidden  overflow-y-scroll fixed top-0 left-0  right-0 backdrop-blur-3xl h-screen bg-black/30 md:inset-0 z-50 flex justify-center items-center">
+        <div className=" overflow-y-scroll overflow-x-hidden fixed top-0 left-0 right-0 backdrop-blur-3xl  bg-black/30 h-screen z-50 ">
 
-            <div className="relative w-full max-w-full px-0 h-auto mt-72 md:pt-0 md:h-auto " style={{ marginTop: "2000px" }}>
+            <div
+                // className="relative w-full max-w-full px-0  mt-0 md:pt-0 md:h-auto "
+                className="relative w-full max-w-full px-0"
+            >
                 {/* <div className="bg-white flex items-start justify-between p-5 border-b rounded-t">
                     <h3 className='text-black text-xl font-semibold'>{title}</h3>
                     <button
@@ -39,19 +43,22 @@ function BookingModal({ title, description, setShowModal , setDisplay}) {
                             {description}
                         </p>
                     </div>
-                    <div className='flex'>
-                        <div className="items-start p-5 border-t border-gray-200 rounded-b">
-                            <button
-                                className="text-white bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-0"
-                                onClick={() => {
-                                    setShowModal(0)
-                                    setDisplay(0)
-                                    dispatch(setAddMoreRoom(false))
-                                    dispatch(clearRoomsSelected())
-                                }}
-                            >Close</button>
-                        </div>
+                    {/* <div className='flex'> */}
+                    <div
+                        // className="items-start p-5 border-t border-gray-200 rounded-b">
+                        className=" p-5">
+                        <button
+                            className="text-white bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-0"
+                            onClick={() => {
+                                setShowModal(0)
+                                setDisplay(0)
+                                dispatch(setAddMoreRoom(false))
+                                dispatch(clearRoomsSelected())
+                                setSearched(false)
+                            }}
+                        >Close</button>
                     </div>
+                    {/* </div> */}
                 </div>
 
             </div>

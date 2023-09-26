@@ -7,7 +7,7 @@ import Modal from '../NewTheme/modal';
 import BookingModal from './BookingModal'
 
 
-function BookingForm({ color, rooms, allHotelDetails }) {
+function BookingForm({ color, rooms, allHotelDetails,searched,setSearched }) {
 
     const [showBookingEngine, setShowBookingEngine] = useState(0);
 
@@ -134,6 +134,7 @@ function BookingForm({ color, rooms, allHotelDetails }) {
                                 // if( enquiry.checkin==="" || enquiry.checkout===""){
                                 //     setErr(true)
                                 // }else{
+                                    setSearched(!searched);
                                     setShowBookingEngine(1);
 
                                 // }
@@ -149,9 +150,10 @@ function BookingForm({ color, rooms, allHotelDetails }) {
             <div className={showBookingEngine == "1" ? "block z-50" : "hidden"}>
                 <BookingModal
                     title="Booking Engine"
-                    description={<BookingEngine display={display}  setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
+                    description={ <BookingEngine display={display}  setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
                     setShowModal={(e) => setShowBookingEngine(e)}
                     setDisplay={(e) => setDisplay(e)}
+                    setSearched={(e)=>setSearched(false)}
                 />
             </div>
 
