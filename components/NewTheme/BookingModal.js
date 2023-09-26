@@ -39,7 +39,7 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
                 </div> */}
                 <div className='bg-white rounded shadow relative'>
                     <div>
-                        <p className='text-sm text-slate-500 '>
+                        <p className='text-sm text-slate-500'>
                             {description}
                         </p>
                     </div>
@@ -56,7 +56,9 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
                                 dispatch(clearRoomsSelected())
                                 setSearched(false)
                             }}
-                        >Close</button>
+                        >
+                            Close
+                        </button>
                     </div>
                     {/* </div> */}
                 </div>

@@ -30,7 +30,6 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, checkinDat
 
     useEffect(() => {
         getRoomDetails()
-
     }, [])
 
     useEffect(() => {
@@ -68,7 +67,7 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, checkinDat
 
             {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
             {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} /> : undefined}
-            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms}/> : undefined}\
+            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms}/> : undefined}
             {display === 3 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
 
             {/* {display===3?<payNow/>:undefined}  */}
