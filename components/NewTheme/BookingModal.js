@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
-import { setRoomsSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
+import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
 
 function BookingModal({ title, description, setShowModal, setDisplay, setSearched }) {
 
@@ -8,7 +8,8 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
 
     return (
         // <div className="overflow-x-hidden  overflow-y-scroll fixed top-0 left-0  right-0 backdrop-blur-3xl h-screen bg-black/30 md:inset-0 z-50 flex justify-center items-center">
-        <div className=" overflow-y-scroll overflow-x-hidden fixed top-0 left-0 right-0 backdrop-blur-3xl  bg-black/30 h-screen z-50 ">
+        // <div className=" overflow-y-scroll overflow-x-hidden fixed top-0 left-0 right-0 backdrop-blur-3xl  bg-black/30 h-screen z-50 ">
+        <div className=" overflow-y-scroll overflow-x-hidden fixed top-0 left-0 right-0 backdrop-blur-3xl  bg-white h-screen z-50 ">
 
             <div
                 // className="relative w-full max-w-full px-0  mt-0 md:pt-0 md:h-auto "

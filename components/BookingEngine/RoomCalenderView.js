@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import RoomCard from '../BookingEngine/RoomCard';
 import Carousel from 'better-react-carousel';
-import { AiOutlineShoppingCart } from "react-icons/ai";
-
+import { AiOutlineShoppingCart, AiOutlineClose } from "react-icons/ai";
 
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
 
 
-function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, color, checkinDate, checkoutDate }) {
+function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
 
     const [selectedDate, setSelectedDate] = useState([]);
+
+    const dispatch = useDispatch()
 
     const addMoreRooms = useSelector(state => state.addMoreRoom)
     const roomsSelected = useSelector(state => state.roomsSelected)
@@ -275,7 +278,8 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
     return (
         <div
             id="main-content"
-            className={`${color?.greybackground} px-4 pt-2 pb-2 `}
+            // className={`${color?.greybackground} px-4 pt-2 pb-2 `}
+            className={`${color?.light} px-4 pt-2 pb-2 `}
         >
             {/* price info */}
             {/* <Carousel cols={9} rows={1} gap={0} autoPlay={false} loop={false}
@@ -349,18 +353,69 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
 
             {/* Basic Details Form */}
 
-            <div className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
+            <div
+                // className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}
+                className={`${color?.light} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}
+            >
 
-                {addMoreRooms === true ?
+                {/* {addMoreRooms === true ?
                     <div className='flex justify-between'>
-                        <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
+                        <h6 
+                        // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
+                        className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
+                        >
                             Rooms For Booking
                         </h6>
-                        <i onClick={()=>{setDisplay(2)}}> <AiOutlineShoppingCart color='white' size={20} /> </i>
+                        <div className='my-auto'>
+                            <i className='cursor-pointer' onClick={()=>{setDisplay(2)}}> <AiOutlineShoppingCart color='black' size={20} /> </i>
+
+                        </div>
                     </div> :
-                    <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
+                    <div className='flex justify-between'>
+                        <h6 
+                        // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
+                        className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
+                        >
+                            Rooms For Booking
+                        </h6>
+                        <div className='my-auto'>
+                            <i className='cursor-pointer' onClick={()=>{setDisplay(2)}}> <AiOutlineShoppingCart color='black' size={20} /> </i>
+
+                        </div>
+                    </div>
+
+                   
+                    } */}
+
+                {/* <div className='flex justify-end '>
+                    <i className='cursor-pointer' onClick={() => { setDisplay(2) }}> <AiOutlineClose color='red' size={20} /> </i>
+
+                    </div> */}
+
+                <div className='flex justify-between'>
+                    <h6
+                        // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
+                        className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
+                    >
                         Rooms For Booking
-                    </h6>}
+                    </h6>
+                    <div className='my-auto'>
+                        <div className='flex gap-10'>
+                            <i className='cursor-pointer' onClick={() => { setDisplay(2) }}> <AiOutlineShoppingCart color='black' size={20} /> </i>
+                            <i className='cursor-pointer'
+                                onClick={() => {
+                                    setDisplay(0)
+                                    setShowModal(0)
+                                    setSearched(false)
+                                    dispatch(setAddMoreRoom(false))
+                                    dispatch(clearRoomsSelected())
+                                }}>
+                                <AiOutlineClose color='red' size={20} /> </i>
+
+                        </div>
+
+                    </div>
+                </div>
 
 
                 {addMoreRooms === true ?

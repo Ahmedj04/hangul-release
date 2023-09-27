@@ -18,7 +18,7 @@ let currentLogged;
 let language = english;
 let visible = 1;
 
-function BookingEngine({ allHotelDetails, rooms, display, setDisplay, checkinDate, checkoutDate }) {
+function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
     // const [basicDetails, setBasicDetails] = useState({})
 
@@ -65,10 +65,9 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, checkinDat
         <>
             <Title name={`Engage | Booking Engine`} />
 
-            {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
-            {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} /> : undefined}
-            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms}/> : undefined}
-            {display === 3 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
+            {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
+            {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} /> : undefined}
+            {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)}/> : undefined}
 
             {/* {display===3?<payNow/>:undefined}  */}
 

@@ -4,14 +4,16 @@ import Color from '../colors/Color';
 import Modal from "../NewTheme/modal";
 import { RxCross2 } from "react-icons/rx";
 import { BiArrowBack } from "react-icons/bi";
+import { AiOutlineClose } from "react-icons/ai";
+
 
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { removeRoomFromSelected, setAddMoreRoom } from '../redux/hangulSlice';
+import { removeRoomFromSelected, setAddMoreRoom, clearRoomsSelected } from '../redux/hangulSlice';
 
 
-function Reviewbooking({ setDisplay, rooms }) {
+function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
 
     let guestTemplate = {
         "guest_name": "",
@@ -86,7 +88,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                     setGstDetails({ ...gstDetails, registation_number: e.target.value })
                 }
                 error={error?.guest_phone}
-                color={Color?.dark}
+                color={Color?.light}
                 req={true}
                 title={'registration number'}
                 tooltip={true}
@@ -101,7 +103,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                     setGstDetails({ ...gstDetails, company_name: e.target.value })
                 }
                 error={error?.guest_phone}
-                color={Color?.dark}
+                color={Color?.light}
                 req={true}
                 title={'name of company'}
                 tooltip={true}
@@ -115,7 +117,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                     setGstDetails({ ...gstDetails, company_address: e.target.value })
                 }
                 error={error?.guest_phone}
-                color={Color?.dark}
+                color={Color?.light}
                 req={true}
                 title={'Address of company'}
                 tooltip={true}
@@ -127,27 +129,42 @@ function Reviewbooking({ setDisplay, rooms }) {
 
 
     return (
-        <div className=' min-h-screen'>
-            <div className='flex py-12 border-b-2 border-black bg-gray-700  h-32 w-screen text-white font-extrabold '>
-                <div className='flex cursor-pointer pl-2 pr-10 my-auto ' onClick={() => setDisplay(1)}>
-                    <i className='my-auto'><BiArrowBack size={30} color='white' /></i>
+        <div className='min-h-screen'>
+
+            <div className='flex py-5 border-b-2  bg-slate-100'>
+                <div className='flex cursor-pointer pl-2 pr-10 my-auto' onClick={() => setDisplay(1)}>
+                    <i className='my-auto'><BiArrowBack size={30} /></i>
                     <span className='my-auto pl-1 font-medium'>Back</span>
                 </div>
-                <h1 className=' pb-4 text-3xl'>Review Booking</h1>
+
+                <div className='flex justify-between w-full'>
+                    <h1 className='text-xl my-auto font-bold'>Review Booking</h1>
+                    <i className='cursor-pointer my-auto mr-5'
+                        onClick={() => {
+                            setDisplay(0)
+                            setShowModal(0)
+                            setSearched(false)
+                            dispatch(setAddMoreRoom(false))
+                            dispatch(clearRoomsSelected())
+                        }}>
+                        <AiOutlineClose color='red' size={20} /> </i>
+                </div>
             </div>
+
             <div id="main-content" className='h-fit text-white flex flex-wrap justify-around gap-2 mx-4 mt-10'>
+
                 {/* left side div  */}
-                <div id="guest-detail-review" className='bg-gray-700 h-fit w-full lg:w-7/12 border-white rounded-2xl'>
-                    <div className=' border-b-2 border-white justify-start mt-2 p-4'>
+                <div id="guest-detail-review" className='bg-white border border-gray-300 text-black h-fit w-full lg:w-6/12  rounded-2xl'>
+                    <div className=' border-b-2 border-gray justify-start mt-2 p-4'>
 
                         <div className='flex justify-between'>
-                            <h6 className={`text-white text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
+                            <h6 className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
                                 Rooms Summary
                             </h6>
                             <button
-                                className='my-2 ml-auto px-4 py-1 bg-cyan-700 rounded-md text-white'
+                                className='my-2 ml-auto px-4 py-1 bg-cyan-600 rounded-md text-white'
                                 onClick={() => {
-                                    setDisplay(3);
+                                    setDisplay(0);
                                     dispatch(setAddMoreRoom(true))
                                 }}
 
@@ -155,11 +172,11 @@ function Reviewbooking({ setDisplay, rooms }) {
 
                         </div>
 
-                        <table className='mx-4' cellPadding={15}>
+                        <table className='mx-4 w-full' cellPadding={15}>
                             <thead>
-                                <th>Room Name</th>
-                                <th>Room Type</th>
-                                <th>Number Of Rooms</th>
+                                <th className='text-start'>Room Name</th>
+                                <th className='text-start'>Room Type</th>
+                                <th className='text-start'>Number Of Rooms</th>
 
                             </thead>
 
@@ -167,7 +184,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                                 return <tr key={index}>
                                     <td>{room?.room_name}</td>
                                     <td>{room?.room_type}</td>
-                                    <td className=' text-black text-center'>
+                                    <td className=' text-black '>
                                         <select
                                             className=' pl-3 pr-10'
                                         // value={room?.selectedQuantity || 1}
@@ -185,7 +202,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                                             ))}
                                         </select>
                                     </td>
-                                    <td className='text-red-800'>
+                                    <td className='text-red-800 '>
                                         <button
                                             className="text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"
                                             onClick={() => {
@@ -209,23 +226,18 @@ function Reviewbooking({ setDisplay, rooms }) {
                                         </button></td>
                                 </tr>
                             })}
-
-
                         </table>
-
                     </div>
-
 
                     <div className='flex justify-start mt-2 p-4'>
                         <h6
-                            className={`text-white text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
+                            className={` text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
                         >
                             Guest Details
                         </h6>
-                        <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-700 rounded-md text-white'>Add Guests</button>
+                        <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-600 rounded-md text-white'>Add Guests</button>
 
                     </div>
-
 
                     <div className="pt-6">
                         <div className="md:px-4 mx-auto w-full">
@@ -245,7 +257,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                                             }
                                             }
                                             error={error?.guest_name}
-                                            color={Color?.dark}
+                                            color={Color?.light}
                                             req={true}
                                             title={'Guest Name'}
                                             tooltip={true}
@@ -260,7 +272,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                                                 handleChangeInGuest(e, i.index, "guest_email")
                                             }
                                             error={error?.guest_email}
-                                            color={Color?.dark}
+                                            color={Color?.light}
                                             req={true}
                                             title={'Guest email'}
                                             tooltip={true}
@@ -275,7 +287,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                                                 handleChangeInGuest(e, i.index, "guest_phone")
                                             }
                                             error={error?.guest_phone}
-                                            color={Color?.dark}
+                                            color={Color?.light}
                                             req={true}
                                             title={'Guest Phone'}
                                             tooltip={true}
@@ -292,7 +304,7 @@ function Reviewbooking({ setDisplay, rooms }) {
                         {/* buttons  */}
                         <div className='flex flex-wrap w-full gap-2 p-2'>
 
-                            <button className='my-2 px-4 py-1 bg-cyan-600 rounded-md text-white w-full'>Submit</button>
+                            <button className='my-2 px-4 py-3 bg-green-800 rounded-md text-white w-full'>Submit</button>
                         </div>
                     </div>
 
@@ -301,21 +313,21 @@ function Reviewbooking({ setDisplay, rooms }) {
                 </div>
 
                 {/* right side div  */}
-                <div id="price-breakup" className=' bg-gray-700 p-4 text-white h-fit w-full lg:w-4/12 border-white rounded-2xl' >
-                    <div className='border border-white rounded-lg w-full h-1/2 my-2'>
+                <div id="price-breakup" className='border border-gray-300 bg-white p-4 text-black h-fit w-full lg:w-4/12  rounded-2xl' >
+                    <div className='border-b border-gray rounded-lgg w-full h-1/2 my-2'>
                         <h1 className="font-extrabold p-2 text-xl">Price Breakup</h1>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>1 Room x for 1 Night<br /> <div className='text-sm font-extralight px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div>
-                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Coupon Discounts</div> <div className='mx-2 flex justify-end w-full'>200.00 Rupees</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div>
+                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 flex justify-end w-full'>200.00 Rupees</div></div>
+                        <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div>
                     </div>
-                    <div className='border border-white rounded-lg w-full h-1/2 my-2 py-2 px-4'>
-                        <h2 className='h-12 w-fit mx-3 p-2'>Coupon Codes</h2>
-                        <input className='my-1 h-12 w-fit mx-4 p-2' onChange={(e) => console.log(e.target.value)} placeholder='Have Coupon Code' />
+                    <div className='border border-gray rounded-lg w-full h-1/2 my-2 py-2 px-4'>
+                        <h2 className='h-12 w-fit mx-3 p-2 font-semibold'>Coupon Codes</h2>
+                        <input className='my-1 border border-gray h-12 w-fit mx-4 p-2' onChange={(e) => console.log(e.target.value)} placeholder='Have Coupon Code' />
 
                     </div>
-                    <button className='px-4 py-2 bg-cyan-600 text-white rounded-lg w-full'>Pay Now</button>
+                    <button className='px-4 py-2 bg-green-800 text-white rounded-lg w-full'>Pay Now</button>
                 </div>
             </div>
 

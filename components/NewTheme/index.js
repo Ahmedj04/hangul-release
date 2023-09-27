@@ -31,6 +31,7 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
     const [showContactUs, setShowContactUs] = useState(0);
     const [privacyPolicy, setPrivacyPolicy] = useState()
     const [termsConditions, setTermsConditions] = useState()
+
     const [searched, setSearched] = useState(false)
 
     useEffect(() => {
@@ -83,6 +84,7 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
                     setShowContactUs={(e) => setShowContactUs(e)}
                 />
             </div>
+            
             <About
                 allHotelDetails={allHotelDetails}
                 hotelDetailLoader={hotelDetailLoader}
@@ -120,13 +122,9 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
                 hotelDetailLoader={hotelDetailLoader}
             />
 
-            
-                <div id="booking_engine" className={`hidden lg:flex  lg:sticky lg:bottom-0 ${searched === false ? 'z-0' : 'z-50'}`}>
-                    <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} searched={searched} setSearched={(e)=>setSearched(e)}/>
-                </div>
-
-            
-
+            <div id="booking_engine" className={`hidden lg:flex  lg:sticky lg:bottom-0 ${searched === false ? 'z-0' : 'z-50'}`}>
+                <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} searched={searched} setSearched={(e) => setSearched(e)} />
+            </div>
 
             <Footer
                 setShowModalPrivacy={setShowModalPrivacy}
