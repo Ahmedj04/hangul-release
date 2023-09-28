@@ -57,7 +57,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
             redirectToReviewPage(filteredRoomData, roomRates)
           }}
           style={{ fontSize: "14px" }}
-          className='px-3 py-2 rounded-md  bg-green-800 hover:bg-cyan-900 text-white font-bold'
+          className='px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'
         >
           Book Now
         </button>

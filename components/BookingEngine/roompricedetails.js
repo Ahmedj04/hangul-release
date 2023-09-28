@@ -12,7 +12,7 @@ import axios from 'axios';
 
 // redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { setRoomsSelected, addInventoryDetail, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
+import { setRoomsSelected, addInventoryDetail,setAddMoreRoom, clearRoomsSelected} from '../redux/hangulSlice';
 
 function RoomPriceDetails({ setDisplay, setShowModal, setSearched, }) {
 
@@ -63,7 +63,7 @@ function RoomPriceDetails({ setDisplay, setShowModal, setSearched, }) {
 
                     <div className='border-t border-gray-300  md:pt-8 relative pt-4'>
                         <button
-                            className='w-full mt-auto px-1 py-2 bg-green-800 text-white rounded-md'
+                            className='w-full mt-auto px-1 py-2 bg-green-700 hover:bg-green-900 text-white rounded-md'
                             onClick={() => {
                                 setDisplay(2);
                                 dispatch(setRoomsSelected([selectedRoom?.room_id]))

@@ -11,6 +11,7 @@ import axios from 'axios';
 import Carousel from 'better-react-carousel';
 import RoomCalenderView from './RoomCalenderView';
 import RoomPriceDetails from './roompricedetails';
+import RoomDetails2 from './RoomDetails2';
 import Reviewbooking from './reviewbooking';
 
 const color = Color?.dark;
@@ -66,7 +67,8 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowMod
             <Title name={`Engage | Booking Engine`} />
 
             {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
-            {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} /> : undefined}
+            {/* {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} /> : undefined} */}
+            {display === 1 ? <RoomDetails2 setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} /> : undefined}
             {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)}/> : undefined}
 
             {/* {display===3?<payNow/>:undefined}  */}

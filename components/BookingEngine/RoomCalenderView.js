@@ -5,7 +5,7 @@ import { AiOutlineShoppingCart, AiOutlineClose } from "react-icons/ai";
 
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
+import { clearRoomsSelected,setAddMoreRoom } from '../redux/hangulSlice'
 
 
 function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
@@ -386,6 +386,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
 
                    
                     } */}
+                    
 
                 {/* <div className='flex justify-end '>
                     <i className='cursor-pointer' onClick={() => { setDisplay(2) }}> <AiOutlineClose color='red' size={20} /> </i>

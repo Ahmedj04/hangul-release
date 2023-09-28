@@ -10,7 +10,7 @@ import { AiOutlineClose } from "react-icons/ai";
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { removeRoomFromSelected, setAddMoreRoom, clearRoomsSelected } from '../redux/hangulSlice';
+import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 
 function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
@@ -130,7 +130,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
 
     return (
         <div className='min-h-screen'>
-
+            
+            {/* app bar  */}
             <div className='flex py-5 border-b-2  bg-slate-100'>
                 <div className='flex cursor-pointer pl-2 pr-10 my-auto' onClick={() => setDisplay(1)}>
                     <i className='my-auto'><BiArrowBack size={30} /></i>
@@ -155,14 +156,15 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
 
                 {/* left side div  */}
                 <div id="guest-detail-review" className='bg-white border border-gray-300 text-black h-fit w-full lg:w-6/12  rounded-2xl'>
+                    
+                    {/* rooms summary section */}
                     <div className=' border-b-2 border-gray justify-start mt-2 p-4'>
-
                         <div className='flex justify-between'>
                             <h6 className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
                                 Rooms Summary
                             </h6>
                             <button
-                                className='my-2 ml-auto px-4 py-1 bg-cyan-600 rounded-md text-white'
+                                className='my-2 ml-auto px-4 py-1 bg-cyan-700 hover:bg-cyan-900 rounded-md text-white'
                                 onClick={() => {
                                     setDisplay(0);
                                     dispatch(setAddMoreRoom(true))
@@ -229,16 +231,16 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                         </table>
                     </div>
 
+                    {/* guests summary section */}
                     <div className='flex justify-start mt-2 p-4'>
                         <h6
                             className={` text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
                         >
                             Guest Details
                         </h6>
-                        <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-600 rounded-md text-white'>Add Guests</button>
+                        <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-700 hover:bg-cyan-900 rounded-md text-white'>Add Guests</button>
 
                     </div>
-
                     <div className="pt-6">
                         <div className="md:px-4 mx-auto w-full">
 
@@ -301,10 +303,10 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                             {addGst === true ? <AddGstForm /> : <></>}
 
                         </div>
+                        
                         {/* buttons  */}
                         <div className='flex flex-wrap w-full gap-2 p-2'>
-
-                            <button className='my-2 px-4 py-3 bg-green-800 rounded-md text-white w-full'>Submit</button>
+                            <button className='my-2 px-4 py-3 bg-green-700 hover:bg-green-900 rounded-md text-white w-full'>Submit</button>
                         </div>
                     </div>
 
@@ -327,7 +329,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                         <input className='my-1 border border-gray h-12 w-fit mx-4 p-2' onChange={(e) => console.log(e.target.value)} placeholder='Have Coupon Code' />
 
                     </div>
-                    <button className='px-4 py-2 bg-green-800 text-white rounded-lg w-full'>Pay Now</button>
+                    <button className='px-4 py-2 bg-green-700 hover:bg-green-900 text-white rounded-lg w-full'>Pay Now</button>
                 </div>
             </div>
 
