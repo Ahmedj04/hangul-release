@@ -17,14 +17,38 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
   function redirectToRoom(room_data, room_rates) {
     localStorage.setItem('room_data', JSON.stringify(room_data))
-    localStorage.setItem('room_rate', JSON.stringify(room_rates))
+    localStorage.setItem('temp_room_rate', JSON.stringify(room_rates))
 
     setDisplay(1)
   }
 
   function redirectToReviewPage(room_data, room_rates) {
     localStorage.setItem('room_data', JSON.stringify(room_data))
-    localStorage.setItem('room_rate', JSON.stringify(room_rates))
+    // localStorage.setItem('room_rate', JSON.stringify(room_rates))
+
+    // Get the existing 'room_rate' from local storage
+    let existingData = localStorage.getItem('room_rates');
+
+    // Check if there is existing data in local storage
+    if (existingData) {
+      // Parse the existing data from JSON
+      existingData = JSON.parse(existingData);
+
+      // Append the new data to the existing data (assuming 'room_id' is unique)
+      existingData[room_rates.room_id] = room_rates;
+
+    } else {
+      // If there is no existing data, create a new object with the new data
+      existingData = {
+        [room_rates.room_id]: room_rates
+      };
+    }
+
+    console.log("this is existing data", existingData)
+
+    // Store the updated data back in local storage
+    localStorage.setItem('room_rates', JSON.stringify(existingData));
+
     setDisplay(2)
     dispatch(setRoomsSelected([room_rates?.room_id]))
   }

@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 
-function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
+function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
 
     let guestTemplate = {
         "guest_name": "",
@@ -32,6 +32,14 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
 
+    const [totals, setTotals] = useState({
+        totalFinalRate: 0,
+        totalTaxAmount: 0,
+        totalOtherFees: 0,
+    });
+    const { totalFinalRate, totalTaxAmount, totalOtherFees } = totals;
+    const couponDiscount = 200;
+
 
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
     console.log("this is roomSelected array using redux", roomsSelected)
@@ -39,6 +47,13 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
     // Create an array of rooms that match the room_ids in roomsSelected
     const selectedRoomsArray = rooms.filter((room) => roomsSelected.has(room.room_id));
     console.log("Selected rooms:", selectedRoomsArray);
+
+
+
+    // state to save the number of rooms
+    const [selectedQuantities, setSelectedQuantities] = useState(selectedRoomsArray.map(() => 1));
+    console.log("number of rooms selected", selectedQuantities)
+
 
     const inventoryDetail = useSelector(state => state.inventoryDetail)
     // console.log("available inventory using  redux :", inventoryDetail)
@@ -49,10 +64,48 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
 
     useEffect(() => {
         let room = localStorage.getItem("room_data")
-        let room_rates = localStorage.getItem("room_rate")
+        // let room_rates = localStorage.getItem("room_rates")
         setSelectedRoom(JSON.parse(room))
-        setRate(JSON.parse(room_rates))
+        // setRate(JSON.parse(room_rates))
     }, [])
+
+    useEffect(() => {
+        let room_rates = localStorage.getItem("room_rates")
+        setRate(JSON.parse(room_rates))
+
+        // Calculate the total final rate
+        const calculatedTotals = calculateTotalFinalRate(rate);
+
+        // Update the state with the new totals
+        setTotals(calculatedTotals);
+
+    }, [rate])
+
+    console.log("total ye hai", totals)
+
+    // Function to calculate the total final rate from multiple objects
+    function calculateTotalFinalRate(rate) {
+
+        let totalFinalRate = 0;
+        let totalTaxAmount = 0;
+        let totalOtherFees = 0;
+
+        // Loop through the objects and accumulate the total_final_rate values
+        for (const roomKey in rate) {
+            if (rate.hasOwnProperty(roomKey)) {
+                totalFinalRate += rate[roomKey].total_final_rate;
+                totalTaxAmount += rate[roomKey].total_tax_amount;
+                totalOtherFees += rate[roomKey].total_otherfees_amount;
+            }
+
+        }
+        // Return the values as an object
+        return {
+            totalFinalRate: totalFinalRate,
+            totalTaxAmount: totalTaxAmount,
+            totalOtherFees: totalOtherFees
+        };
+    }
 
     // to add guest in ui view 
     const addGuest = () => {
@@ -127,10 +180,46 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
         </div></>)
     }
 
+    // Function to remove data from 'room_data' in local storage based on room_id
+    function removeRoomRateByRoomId(roomIdToRemove) {
+        // Get the existing 'room_data' from local storage
+        let existingData = localStorage.getItem('room_rates');
+
+        // Check if there is existing data in local storage
+        if (existingData) {
+            // Parse the existing data from JSON
+            existingData = JSON.parse(existingData);
+
+            // Check if the room_id to remove exists in the data
+            if (existingData[roomIdToRemove]) {
+                // Remove the entry with the specified room_id
+                delete existingData[roomIdToRemove];
+
+                // Store the updated data back in local storage
+                localStorage.setItem('room_rates', JSON.stringify(existingData));
+
+            } else {
+                // Handle the case where the specified room_id doesn't exist in the data
+                console.log(`Room with room_id ${roomIdToRemove} not found.`);
+            }
+        } else {
+            // Handle the case where there is no existing data in local storage
+            console.log('No existing room data found in local storage.');
+        }
+
+    }
+
+    // Function to delete room_rates from local storage
+    function deleteRoomRates() {
+        // Remove the room_rates key from local storage
+        localStorage.removeItem('room_rates');
+        localStorage.removeItem('temp_room_rate');
+    }
+
 
     return (
         <div className='min-h-screen'>
-            
+
             {/* app bar  */}
             <div className='flex py-5 border-b-2  bg-slate-100'>
                 <div className='flex cursor-pointer pl-2 pr-10 my-auto' onClick={() => setDisplay(1)}>
@@ -147,6 +236,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                             setSearched(false)
                             dispatch(setAddMoreRoom(false))
                             dispatch(clearRoomsSelected())
+                            deleteRoomRates()
                         }}>
                         <AiOutlineClose color='red' size={20} /> </i>
                 </div>
@@ -156,7 +246,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
 
                 {/* left side div  */}
                 <div id="guest-detail-review" className='bg-white border border-gray-300 text-black h-fit w-full lg:w-6/12  rounded-2xl'>
-                    
+
                     {/* rooms summary section */}
                     <div className=' border-b-2 border-gray justify-start mt-2 p-4'>
                         <div className='flex justify-between'>
@@ -189,12 +279,12 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                                     <td className=' text-black '>
                                         <select
                                             className=' pl-3 pr-10'
-                                        // value={room?.selectedQuantity || 1}
-                                        // onChange={(e) => {
-                                        //     const selectedQuantity = parseInt(e.target.value);
-                                        //     // You can handle the selected quantity here as needed
-                                        //     // For example, you can update it in your state or dispatch an action
-                                        // }}
+                                            value={selectedQuantities[index]}
+                                            onChange={(e) => {
+                                                const newSelectedQuantities = [...selectedQuantities];
+                                                newSelectedQuantities[index] = parseInt(e.target.value);
+                                                setSelectedQuantities(newSelectedQuantities);
+                                            }}
                                         >
                                             {/* Generate options for the dropdown based on inventory_available */}
                                             {Array.from({ length: inventory_available || 1 }, (_, index) => index + 1).map((quantity) => (
@@ -209,6 +299,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                                             className="text-white bg-red-500 border-0 py-1 px-4 focus:outline-none hover:bg-red-600 rounded text-md"
                                             onClick={() => {
                                                 dispatch(removeRoomFromSelected(room?.room_id))
+                                                removeRoomRateByRoomId(room?.room_id)  //remove room_rate from local storage
                                             }}
                                         >
                                             <svg
@@ -303,7 +394,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                             {addGst === true ? <AddGstForm /> : <></>}
 
                         </div>
-                        
+
                         {/* buttons  */}
                         <div className='flex flex-wrap w-full gap-2 p-2'>
                             <button className='my-2 px-4 py-3 bg-green-700 hover:bg-green-900 rounded-md text-white w-full'>Submit</button>
@@ -318,11 +409,15 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched}) {
                 <div id="price-breakup" className='border border-gray-300 bg-white p-4 text-black h-fit w-full lg:w-4/12  rounded-2xl' >
                     <div className='border-b border-gray rounded-lgg w-full h-1/2 my-2'>
                         <h1 className="font-extrabold p-2 text-xl">Price Breakup</h1>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div>
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div>
-                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 flex justify-end w-full'>200.00 Rupees</div></div>
-                        <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div>
+                        {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div> */}
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {totalFinalRate}</div></div>
+                        {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div> */}
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {totalTaxAmount}</div></div>
+                        {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div> */}
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {totalOtherFees}</div></div>
+                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 flex justify-end w-full'>{couponDiscount}.00 Rupees</div></div>
+                        {/* <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div> */}
+                        <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {(totalFinalRate + totalTaxAmount + totalOtherFees) - couponDiscount}</div></div>
                     </div>
                     <div className='border border-gray rounded-lg w-full h-1/2 my-2 py-2 px-4'>
                         <h2 className='h-12 w-fit mx-3 p-2 font-semibold'>Coupon Codes</h2>

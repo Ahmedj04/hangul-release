@@ -34,7 +34,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
 
   useEffect(() => {
     let room = localStorage.getItem("room_data")
-    let room_rates = localStorage.getItem("room_rate")
+    let room_rates = localStorage.getItem("temp_room_rate")
     setSelectedRoom(JSON.parse(room))
     setRate(JSON.parse(room_rates))
     getInventoryDetail()
@@ -53,6 +53,41 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
     })
   }
 
+  function redirectToReviewPage(room_rates) {
+
+    // Get the existing 'room_rate' from local storage
+    let existingData = localStorage.getItem('room_rates');
+
+    // Check if there is existing data in local storage
+    if (existingData) {
+      // Parse the existing data from JSON
+      existingData = JSON.parse(existingData);
+
+      // Append the new data to the existing data (assuming 'room_id' is unique)
+      existingData[room_rates.room_id] = room_rates;
+
+    } else {
+      // If there is no existing data, create a new object with the new data
+      existingData = {
+        [room_rates.room_id]: room_rates
+      };
+    }
+
+    console.log("this is existing data", existingData)
+
+    // Store the updated data back in local storage
+    localStorage.setItem('room_rates', JSON.stringify(existingData));
+
+    setDisplay(2);
+  }
+
+  // Function to delete room_rates from local storage
+  function deleteRoomRates() {
+    // Remove the room_rates key from local storage
+    localStorage.removeItem('room_rates');
+    localStorage.removeItem('temp_room_rate');
+  }
+
   function Booknow() {
     return (<>
       <div className='flex justify-end'>
@@ -69,7 +104,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
             <button
               className='w-full mt-auto px-1 py-2 bg-green-700 hover:bg-green-900 text-white rounded-md'
               onClick={() => {
-                setDisplay(2);
+                redirectToReviewPage(rate)
                 dispatch(setRoomsSelected([selectedRoom?.room_id]))
               }}
             >
@@ -84,7 +119,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
   return (
     <section>
 
-    {/* app bar */}
+      {/* app bar */}
       <div className='flex justify-between pt-3'>
         <div className='flex cursor-pointer pr-10' onClick={() => setDisplay(0)}>
           <i className='my-auto pl-1'><BiArrowBack size={30} /></i>
@@ -101,6 +136,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
               setSearched(false)
               dispatch(setAddMoreRoom(false))
               dispatch(clearRoomsSelected())
+              deleteRoomRates()
             }}>
             <AiOutlineClose color='red' size={20} /> </i>
         </div>
@@ -108,8 +144,8 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
 
       {/* room details div */}
       <div className='px-20 flex'>
-      {/* left div */}
-        <div className='w-7/12'>  
+        {/* left div */}
+        <div className='w-7/12'>
           {/* brief property overview div */}
           <div className=' mt-5 mb-12'>
             <h1 className='text-4xl text-black'>{selectedRoom?.room_name}</h1>

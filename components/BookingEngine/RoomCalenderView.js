@@ -5,7 +5,7 @@ import { AiOutlineShoppingCart, AiOutlineClose } from "react-icons/ai";
 
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { clearRoomsSelected,setAddMoreRoom } from '../redux/hangulSlice'
+import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
 
 
 function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
@@ -275,6 +275,13 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
         return lowestRatesArray;
     }
 
+    // Function to delete room_rates from local storage
+    function deleteRoomRates() {
+        // Remove the room_rates key from local storage
+        localStorage.removeItem('room_rates');
+        localStorage.removeItem('temp_room_rate');
+    }
+
     return (
         <div
             id="main-content"
@@ -358,41 +365,6 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                 className={`${color?.light} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}
             >
 
-                {/* {addMoreRooms === true ?
-                    <div className='flex justify-between'>
-                        <h6 
-                        // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
-                        className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
-                        >
-                            Rooms For Booking
-                        </h6>
-                        <div className='my-auto'>
-                            <i className='cursor-pointer' onClick={()=>{setDisplay(2)}}> <AiOutlineShoppingCart color='black' size={20} /> </i>
-
-                        </div>
-                    </div> :
-                    <div className='flex justify-between'>
-                        <h6 
-                        // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
-                        className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
-                        >
-                            Rooms For Booking
-                        </h6>
-                        <div className='my-auto'>
-                            <i className='cursor-pointer' onClick={()=>{setDisplay(2)}}> <AiOutlineShoppingCart color='black' size={20} /> </i>
-
-                        </div>
-                    </div>
-
-                   
-                    } */}
-                    
-
-                {/* <div className='flex justify-end '>
-                    <i className='cursor-pointer' onClick={() => { setDisplay(2) }}> <AiOutlineClose color='red' size={20} /> </i>
-
-                    </div> */}
-
                 <div className='flex justify-between'>
                     <h6
                         // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
@@ -410,6 +382,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                                     setSearched(false)
                                     dispatch(setAddMoreRoom(false))
                                     dispatch(clearRoomsSelected())
+                                    deleteRoomRates()
                                 }}>
                                 <AiOutlineClose color='red' size={20} /> </i>
 

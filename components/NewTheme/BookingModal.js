@@ -1,10 +1,17 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
-import { clearRoomsSelected,setAddMoreRoom } from '../redux/hangulSlice'
+import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
 
 function BookingModal({ title, description, setShowModal, setDisplay, setSearched }) {
 
     const dispatch = useDispatch();
+
+    // Function to delete room_rates from local storage
+    function deleteRoomRates() {
+        // Remove the room_rates key from local storage
+        localStorage.removeItem('room_rates');
+        localStorage.removeItem('temp_room_rate');
+    }
 
     return (
         // <div className="overflow-x-hidden  overflow-y-scroll fixed top-0 left-0  right-0 backdrop-blur-3xl h-screen bg-black/30 md:inset-0 z-50 flex justify-center items-center">
@@ -56,6 +63,7 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
                                 dispatch(setAddMoreRoom(false))
                                 dispatch(clearRoomsSelected())
                                 setSearched(false)
+                                deleteRoomRates()
                             }}
                         >
                             Close
