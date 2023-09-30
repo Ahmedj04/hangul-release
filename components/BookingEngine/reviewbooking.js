@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 
-function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
+function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
     let guestTemplate = {
         "guest_name": "",
@@ -40,19 +40,20 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
     const { totalFinalRate, totalTaxAmount, totalOtherFees } = totals;
     const couponDiscount = 200;
 
+    const startDate = new Date(checkinDate); // Booking start date
+    const endDate = new Date(checkoutDate); // Booking end date
+
+    // Calculate the number of days for the booking
+    const oneDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+    const numberOfNights = Math.round((endDate - startDate) / oneDay); // Add 1 to include the start date
+
 
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
-    console.log("this is roomSelected array using redux", roomsSelected)
+    console.log("this is roomSelected set using redux", roomsSelected)
 
     // Create an array of rooms that match the room_ids in roomsSelected
     const selectedRoomsArray = rooms.filter((room) => roomsSelected.has(room.room_id));
     console.log("Selected rooms:", selectedRoomsArray);
-
-
-
-    // state to save the number of rooms
-    const [selectedQuantities, setSelectedQuantities] = useState(selectedRoomsArray.map(() => 1));
-    console.log("number of rooms selected", selectedQuantities)
 
 
     const inventoryDetail = useSelector(state => state.inventoryDetail)
@@ -62,19 +63,21 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        let room = localStorage.getItem("room_data")
-        // let room_rates = localStorage.getItem("room_rates")
-        setSelectedRoom(JSON.parse(room))
-        // setRate(JSON.parse(room_rates))
-    }, [])
+    // useEffect(() => {
+    //     // let room = localStorage.getItem("room_data")
+    //     // let room_rates = localStorage.getItem("room_rates")
+    //     // setSelectedRoom(JSON.parse(room))
+    //     // setRate(JSON.parse(room_rates))
+    // }, [])
 
     useEffect(() => {
+        let room = localStorage.getItem("room_data")
+        setSelectedRoom(JSON.parse(room))
         let room_rates = localStorage.getItem("room_rates")
         setRate(JSON.parse(room_rates))
 
         // Calculate the total final rate
-        const calculatedTotals = calculateTotalFinalRate(rate);
+        const calculatedTotals = calculateTotalFinalRate(rate, selectedQuantitiesMap);
 
         // Update the state with the new totals
         setTotals(calculatedTotals);
@@ -83,9 +86,75 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
 
     console.log("total ye hai", totals)
 
-    // Function to calculate the total final rate from multiple objects
-    function calculateTotalFinalRate(rate) {
+    // useEffect(() => {
+    //     // Create a new Map with keys from roomsSelected and values as 1
+    //     const newSelectedQuantitiesMap = new Map();
+    //     roomsSelected.forEach(roomId => {
+    //         newSelectedQuantitiesMap.set(roomId, 1);
+    //     });
 
+    //     // Update the selectedQuantitiesMap state
+    //     setSelectedQuantitiesMap(newSelectedQuantitiesMap);
+    // }, [roomsSelected])
+
+    // useEffect(() => {
+    //     console.log("Updated selectedQuantitiesMap:", selectedQuantitiesMap);
+    //     alert("testing 3")
+    // }, [selectedQuantitiesMap]);
+
+
+    // Create a state variable for the Map
+    const [selectedQuantitiesMap, setSelectedQuantitiesMap] = useState(new Map());
+
+    // Function to update the selected quantity for a room
+    const updateSelectedQuantity = (room_id, quantity) => {
+
+        const newMap = new Map(selectedQuantitiesMap);
+        newMap.set(room_id, quantity);
+        console.log("testing", newMap)
+
+
+        setSelectedQuantitiesMap(newMap);
+
+        // console.log("testing2", selectedQuantitiesMap)
+        // alert(selectedQuantitiesMap)
+    };
+    console.log("number of rooms selected", selectedQuantitiesMap)
+
+
+    // // Calculate the total sum of selected quantities
+    // const totalSelectedQuantities = [...selectedQuantitiesMap.values()].reduce((acc, quantity) => acc + quantity, 0);
+
+    // // Now, totalSelectedQuantities contains the total sum of selected quantities
+    // console.log("Total Selected Quantities:", totalSelectedQuantities);
+    // alert("helo")
+
+
+
+    // Function to calculate the total final rate from multiple objects
+    // function calculateTotalFinalRate(rate) {
+
+    //     let totalFinalRate = 0;
+    //     let totalTaxAmount = 0;
+    //     let totalOtherFees = 0;
+
+    //     // Loop through the objects and accumulate the total_final_rate values
+    //     for (const roomKey in rate) {
+    //         if (rate.hasOwnProperty(roomKey)) {
+    //             totalFinalRate += rate[roomKey].total_final_rate;
+    //             totalTaxAmount += rate[roomKey].total_tax_amount;
+    //             totalOtherFees += rate[roomKey].total_otherfees_amount;
+    //         }
+
+    //     }
+    //     // Return the values as an object
+    //     return {
+    //         totalFinalRate: totalFinalRate,
+    //         totalTaxAmount: totalTaxAmount,
+    //         totalOtherFees: totalOtherFees
+    //     };
+    // }
+    function calculateTotalFinalRate(rate, selectedQuantitiesMap) {
         let totalFinalRate = 0;
         let totalTaxAmount = 0;
         let totalOtherFees = 0;
@@ -93,17 +162,21 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
         // Loop through the objects and accumulate the total_final_rate values
         for (const roomKey in rate) {
             if (rate.hasOwnProperty(roomKey)) {
-                totalFinalRate += rate[roomKey].total_final_rate;
-                totalTaxAmount += rate[roomKey].total_tax_amount;
-                totalOtherFees += rate[roomKey].total_otherfees_amount;
-            }
+                const room = rate[roomKey];
+                const selectedQuantity = selectedQuantitiesMap.get(roomKey) || 1; // Default to 1 if no quantity is selected
 
+                // Calculate the updated total final rate, total tax amount, and total other fees
+                totalFinalRate += room.total_final_rate * selectedQuantity;
+                totalTaxAmount += room.total_tax_amount * selectedQuantity;
+                totalOtherFees += room.total_otherfees_amount * selectedQuantity;
+            }
         }
+
         // Return the values as an object
         return {
             totalFinalRate: totalFinalRate,
             totalTaxAmount: totalTaxAmount,
-            totalOtherFees: totalOtherFees
+            totalOtherFees: totalOtherFees,
         };
     }
 
@@ -279,11 +352,16 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
                                     <td className=' text-black '>
                                         <select
                                             className=' pl-3 pr-10'
-                                            value={selectedQuantities[index]}
+                                            // value={selectedQuantities[index]}
+                                            // onChange={(e) => {
+                                            //     const newSelectedQuantities = [...selectedQuantities];
+                                            //     newSelectedQuantities[index] = parseInt(e.target.value);
+                                            //     setSelectedQuantities(newSelectedQuantities);
+                                            // }}
+                                            value={selectedQuantitiesMap?.get(room?.room_id) || "1"} // Use selected quantity from the Map
                                             onChange={(e) => {
-                                                const newSelectedQuantities = [...selectedQuantities];
-                                                newSelectedQuantities[index] = parseInt(e.target.value);
-                                                setSelectedQuantities(newSelectedQuantities);
+                                                const newQuantity = parseInt(e.target.value);
+                                                updateSelectedQuantity(room?.room_id, newQuantity); // Update selected quantity in the Map
                                             }}
                                         >
                                             {/* Generate options for the dropdown based on inventory_available */}
@@ -410,12 +488,12 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched }) {
                     <div className='border-b border-gray rounded-lgg w-full h-1/2 my-2'>
                         <h1 className="font-extrabold p-2 text-xl">Price Breakup</h1>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div> */}
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {totalFinalRate}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room for {numberOfNights === 0 ? '1 Day' : numberOfNights === 1 ? '1 Night' : `${numberOfNights} Nights`}<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalFinalRate}</div></div>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div> */}
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {totalTaxAmount}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalTaxAmount}</div></div>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div> */}
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {totalOtherFees}</div></div>
-                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 flex justify-end w-full'>{couponDiscount}.00 Rupees</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalOtherFees}</div></div>
+                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 my-auto flex justify-end w-full'>{couponDiscount}.00 Rupees</div></div>
                         {/* <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div> */}
                         <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {(totalFinalRate + totalTaxAmount + totalOtherFees) - couponDiscount}</div></div>
                     </div>
