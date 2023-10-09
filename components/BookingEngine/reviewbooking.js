@@ -45,7 +45,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     // Calculate the number of days for the booking
     const oneDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
-    const numberOfNights = Math.round((endDate - startDate) / oneDay); // Add 1 to include the start date
+    const numberOfNights = Math.round((endDate - startDate) / oneDay);
 
 
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
@@ -73,6 +73,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     useEffect(() => {
         let room = localStorage.getItem("room_data")
         setSelectedRoom(JSON.parse(room))
+
         let room_rates = localStorage.getItem("room_rates")
         setRate(JSON.parse(room_rates))
 
@@ -88,19 +89,15 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     // useEffect(() => {
     //     // Create a new Map with keys from roomsSelected and values as 1
-    //     const newSelectedQuantitiesMap = new Map();
+    //     const newSelectedQuantitiesMap = new Map(selectedQuantitiesMap);
     //     roomsSelected.forEach(roomId => {
     //         newSelectedQuantitiesMap.set(roomId, 1);
+
     //     });
 
     //     // Update the selectedQuantitiesMap state
     //     setSelectedQuantitiesMap(newSelectedQuantitiesMap);
     // }, [roomsSelected])
-
-    // useEffect(() => {
-    //     console.log("Updated selectedQuantitiesMap:", selectedQuantitiesMap);
-    //     alert("testing 3")
-    // }, [selectedQuantitiesMap]);
 
 
     // Create a state variable for the Map
@@ -111,13 +108,10 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
         const newMap = new Map(selectedQuantitiesMap);
         newMap.set(room_id, quantity);
+
         console.log("testing", newMap)
 
-
         setSelectedQuantitiesMap(newMap);
-
-        // console.log("testing2", selectedQuantitiesMap)
-        // alert(selectedQuantitiesMap)
     };
     console.log("number of rooms selected", selectedQuantitiesMap)
 
@@ -132,28 +126,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
 
     // Function to calculate the total final rate from multiple objects
-    // function calculateTotalFinalRate(rate) {
-
-    //     let totalFinalRate = 0;
-    //     let totalTaxAmount = 0;
-    //     let totalOtherFees = 0;
-
-    //     // Loop through the objects and accumulate the total_final_rate values
-    //     for (const roomKey in rate) {
-    //         if (rate.hasOwnProperty(roomKey)) {
-    //             totalFinalRate += rate[roomKey].total_final_rate;
-    //             totalTaxAmount += rate[roomKey].total_tax_amount;
-    //             totalOtherFees += rate[roomKey].total_otherfees_amount;
-    //         }
-
-    //     }
-    //     // Return the values as an object
-    //     return {
-    //         totalFinalRate: totalFinalRate,
-    //         totalTaxAmount: totalTaxAmount,
-    //         totalOtherFees: totalOtherFees
-    //     };
-    // }
     function calculateTotalFinalRate(rate, selectedQuantitiesMap) {
         let totalFinalRate = 0;
         let totalTaxAmount = 0;
@@ -352,12 +324,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                     <td className=' text-black '>
                                         <select
                                             className=' pl-3 pr-10'
-                                            // value={selectedQuantities[index]}
-                                            // onChange={(e) => {
-                                            //     const newSelectedQuantities = [...selectedQuantities];
-                                            //     newSelectedQuantities[index] = parseInt(e.target.value);
-                                            //     setSelectedQuantities(newSelectedQuantities);
-                                            // }}
                                             value={selectedQuantitiesMap?.get(room?.room_id) || "1"} // Use selected quantity from the Map
                                             onChange={(e) => {
                                                 const newQuantity = parseInt(e.target.value);
