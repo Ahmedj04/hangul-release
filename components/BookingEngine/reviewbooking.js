@@ -65,13 +65,16 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     // let room = localStorage.getItem("room_data")
-    //     // let room_rates = localStorage.getItem("room_rates")
-    //     // setSelectedRoom(JSON.parse(room))
-    //     // setRate(JSON.parse(room_rates))
-    // }, [])
+    // Create a state variable for the Map
+    const [selectedQuantitiesMap, setSelectedQuantitiesMap] = useState(new Map());
 
+    // Calculate the total sum of selected rooms
+    const totalSelectedQuantities = [...selectedQuantitiesMap.values()].reduce((acc, quantity) => acc + quantity, 0);
+
+    // Now, totalSelectedQuantities contains the total sum of selected quantities
+    console.log("Total Selected Quantities:", totalSelectedQuantities);
+
+    // for getting the data from the local storage and setting the data
     useEffect(() => {
         let room = localStorage.getItem("room_data")
         setSelectedRoom(JSON.parse(room))
@@ -89,6 +92,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     console.log("total ye hai", totals)
 
+    // to check for selected rooms whenever the page renders
     useEffect(() => {
         // Create a new Map with keys from roomsSelected and values as 1
         const newSelectedQuantitiesMap = new Map(selectedQuantitiesMap);
@@ -99,28 +103,14 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         setSelectedQuantitiesMap(newSelectedQuantitiesMap);
     }, [])
 
-
-    // Create a state variable for the Map
-    const [selectedQuantitiesMap, setSelectedQuantitiesMap] = useState(new Map());
-
     // Function to update the selected quantity for a room
     const updateSelectedQuantity = (room_id, quantity) => {
-
         const newMap = new Map(selectedQuantitiesMap);
         newMap.set(room_id, quantity);
-
-        console.log("testing", newMap)
-
         setSelectedQuantitiesMap(newMap);
     };
+
     console.log("number of rooms selected", selectedQuantitiesMap)
-
-
-    // // Calculate the total sum of selected rooms
-    const totalSelectedQuantities = [...selectedQuantitiesMap.values()].reduce((acc, quantity) => acc + quantity, 0);
-
-    // Now, totalSelectedQuantities contains the total sum of selected quantities
-    console.log("Total Selected Quantities:", totalSelectedQuantities);
 
     // Function to calculate the total final rate from multiple objects
     function calculateTotalFinalRate(rate, selectedQuantitiesMap) {
