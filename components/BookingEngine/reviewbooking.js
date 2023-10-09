@@ -18,7 +18,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     let guestTemplate = {
         "guest_name": "",
         "guest_email": "",
-        "phone_number": ""
+        "phone_number": "",
+        "guest_age": ""
+
     }
     const [error, setError] = useState({})
     const [guest, setGuest] = useState([{ ...guestTemplate, index: 0 }]);
@@ -87,17 +89,15 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     console.log("total ye hai", totals)
 
-    // useEffect(() => {
-    //     // Create a new Map with keys from roomsSelected and values as 1
-    //     const newSelectedQuantitiesMap = new Map(selectedQuantitiesMap);
-    //     roomsSelected.forEach(roomId => {
-    //         newSelectedQuantitiesMap.set(roomId, 1);
-
-    //     });
-
-    //     // Update the selectedQuantitiesMap state
-    //     setSelectedQuantitiesMap(newSelectedQuantitiesMap);
-    // }, [roomsSelected])
+    useEffect(() => {
+        // Create a new Map with keys from roomsSelected and values as 1
+        const newSelectedQuantitiesMap = new Map(selectedQuantitiesMap);
+        roomsSelected.forEach(roomId => {
+            newSelectedQuantitiesMap.set(roomId, 1);
+        });
+        // Update the selectedQuantitiesMap state
+        setSelectedQuantitiesMap(newSelectedQuantitiesMap);
+    }, [])
 
 
     // Create a state variable for the Map
@@ -116,14 +116,11 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     console.log("number of rooms selected", selectedQuantitiesMap)
 
 
-    // // Calculate the total sum of selected quantities
-    // const totalSelectedQuantities = [...selectedQuantitiesMap.values()].reduce((acc, quantity) => acc + quantity, 0);
+    // // Calculate the total sum of selected rooms
+    const totalSelectedQuantities = [...selectedQuantitiesMap.values()].reduce((acc, quantity) => acc + quantity, 0);
 
-    // // Now, totalSelectedQuantities contains the total sum of selected quantities
-    // console.log("Total Selected Quantities:", totalSelectedQuantities);
-    // alert("helo")
-
-
+    // Now, totalSelectedQuantities contains the total sum of selected quantities
+    console.log("Total Selected Quantities:", totalSelectedQuantities);
 
     // Function to calculate the total final rate from multiple objects
     function calculateTotalFinalRate(rate, selectedQuantitiesMap) {
@@ -421,12 +418,25 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) =>
-                                                handleChangeInGuest(e, i.index, "guest_phone")
+                                                handleChangeInGuest(e, i.index, "phone_number")
                                             }
                                             error={error?.guest_phone}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Phone'}
+                                            tooltip={true}
+                                        />
+                                        <InputText
+                                            label={'Guest Age'}
+                                            visible={1}
+                                            defaultValue={``}
+                                            onChangeAction={(e) =>
+                                                handleChangeInGuest(e, i.index, "guest_age")
+                                            }
+                                            error={error?.guest_age}
+                                            color={Color?.light}
+                                            req={true}
+                                            title={'Guest Age'}
                                             tooltip={true}
                                         />
                                     </div>
@@ -454,7 +464,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                     <div className='border-b border-gray rounded-lgg w-full h-1/2 my-2'>
                         <h1 className="font-extrabold p-2 text-xl">Price Breakup</h1>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room x for 1 Night<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_final_rate}</div></div> */}
-                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>1 Room for {numberOfNights === 0 ? '1 Day' : numberOfNights === 1 ? '1 Night' : `${numberOfNights} Nights`}<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalFinalRate}</div></div>
+                        <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>{totalSelectedQuantities} Room for {numberOfNights === 0 ? '1 Day' : numberOfNights === 1 ? '1 Night' : `${numberOfNights} Nights`}<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalFinalRate}</div></div>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_tax_amount}</div></div> */}
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalTaxAmount}</div></div>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div> */}
