@@ -14,6 +14,9 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
 
         // Remove the room_data key from local storage
         localStorage.removeItem('room_data');
+
+        // Remove the room reservation_ids key from local storage
+        localStorage.removeItem('reservation_ids');
     }
 
     return (
