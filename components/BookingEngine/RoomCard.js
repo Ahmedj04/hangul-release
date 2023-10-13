@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux';
-import { setRoomsSelected } from '../redux/hangulSlice';
+import { setRoomsSelected, setReserveRoom } from '../redux/hangulSlice';
+import axios from 'axios';
+import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 
 function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinDate, checkoutDate }) {
 
@@ -24,7 +26,6 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
   function redirectToReviewPage(room_data, room_rates) {
     localStorage.setItem('room_data', JSON.stringify(room_data))
-    // localStorage.setItem('room_rate', JSON.stringify(room_rates))
 
     // Get the existing 'room_rate' from local storage
     let existingData = localStorage.getItem('room_rates');
@@ -54,6 +55,50 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
   }
 
 
+
+  function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
+    // Get the existing 'reservation_id's' from local storage
+    let existingData = localStorage.getItem('reservation_ids');
+
+    // Check if there is existing data in local storage
+    if (existingData) {
+      // Parse the existing data from JSON
+      existingData = JSON.parse(existingData);
+
+      // Update the reservation ID for the specific room ID
+      existingData[roomId] = reservation_id;
+
+    } else {
+      // If there is no existing data, create a new object with the new data
+      existingData = {
+        // [reservation_id]: 'reservation_id'
+        [roomId]: reservation_id
+      };
+    }
+
+    console.log("this is reservation data", existingData)
+
+    // Store the updated data back in local storage
+    localStorage.setItem('reservation_ids', JSON.stringify(existingData));
+  }
+
+  function reserveRoom(roomdata, roomId) {
+    let url = "/api/reserve_rooms";
+    axios.post(url, roomdata).then((response) => {
+      alert(response.data.message)
+      // alert(response.data.reservation_id)
+      toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
+      dispatch(setReserveRoom(false))
+
+    }).catch((err) => {
+      console.log(err)
+    })
+
+  }
+
+  console.log(roomRates)
+
+
   return (
     <div className=' w-100 h-1/4 text-black border border-gray-500 bg-white rounded-2xl p-4 m-4 flex flex-wrap justify-center items-center lg:flex-row md:flex-row flex-col'>
       <div className='lg:w-1/6 md:w-1/6'>
@@ -79,6 +124,8 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
         <button
           onClick={() => {
             redirectToReviewPage(filteredRoomData, roomRates)
+            reserveRoom({ "reserve_rooms": [{ "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) }] }, roomRates?.room_id)
+            dispatch(setReserveRoom(true))
           }}
           style={{ fontSize: "14px" }}
           className='px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'

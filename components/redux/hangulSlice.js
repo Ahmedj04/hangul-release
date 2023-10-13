@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     roomsSelected: [],
     addMoreRoom: false,
-    inventoryDetail: {}
+    inventoryDetail: {},
+    reserveRoom: false,
 }
 
 
@@ -34,6 +35,9 @@ export const hangulSlice = createSlice({
         },
         addInventoryDetail: (state, action) => {
             state.inventoryDetail = (action.payload)
+        },
+        setReserveRoom: (state, action) => {
+            state.reserveRoom = (action.payload)
         }
     }
 })
@@ -43,7 +47,8 @@ export const {
     removeRoomFromSelected,
     clearRoomsSelected,
     setAddMoreRoom,
-    addInventoryDetail
+    addInventoryDetail,
+    setReserveRoom
 } = hangulSlice.actions  //to be used in component files
 
 export default hangulSlice.reducer //this will be used to put in store

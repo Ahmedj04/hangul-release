@@ -13,6 +13,8 @@ import { useDispatch } from 'react-redux';
 import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 
+import axios from 'axios';
+
 function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
     let guestTemplate = {
@@ -33,6 +35,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
+
+    const [disabled, setDisabled] = useState(false)
 
     const [totals, setTotals] = useState({
         totalFinalRate: 0,
@@ -73,6 +77,11 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     // Now, totalSelectedQuantities contains the total sum of selected quantities
     console.log("Total Selected Quantities:", totalSelectedQuantities);
+
+    // check the boolean value of reserveRoom state and based on this changed the css of payNow button
+    const reserveRoom = useSelector(state => state.reserveRoom);
+
+
 
     // for getting the data from the local storage and setting the data
     useEffect(() => {
@@ -249,7 +258,67 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
         // Remove the room_data key from local storage
         localStorage.removeItem('room_data');
+
+        // Remove the room reservation_ids key from local storage
+        localStorage.removeItem('reservation_ids');
+
     }
+
+    // function to delete the reservation id of the room from the local storage
+    function removeReservationIdFromLocalStorage(roomId) {
+        // Get the existing 'reservation_ids' from local storage
+        let existingData = localStorage.getItem('reservation_ids');
+
+        if (existingData) {
+            // Parse the existing data from JSON
+            existingData = JSON.parse(existingData);
+
+            // Remove the reservation ID for the specific room ID
+            delete existingData[roomId];
+
+            // Store the updated data back in local storage
+            localStorage.setItem('reservation_ids', JSON.stringify(existingData));
+
+            console.log("Reservation ID for room", roomId, "has been removed.");
+        } else {
+            console.log("No reservation IDs found in local storage.");
+        }
+    }
+
+    function updateReserveRoom(roomdata) {
+        let url = "/api/reserve_rooms";
+        axios.put(url, roomdata).then((response) => {
+            setDisabled(false)  // this state is used to manage the css of paynow button
+            console.log(response)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
+    function fetchReservationid(roomId) {
+        // Get the existing 'reservation_ids' from local storage
+        let data = localStorage.getItem("reservation_ids");
+
+        // Check if there is existing data in local storage
+        if (data) {
+            // Parse the existing data from JSON
+            let existingData = JSON.parse(data);
+
+            // Access the reservation ID for the specific room ID
+            let reservationId = existingData[roomId];
+
+            // Check if the room ID exists in the local storage
+            if (reservationId) {
+                // console.log("Reservation ID for room " + roomId + ": " + reservationId);
+                return reservationId;
+            } else {
+                console.log("No reservation ID found for room " + roomId);
+            }
+        } else {
+            alert("No reservation IDs found in local storage.");
+        }
+    }
+
 
 
     return (
@@ -327,6 +396,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             onChange={(e) => {
                                                 const newQuantity = parseInt(e.target.value);
                                                 updateSelectedQuantity(room?.room_id, newQuantity); // Update selected quantity in the Map
+                                                updateReserveRoom({ "reserve_rooms": [{ "reservation_id": fetchReservationid(room?.room_id), "room_count": newQuantity }] })
+                                                setDisabled(true)
                                             }}
                                         >
                                             {/* Generate options for the dropdown based on inventory_available */}
@@ -343,6 +414,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             onClick={() => {
                                                 dispatch(removeRoomFromSelected(room?.room_id))
                                                 removeRoomRateByRoomId(room?.room_id)  //remove room_rate from local storage
+                                                removeReservationIdFromLocalStorage(room?.room_id)
                                             }}
                                         >
                                             <svg
@@ -480,7 +552,10 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                         <input className='my-1 border border-gray h-12 w-fit mx-4 p-2' onChange={(e) => console.log(e.target.value)} placeholder='Have Coupon Code' />
 
                     </div>
-                    <button className='px-4 py-2 bg-green-700 hover:bg-green-900 text-white rounded-lg w-full'>Pay Now</button>
+                    <button
+                        disabled={reserveRoom || disabled}
+                        onClick={() => alert('helo')}
+                        className={`px-4 py-2 ${reserveRoom === true ? "bg-gray-500" : disabled === true ? 'bg-gray-500' : 'bg-green-700 hover:bg-green-900'}   text-white rounded-lg w-full`}>Pay Now</button>
                 </div>
             </div>
 
