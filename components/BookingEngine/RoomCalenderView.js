@@ -7,6 +7,9 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
 
@@ -275,11 +278,15 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
         return lowestRatesArray;
     }
 
-    // Function to delete room_rates from local storage
-    function deleteRoomRates() {
+    // Function to delete room_rates and room_data from local storage
+    function deleteRoomDetails() {
         // Remove the room_rates key from local storage
         localStorage.removeItem('room_rates');
         localStorage.removeItem('temp_room_rate');
+
+        // Remove the room_data key from local storage
+        localStorage.removeItem('room_data');
+
     }
 
     return (
@@ -374,7 +381,15 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                     </h6>
                     <div className='my-auto'>
                         <div className='flex gap-10'>
-                            <i className='cursor-pointer' onClick={() => { setDisplay(2) }}> <AiOutlineShoppingCart color='black' size={20} /> </i>
+                            <i className='cursor-pointer'
+                                onClick={() => {
+                                    if (roomsSelected.length === 0) {
+                                        toast.error("APP: Cart is Empty.");
+                                    } else {
+                                        setDisplay(2)
+                                    }
+                                }}
+                            > <AiOutlineShoppingCart color='black' size={20} /> </i>
                             <i className='cursor-pointer'
                                 onClick={() => {
                                     setDisplay(0)
@@ -382,10 +397,9 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                                     setSearched(false)
                                     dispatch(setAddMoreRoom(false))
                                     dispatch(clearRoomsSelected())
-                                    deleteRoomRates()
+                                    deleteRoomDetails()
                                 }}>
                                 <AiOutlineClose color='red' size={20} /> </i>
-
                         </div>
 
                     </div>

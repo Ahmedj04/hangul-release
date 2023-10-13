@@ -241,11 +241,14 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     }
 
-    // Function to delete room_rates from local storage
-    function deleteRoomRates() {
+    // Function to delete room_rates and room_data from local storage
+    function deleteRoomDetails() {
         // Remove the room_rates key from local storage
         localStorage.removeItem('room_rates');
         localStorage.removeItem('temp_room_rate');
+
+        // Remove the room_data key from local storage
+        localStorage.removeItem('room_data');
     }
 
 
@@ -254,7 +257,16 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
             {/* app bar  */}
             <div className='flex py-5 border-b-2  bg-slate-100'>
-                <div className='flex cursor-pointer pl-2 pr-10 my-auto' onClick={() => setDisplay(1)}>
+                <div className='flex cursor-pointer pl-2 pr-10 my-auto'
+                    onClick={() => {
+                        if (localStorage.getItem("temp_room_rate") === null) {
+                            setDisplay(0)
+
+                        } else {
+                            setDisplay(1)
+
+                        }
+                    }}>
                     <i className='my-auto'><BiArrowBack size={30} /></i>
                     <span className='my-auto pl-1 font-medium'>Back</span>
                 </div>
@@ -268,7 +280,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                             setSearched(false)
                             dispatch(setAddMoreRoom(false))
                             dispatch(clearRoomsSelected())
-                            deleteRoomRates()
+                            deleteRoomDetails()
                         }}>
                         <AiOutlineClose color='red' size={20} /> </i>
                 </div>

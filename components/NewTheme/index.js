@@ -12,6 +12,9 @@ import BookingForm from './Booking';
 import Color from '../colors/Color';
 import Contactus from '../utils/Contactus';
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone, email }) {
 
@@ -84,7 +87,7 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
                     setShowContactUs={(e) => setShowContactUs(e)}
                 />
             </div>
-            
+
             <About
                 allHotelDetails={allHotelDetails}
                 hotelDetailLoader={hotelDetailLoader}
@@ -125,6 +128,19 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
             <div id="booking_engine" className={`hidden lg:flex  lg:sticky lg:bottom-0 ${searched === false ? 'z-0' : 'z-50'}`}>
                 <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} searched={searched} setSearched={(e) => setSearched(e)} />
             </div>
+
+            {/* Toast Container */}
+            <ToastContainer
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
 
             <Footer
                 setShowModalPrivacy={setShowModalPrivacy}

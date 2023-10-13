@@ -81,11 +81,14 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
     setDisplay(2);
   }
 
-  // Function to delete room_rates from local storage
-  function deleteRoomRates() {
+  // Function to delete room_rates and room_data from local storage
+  function deleteRoomDetails() {
     // Remove the room_rates key from local storage
     localStorage.removeItem('room_rates');
     localStorage.removeItem('temp_room_rate');
+
+    // Remove the room_data key from local storage
+    localStorage.removeItem('room_data');
   }
 
   function Booknow() {
@@ -136,7 +139,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
               setSearched(false)
               dispatch(setAddMoreRoom(false))
               dispatch(clearRoomsSelected())
-              deleteRoomRates()
+              deleteRoomDetails()
             }}>
             <AiOutlineClose color='red' size={20} /> </i>
         </div>

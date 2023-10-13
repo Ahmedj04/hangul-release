@@ -6,11 +6,14 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
 
     const dispatch = useDispatch();
 
-    // Function to delete room_rates from local storage
-    function deleteRoomRates() {
+    // Function to delete room_rates and room_data from local storage
+    function deleteRoomDetails() {
         // Remove the room_rates key from local storage
         localStorage.removeItem('room_rates');
         localStorage.removeItem('temp_room_rate');
+
+        // Remove the room_data key from local storage
+        localStorage.removeItem('room_data');
     }
 
     return (
@@ -63,7 +66,7 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
                                 dispatch(setAddMoreRoom(false))
                                 dispatch(clearRoomsSelected())
                                 setSearched(false)
-                                deleteRoomRates()
+                                deleteRoomDetails()
                             }}
                         >
                             Close
