@@ -13,10 +13,12 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import SquareFootIcon from '@mui/icons-material/SquareFoot';
 
 import axios from 'axios';
+import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
+
 
 // redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { setRoomsSelected, addInventoryDetail, setAddMoreRoom, clearRoomsSelected } from '../redux/hangulSlice';
+import { setRoomsSelected, addInventoryDetail, setAddMoreRoom, clearRoomsSelected, setReserveRoom } from '../redux/hangulSlice';
 
 function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
 
@@ -94,6 +96,46 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
     localStorage.removeItem('reservation_ids');
   }
 
+
+  function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
+    // Get the existing 'reservation_id's' from local storage
+    let existingData = localStorage.getItem('reservation_ids');
+
+    // Check if there is existing data in local storage
+    if (existingData) {
+      // Parse the existing data from JSON
+      existingData = JSON.parse(existingData);
+
+      // Update the reservation ID for the specific room ID
+      existingData[roomId] = reservation_id;
+
+    } else {
+      // If there is no existing data, create a new object with the new data
+      existingData = {
+        // [reservation_id]: 'reservation_id'
+        [roomId]: reservation_id
+      };
+    }
+
+    console.log("this is reservation data", existingData)
+
+    // Store the updated data back in local storage
+    localStorage.setItem('reservation_ids', JSON.stringify(existingData));
+  }
+
+  function reserveRoom(roomdata, roomId) {
+    let url = "/api/reserve_rooms";
+    axios.post(url, roomdata).then((response) => {
+      alert(response.data.message)
+      toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
+      dispatch(setReserveRoom(false))
+
+    }).catch((err) => {
+      console.log(err)
+    })
+
+  }
+
   function Booknow() {
     return (<>
       <div className='flex justify-end'>
@@ -112,6 +154,8 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
               onClick={() => {
                 redirectToReviewPage(rate)
                 dispatch(setRoomsSelected([selectedRoom?.room_id]))
+                reserveRoom({ "reserve_rooms": [{ "room_id": selectedRoom?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) }] }, selectedRoom?.room_id)
+                dispatch(setReserveRoom(true))
               }}
             >
               Book Now

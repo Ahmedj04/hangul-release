@@ -34,10 +34,10 @@ export const hangulSlice = createSlice({
             state.addMoreRoom = action.payload
         },
         addInventoryDetail: (state, action) => {
-            state.inventoryDetail = (action.payload)
+            state.inventoryDetail = action.payload
         },
         setReserveRoom: (state, action) => {
-            state.reserveRoom = (action.payload)
+            state.reserveRoom = action.payload
         }
     }
 })
