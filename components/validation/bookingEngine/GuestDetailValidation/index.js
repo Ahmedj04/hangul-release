@@ -9,10 +9,11 @@ export default function validateGuestDetail(data) {
     }
     // validating if email typed is valid or not
     if (data?.guest_email !== "" && data?.guest_email !== undefined) {
-        if ((!data?.guest_email?.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/))) {
+        if ((!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(data?.guest_email))) {
             flag = true
             error.guest_email = "APP: The email is invalid."
         }
+
     }
 
     // validating if name is empty or not 
@@ -43,15 +44,20 @@ export default function validateGuestDetail(data) {
     if (data?.guest_age === "" || data?.guest_age === undefined) {
         error.guest_age = "APP: Age field cannot be empty"
         flag = true
-    }
-    // validating if age is within 150
-    if (data?.guest_age !== " " || data?.guest_age !== undefined) {
+    } else {
+        // validating if age is within 150
+        // if (data?.guest_age !== "" || data?.guest_age !== undefined) {
+        if ((!data?.guest_age?.match(/^([1-9]+[0-9]*)$/))) {
+            error.guest_age = "APP: Age entered is invalid"
+            flag = true
+        }
         if (data?.guest_age > 150) {
             error.guest_age = "APP: Age cannot be greater then 150"
             flag = true
         }
-
+        // }
     }
+
 
     return flag === false ? true : error;
 }

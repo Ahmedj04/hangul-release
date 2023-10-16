@@ -13,7 +13,8 @@ import { useDispatch } from 'react-redux';
 import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
 // validation
-import Validation from '../validation/bookingEngine/GuestDetailValidation'
+import GuestDetailValidation from '../validation/bookingEngine/GuestDetailValidation'
+import GstValidation from '../validation/bookingEngine/GstDetailValidation'
 
 
 import axios from 'axios';
@@ -27,11 +28,13 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         "guest_age": ""
 
     }
-    const [error, setError] = useState({})
+    const [guestDetailerror, setGuestDetailError] = useState({})
+    const [gstDetailerror, setGstDetailError] = useState({})
     const [guest, setGuest] = useState([{ ...guestTemplate, index: 0 }]);
     // const [guest, setGuest] = useState([guestTemplate]?.map((i, id) => { return { ...i, index: id } }))
     const [addGst, setAddGst] = useState(false);
-    const [gstDetails, setGstDetails] = useState({ "registation_number": "", "company_name": "", "company_address": "" })
+    // const [gstDetails, setGstDetails] = useState({ "registation_number": "", "company_name": "", "company_address": "" })
+    const [gstDetails, setGstDetails] = useState({})
     const [addNewUser, setAddNewUser] = useState(0)
     const [guestIndex, setGuestIndex] = useState(0)
 
@@ -88,15 +91,31 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const [guestDetail, setGuestDetail] = useState({})
 
     function SubmitGuestDetails() {
-        let result = Validation(guestDetail);
-        if (result === true) {
-            // network call
+        let isGuestDetailsValid = GuestDetailValidation(guestDetail);
+
+        // isGuestDetailsValid can be either true or an error object
+        if (isGuestDetailsValid !== true) {
+            // Guest details are invalid, you can handle the error here
+            setGuestDetailError(isGuestDetailsValid);
         }
         else {
-            setError(result)
+            setGuestDetailError({})
+            //network call
+        }
+
+        if (addGst) {
+            let isGstDetailsValid = GstValidation(gstDetails);
+            // Step 2: Validate GST if GST is true
+            if (isGstDetailsValid !== true) {
+                // GST details are invalid, you can handle the error here
+                setGstDetailError(isGstDetailsValid);
+
+            } else {
+                setGstDetailError({})
+                //network call
+            }
         }
     }
-
 
 
     // for getting the data from the local storage and setting the data
@@ -187,57 +206,57 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     };
 
     // ui of add gst form 
-    function AddGstForm() {
-        return (<>
-            <div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
-                {/* GST Registration Number  */}
-                <InputText
-                    label={'GST Registration Number'}
-                    visible={1}
-                    defaultValue={``}
-                    onChangeAction={(e) =>
-                        setGstDetails({ ...gstDetails, registation_number: e.target.value })
-                    }
-                    error={error?.guest_phone}
-                    color={Color?.light}
-                    req={true}
-                    title={'registration number'}
-                    tooltip={true}
-                />
+    // function AddGstForm() {
+    //     return (<>
+    //         <div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
+    //             {/* GST Registration Number  */}
+    //             <InputText
+    //                 label={'GST Registration Number'}
+    //                 visible={1}
+    //                 defaultValue={``}
+    //                 onChangeAction={(e) =>
+    //                     setGstDetails({ ...gstDetails, gst_registration_no: e.target.value })
+    //                 }
+    //                 error={error?.gst_registration_no}
+    //                 color={Color?.light}
+    //                 req={true}
+    //                 title={'registration number'}
+    //                 tooltip={true}
+    //             />
 
-                {/* Registered company name  */}
-                <InputText
-                    label={'Registered Company Name'}
-                    visible={1}
-                    defaultValue={``}
-                    onChangeAction={(e) =>
-                        setGstDetails({ ...gstDetails, company_name: e.target.value })
-                    }
-                    error={error?.guest_phone}
-                    color={Color?.light}
-                    req={true}
-                    title={'name of company'}
-                    tooltip={true}
-                />
-                {/* Registered company address  */}
-                <InputText
-                    label={'Registered Company Address'}
-                    visible={1}
-                    defaultValue={``}
-                    onChangeAction={(e) =>
-                        setGstDetails({ ...gstDetails, company_address: e.target.value })
-                    }
-                    error={error?.guest_phone}
-                    color={Color?.light}
-                    req={true}
-                    title={'Address of company'}
-                    tooltip={true}
-                />
+    //             {/* Registered company name  */}
+    //             <InputText
+    //                 label={'Registered Company Name'}
+    //                 visible={1}
+    //                 defaultValue={``}
+    //                 onChangeAction={(e) =>
+    //                     setGstDetails({ ...gstDetails, gst_company_name: e.target.value })
+    //                 }
+    //                 error={error?.gst_company_name}
+    //                 color={Color?.light}
+    //                 req={true}
+    //                 title={'name of company'}
+    //                 tooltip={true}
+    //             />
+    //             {/* Registered company address  */}
+    //             <InputText
+    //                 label={'Registered Company Address'}
+    //                 visible={1}
+    //                 defaultValue={``}
+    //                 onChangeAction={(e) =>
+    //                     setGstDetails({ ...gstDetails, gst_company_address: e.target.value })
+    //                 }
+    //                 error={error?.gst_company_address}
+    //                 color={Color?.light}
+    //                 req={true}
+    //                 title={'Address of company'}
+    //                 tooltip={true}
+    //             />
 
 
-            </div>
-        </>)
-    }
+    //         </div>
+    //     </>)
+    // }
 
     // Function to remove data from 'room_data' in local storage based on room_id
     function removeRoomRateByRoomId(roomIdToRemove) {
@@ -487,7 +506,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                                             }
                                             }
-                                            error={error?.guest_name}
+                                            error={guestDetailerror?.guest_name}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Name'}
@@ -508,7 +527,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             }
 
                                             }
-                                            error={error?.guest_email}
+                                            error={guestDetailerror?.guest_email}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest email'}
@@ -527,7 +546,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                                     guest_phone: e.target.value,
                                                 })
                                             }}
-                                            error={error?.guest_phone}
+                                            error={guestDetailerror?.guest_phone}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Phone'}
@@ -544,7 +563,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                                     guest_age: e.target.value,
                                                 })
                                             }}
-                                            error={error?.guest_age}
+                                            error={guestDetailerror?.guest_age}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Age'}
@@ -556,7 +575,56 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                             ))}
                             <input type="checkbox" name="add_gst" onClick={() => setAddGst(!addGst)} />
                             <span className='font-semibold text-base mx-2'>Add GST Details (optional)</span>
-                            {addGst === true ? <AddGstForm /> : <></>}
+                            {addGst === true ?
+                                <div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
+                                    {/* GST Registration Number  */}
+                                    <InputText
+                                        label={'GST Registration Number'}
+                                        visible={1}
+                                        defaultValue={``}
+                                        onChangeAction={(e) =>
+                                            setGstDetails({ ...gstDetails, gst_registration_no: e.target.value })
+                                        }
+                                        error={gstDetailerror?.gst_registration_no}
+                                        color={Color?.light}
+                                        req={true}
+                                        title={'registration number'}
+                                        tooltip={true}
+                                    />
+
+                                    {/* Registered company name  */}
+                                    <InputText
+                                        label={'Registered Company Name'}
+                                        visible={1}
+                                        defaultValue={``}
+                                        onChangeAction={(e) =>
+                                            setGstDetails({ ...gstDetails, gst_company_name: e.target.value })
+                                        }
+                                        error={gstDetailerror?.gst_company_name}
+                                        color={Color?.light}
+                                        req={true}
+                                        title={'name of company'}
+                                        tooltip={true}
+                                    />
+                                    {/* Registered company address  */}
+                                    <InputText
+                                        label={'Registered Company Address'}
+                                        visible={1}
+                                        defaultValue={``}
+                                        onChangeAction={(e) =>
+                                            setGstDetails({ ...gstDetails, gst_company_address: e.target.value })
+                                        }
+                                        error={gstDetailerror?.gst_company_address}
+                                        color={Color?.light}
+                                        req={true}
+                                        title={'Address of company'}
+                                        tooltip={true}
+                                    />
+
+
+                                </div>
+
+                                : <></>}
 
                         </div>
 
