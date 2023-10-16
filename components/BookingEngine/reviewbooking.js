@@ -12,6 +12,9 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
 
+// validation
+import Validation from '../validation/bookingEngine/GuestDetailValidation'
+
 
 import axios from 'axios';
 
@@ -44,7 +47,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         totalOtherFees: 0,
     });
     const { totalFinalRate, totalTaxAmount, totalOtherFees } = totals;
-    const couponDiscount = 200;
+    const couponDiscount = 0;
 
     const startDate = new Date(checkinDate); // Booking start date
     const endDate = new Date(checkoutDate); // Booking end date
@@ -80,6 +83,19 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     // check the boolean value of reserveRoom state and based on this changed the css of payNow button
     const reserveRoom = useSelector(state => state.reserveRoom);
+
+
+    const [guestDetail, setGuestDetail] = useState({})
+
+    function SubmitGuestDetails() {
+        let result = Validation(guestDetail);
+        if (result === true) {
+            // network call
+        }
+        else {
+            setError(result)
+        }
+    }
 
 
 
@@ -172,53 +188,55 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     // ui of add gst form 
     function AddGstForm() {
-        return (<><div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
-            {/* GST Registration Number  */}
-            <InputText
-                label={'GST Registration Number'}
-                visible={1}
-                defaultValue={``}
-                onChangeAction={(e) =>
-                    setGstDetails({ ...gstDetails, registation_number: e.target.value })
-                }
-                error={error?.guest_phone}
-                color={Color?.light}
-                req={true}
-                title={'registration number'}
-                tooltip={true}
-            />
+        return (<>
+            <div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
+                {/* GST Registration Number  */}
+                <InputText
+                    label={'GST Registration Number'}
+                    visible={1}
+                    defaultValue={``}
+                    onChangeAction={(e) =>
+                        setGstDetails({ ...gstDetails, registation_number: e.target.value })
+                    }
+                    error={error?.guest_phone}
+                    color={Color?.light}
+                    req={true}
+                    title={'registration number'}
+                    tooltip={true}
+                />
 
-            {/* Registered company name  */}
-            <InputText
-                label={'Registered Company Name'}
-                visible={1}
-                defaultValue={``}
-                onChangeAction={(e) =>
-                    setGstDetails({ ...gstDetails, company_name: e.target.value })
-                }
-                error={error?.guest_phone}
-                color={Color?.light}
-                req={true}
-                title={'name of company'}
-                tooltip={true}
-            />
-            {/* Registered company address  */}
-            <InputText
-                label={'Registered Company Address'}
-                visible={1}
-                defaultValue={``}
-                onChangeAction={(e) =>
-                    setGstDetails({ ...gstDetails, company_address: e.target.value })
-                }
-                error={error?.guest_phone}
-                color={Color?.light}
-                req={true}
-                title={'Address of company'}
-                tooltip={true}
-            />
+                {/* Registered company name  */}
+                <InputText
+                    label={'Registered Company Name'}
+                    visible={1}
+                    defaultValue={``}
+                    onChangeAction={(e) =>
+                        setGstDetails({ ...gstDetails, company_name: e.target.value })
+                    }
+                    error={error?.guest_phone}
+                    color={Color?.light}
+                    req={true}
+                    title={'name of company'}
+                    tooltip={true}
+                />
+                {/* Registered company address  */}
+                <InputText
+                    label={'Registered Company Address'}
+                    visible={1}
+                    defaultValue={``}
+                    onChangeAction={(e) =>
+                        setGstDetails({ ...gstDetails, company_address: e.target.value })
+                    }
+                    error={error?.guest_phone}
+                    color={Color?.light}
+                    req={true}
+                    title={'Address of company'}
+                    tooltip={true}
+                />
 
 
-        </div></>)
+            </div>
+        </>)
     }
 
     // Function to remove data from 'room_data' in local storage based on room_id
@@ -447,7 +465,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                         <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-700 hover:bg-cyan-900 rounded-md text-white'>Add Guests</button>
 
                     </div>
-                    <div className="pt-6">
+                    <div className="pt-6 pb-4">
                         <div className="md:px-4 mx-auto w-full">
 
                             {guest.map((i, loopIndex) => (
@@ -462,6 +480,11 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             defaultValue={``}
                                             onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "guest_name")
+                                                setGuestDetail({
+                                                    ...guestDetail,
+                                                    guest_name: e.target.value,
+                                                })
+
                                             }
                                             }
                                             error={error?.guest_name}
@@ -476,8 +499,14 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             label={'Guest Email'}
                                             visible={1}
                                             defaultValue={``}
-                                            onChangeAction={(e) =>
+                                            onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "guest_email")
+                                                setGuestDetail({
+                                                    ...guestDetail,
+                                                    guest_email: e.target.value,
+                                                })
+                                            }
+
                                             }
                                             error={error?.guest_email}
                                             color={Color?.light}
@@ -491,9 +520,13 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             label={'Guest Phone'}
                                             visible={1}
                                             defaultValue={``}
-                                            onChangeAction={(e) =>
+                                            onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "phone_number")
-                                            }
+                                                setGuestDetail({
+                                                    ...guestDetail,
+                                                    guest_phone: e.target.value,
+                                                })
+                                            }}
                                             error={error?.guest_phone}
                                             color={Color?.light}
                                             req={true}
@@ -504,9 +537,13 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             label={'Guest Age'}
                                             visible={1}
                                             defaultValue={``}
-                                            onChangeAction={(e) =>
+                                            onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "guest_age")
-                                            }
+                                                setGuestDetail({
+                                                    ...guestDetail,
+                                                    guest_age: e.target.value,
+                                                })
+                                            }}
                                             error={error?.guest_age}
                                             color={Color?.light}
                                             req={true}
@@ -524,9 +561,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                         </div>
 
                         {/* buttons  */}
-                        <div className='flex flex-wrap w-full gap-2 p-2'>
+                        {/* <div className='flex flex-wrap w-full gap-2 p-2'>
                             <button className='my-2 px-4 py-3 bg-green-700 hover:bg-green-900 rounded-md text-white w-full'>Submit</button>
-                        </div>
+                        </div> */}
                     </div>
 
 
@@ -543,7 +580,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalTaxAmount}</div></div>
                         {/* <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 flex justify-end w-full'>₹ {rate?.total_otherfees_amount}</div></div> */}
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalOtherFees}</div></div>
-                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 my-auto flex justify-end w-full'>{couponDiscount}.00 Rupees</div></div>
+                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {couponDiscount}.00</div></div>
                         {/* <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</div></div> */}
                         <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {(totalFinalRate + totalTaxAmount + totalOtherFees) - couponDiscount}</div></div>
                     </div>
@@ -554,7 +591,10 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                     </div>
                     <button
                         disabled={reserveRoom || disabled}
-                        onClick={() => alert('helo')}
+                        onClick={() => {
+                            // alert('helo')
+                            SubmitGuestDetails()
+                        }}
                         className={`px-4 py-2 ${reserveRoom === true ? "bg-gray-500" : disabled === true ? 'bg-gray-500' : 'bg-green-700 hover:bg-green-900'}   text-white rounded-lg w-full`}>Pay Now</button>
                 </div>
             </div>

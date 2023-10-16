@@ -85,7 +85,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
   function reserveRoom(roomdata, roomId) {
     let url = "/api/reserve_rooms";
     axios.post(url, roomdata).then((response) => {
-      alert(response.data.message)
+      // alert(response.data.message)
       // alert(response.data.reservation_id)
       toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
       dispatch(setReserveRoom(false))

@@ -15,6 +15,8 @@ import SquareFootIcon from '@mui/icons-material/SquareFoot';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // redux imports
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,6 +32,8 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
   const dispatch = useDispatch();
 
   const inventoryDetail = useSelector(state => state.inventoryDetail)
+  const roomsSelected = useSelector(state => state.roomsSelected)
+
   // console.log("this is inventory details", inventoryDetail)
 
   let inventory_available = inventoryDetail?.[0]?.inventory_available;
@@ -126,7 +130,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
   function reserveRoom(roomdata, roomId) {
     let url = "/api/reserve_rooms";
     axios.post(url, roomdata).then((response) => {
-      alert(response.data.message)
+      // alert(response.data.message)
       toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
       dispatch(setReserveRoom(false))
 
@@ -171,14 +175,21 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
 
       {/* app bar */}
       <div className='flex justify-between pt-3'>
-        <div className='flex cursor-pointer pr-10' onClick={() => setDisplay(0)}>
+        <div className='flex cursor-pointer pr-10' onClick={() => { setDisplay(0) }}>
           <i className='my-auto pl-1'><BiArrowBack size={30} /></i>
           <span className='my-auto pl-1 font-medium'>Back</span>
         </div>
 
         <div className='my-auto mr-10 text-base italic flex gap-10'>
           <p className='my-auto'>Available Inventory: {inventory_available}</p>
-          <i className='cursor-pointer' onClick={() => { setDisplay(2) }}> <AiOutlineShoppingCart color='black' size={20} /> </i>
+          <i className='cursor-pointer'
+            onClick={() => {
+              if (roomsSelected.length === 0) {
+                toast.error("APP: Cart is Empty.");
+              } else {
+                setDisplay(2)
+              }
+            }}> <AiOutlineShoppingCart color='black' size={20} /> </i>
           <i className='cursor-pointer my-auto'
             onClick={() => {
               setDisplay(0)
