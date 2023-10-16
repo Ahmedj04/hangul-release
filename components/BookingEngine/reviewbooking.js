@@ -205,58 +205,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         setGuest(updatedGuests); //list of guest not removed
     };
 
-    // ui of add gst form 
-    // function AddGstForm() {
-    //     return (<>
-    //         <div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
-    //             {/* GST Registration Number  */}
-    //             <InputText
-    //                 label={'GST Registration Number'}
-    //                 visible={1}
-    //                 defaultValue={``}
-    //                 onChangeAction={(e) =>
-    //                     setGstDetails({ ...gstDetails, gst_registration_no: e.target.value })
-    //                 }
-    //                 error={error?.gst_registration_no}
-    //                 color={Color?.light}
-    //                 req={true}
-    //                 title={'registration number'}
-    //                 tooltip={true}
-    //             />
-
-    //             {/* Registered company name  */}
-    //             <InputText
-    //                 label={'Registered Company Name'}
-    //                 visible={1}
-    //                 defaultValue={``}
-    //                 onChangeAction={(e) =>
-    //                     setGstDetails({ ...gstDetails, gst_company_name: e.target.value })
-    //                 }
-    //                 error={error?.gst_company_name}
-    //                 color={Color?.light}
-    //                 req={true}
-    //                 title={'name of company'}
-    //                 tooltip={true}
-    //             />
-    //             {/* Registered company address  */}
-    //             <InputText
-    //                 label={'Registered Company Address'}
-    //                 visible={1}
-    //                 defaultValue={``}
-    //                 onChangeAction={(e) =>
-    //                     setGstDetails({ ...gstDetails, gst_company_address: e.target.value })
-    //                 }
-    //                 error={error?.gst_company_address}
-    //                 color={Color?.light}
-    //                 req={true}
-    //                 title={'Address of company'}
-    //                 tooltip={true}
-    //             />
-
-
-    //         </div>
-    //     </>)
-    // }
 
     // Function to remove data from 'room_data' in local storage based on room_id
     function removeRoomRateByRoomId(roomIdToRemove) {
