@@ -6,7 +6,6 @@ import { RxCross2 } from "react-icons/rx";
 import { BiArrowBack } from "react-icons/bi";
 import { AiOutlineClose } from "react-icons/ai";
 
-
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -15,6 +14,9 @@ import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../r
 // validation
 import GuestDetailValidation from '../validation/bookingEngine/GuestDetailValidation'
 import GstValidation from '../validation/bookingEngine/GstDetailValidation'
+
+// timestamp
+import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 
 
 import axios from 'axios';
@@ -37,11 +39,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const [gstDetails, setGstDetails] = useState({})
     const [addNewUser, setAddNewUser] = useState(0)
     const [guestIndex, setGuestIndex] = useState(0)
-
-
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
-
     const [disabled, setDisabled] = useState(false)
 
     const [totals, setTotals] = useState({
@@ -101,6 +100,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         else {
             setGuestDetailError({})
             //network call
+            bookingRoom()
+            setDisplay(3)
+
         }
 
         if (addGst) {
@@ -115,6 +117,30 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                 //network call
             }
         }
+    }
+
+    function bookingRoom() {
+        let url = "/api/room_bookings";
+        let data = {
+            "bookings": [
+                {
+                    "booking_date_from": checkinDate,
+                    "booking_date_to": checkoutDate,
+                    "total_rooms_booked": 1,
+                    is_cancelled: false,
+                    booking_time: formatDateToCustomFormat(new Date())
+                }
+            ]
+        }
+        axios.post(url, data).then((response) => {
+            alert(response.data.message)
+            // alert(response.data.reservation_id)
+
+
+        }).catch((err) => {
+            console.log(err)
+        })
+
     }
 
 
@@ -204,7 +230,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         const updatedGuests = guest.filter((i, index) => i.index !== indexToRemove);
         setGuest(updatedGuests); //list of guest not removed
     };
-
 
     // Function to remove data from 'room_data' in local storage based on room_id
     function removeRoomRateByRoomId(roomIdToRemove) {
@@ -608,8 +633,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                     <button
                         disabled={reserveRoom || disabled}
                         onClick={() => {
-                            // alert('helo')
                             SubmitGuestDetails()
+                            // setDisplay(3)
                         }}
                         className={`px-4 py-2 ${reserveRoom === true ? "bg-gray-500" : disabled === true ? 'bg-gray-500' : 'bg-green-700 hover:bg-green-900'}   text-white rounded-lg w-full`}>Pay Now</button>
                 </div>

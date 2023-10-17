@@ -13,6 +13,7 @@ import RoomCalenderView from './RoomCalenderView';
 import RoomPriceDetails from './roompricedetails';
 import RoomDetails2 from './RoomDetails2';
 import Reviewbooking from './reviewbooking';
+import BookingSuccess from './BookingSuccess';
 
 const color = Color?.dark;
 let currentLogged;
@@ -71,7 +72,7 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowMod
             {display === 1 ? <RoomDetails2 setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} /> : undefined}
             {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
 
-            {/* {display===3?<payNow/>:undefined}  */}
+            {display === 3 ? <BookingSuccess setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
 
         </>
     )
