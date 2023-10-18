@@ -26,7 +26,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     let guestTemplate = {
         "guest_name": "",
         "guest_email": "",
-        "phone_number": "",
+        "guest_phone_number": "",
         "guest_age": ""
 
     }
@@ -86,62 +86,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     // check the boolean value of reserveRoom state and based on this changed the css of payNow button
     const reserveRoom = useSelector(state => state.reserveRoom);
 
-
-    const [guestDetail, setGuestDetail] = useState({})
-
-    function SubmitGuestDetails() {
-        let isGuestDetailsValid = GuestDetailValidation(guestDetail);
-
-        // isGuestDetailsValid can be either true or an error object
-        if (isGuestDetailsValid !== true) {
-            // Guest details are invalid, you can handle the error here
-            setGuestDetailError(isGuestDetailsValid);
-        }
-        else {
-            setGuestDetailError({})
-            //network call
-            bookingRoom()
-            setDisplay(3)
-
-        }
-
-        if (addGst) {
-            let isGstDetailsValid = GstValidation(gstDetails);
-            // Step 2: Validate GST if GST is true
-            if (isGstDetailsValid !== true) {
-                // GST details are invalid, you can handle the error here
-                setGstDetailError(isGstDetailsValid);
-
-            } else {
-                setGstDetailError({})
-                //network call
-            }
-        }
-    }
-
-    function bookingRoom() {
-        let url = "/api/room_bookings";
-        let data = {
-            "bookings": [
-                {
-                    "booking_date_from": checkinDate,
-                    "booking_date_to": checkoutDate,
-                    "total_rooms_booked": 1,
-                    is_cancelled: false,
-                    booking_time: formatDateToCustomFormat(new Date())
-                }
-            ]
-        }
-        axios.post(url, data).then((response) => {
-            alert(response.data.message)
-            // alert(response.data.reservation_id)
-
-
-        }).catch((err) => {
-            console.log(err)
-        })
-
-    }
 
 
     // for getting the data from the local storage and setting the data
@@ -330,6 +274,160 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     }
 
 
+    // these below functions will work when the pay now button is clicked
+    function SubmitGuestDetails() {
+        // let isGuestDetailsValid = GuestDetailValidation(guestDetail);
+        let isGuestDetailsValid = GuestDetailValidation(guest);
+
+        // isGuestDetailsValid can be either true or an error object
+        if (isGuestDetailsValid !== true) {
+            // Guest details are invalid, you can handle the error here
+            setGuestDetailError(isGuestDetailsValid);
+        }
+        else {
+            setGuestDetailError({})
+            //network call
+            bookingRoom()
+            setDisplay(3)
+
+        }
+
+        if (addGst) {
+            let isGstDetailsValid = GstValidation(gstDetails);
+            // Step 2: Validate GST if GST is true
+            if (isGstDetailsValid !== true) {
+                // GST details are invalid, you can handle the error here
+                setGstDetailError(isGstDetailsValid);
+
+            } else {
+                setGstDetailError({})
+                //network call
+            }
+        }
+    }
+
+    function bookingRoom() {
+
+        let roomBookingData = {
+            "bookings": [
+                {
+                    "booking_date_from": checkinDate,
+                    "booking_date_to": checkoutDate,
+                    "total_rooms_booked": 1,
+                    "is_cancelled": false,
+                    "booking_time": formatDateToCustomFormat(new Date())
+                }
+            ]
+        }
+        let guestsForThisBooking = {
+            "guest_booking_link": guest.map((guestdetail) => {
+                return ({
+                    "guest_name": guestdetail.guest_name,
+                    "guest_email": guestdetail.guest_email,
+                    "guest_age": guestdetail.guest_age,
+                    "guest_phone_number": guestdetail.guest_phone_number,
+                    "booking_id": ""
+                })
+            }
+            )
+        }
+        let invoiceForThisBooking = {
+            "booking_invoice_link": [
+                {
+                    "base_price": totalFinalRate,
+                    "taxes": totalTaxAmount,
+                    "other_fees": totalOtherFees,
+                    "coupon_discount": couponDiscount,
+                    "total_price": totalFinalRate + totalOtherFees + totalTaxAmount - couponDiscount,
+                    // "transaction_refrence_no": "tid123",
+                    "invoice_time": formatDateToCustomFormat(new Date()),
+                    "booking_id": ""
+                }
+            ]
+
+        }
+
+        //multiple api call's will be performed in this bookRoom function so that is why it is divided in multiple functions.
+        bookRoom(roomBookingData, guestsForThisBooking, invoiceForThisBooking)
+
+        // axios.post(roomBookingUrl, roomBookingData).then((responseFromRoomBookingUrl) => {
+        //     // alert(responseFromRoomBookingUrl.data.message)
+
+        //     // Update the booking_id property
+        //     guestsForThisBooking.guest_booking_link = guestsForThisBooking.guest_booking_link.map(item => {
+        //         item.booking_id = responseFromRoomBookingUrl.data.booking_id;
+        //         return item;
+        //     });
+        //     invoiceForThisBooking.booking_invoice_link = invoiceForThisBooking.booking_invoice_link.map(item => {
+        //         item.booking_id = responseFromRoomBookingUrl.data.booking_id;
+        //         return item;
+        //     });
+
+        //     // Now guestsForThisBooking is updated and you can use it for another post request if needed
+        //     axios.post(bookingLinkUrl, guestsForThisBooking).then((responseFromBookingLinkUrl) => {
+        //         // handle the second post response
+        //         // alert(responseFromBookingLinkUrl.data.message)
+
+        //         axios.post(invoiceLinkUrl, invoiceForThisBooking).then((responseFromInvoiceLinkUrl) => {
+        //             // handle the third post response
+        //             // alert(responseFromInvoiceLinkUrl.data.message)
+
+
+        //         }).catch((err) => {
+        //             console.log(err)
+        //         })
+
+        //     }).catch((err) => {
+        //         console.log(err)
+        //     });
+
+        // }).catch((err) => {
+        //     console.log(err)
+        // })
+    }
+
+    function bookRoom(roomBookingData, guestsForThisBooking, invoiceForThisBooking) {
+        let roomBookingUrl = "/api/room_bookings";
+        axios.post(roomBookingUrl, roomBookingData).then((responseFromRoomBookingUrl) => {
+            // Update the booking_id property
+            guestsForThisBooking.guest_booking_link = guestsForThisBooking.guest_booking_link.map(item => {
+                item.booking_id = responseFromRoomBookingUrl.data.booking_id;
+                return item;
+            });
+            invoiceForThisBooking.booking_invoice_link = invoiceForThisBooking.booking_invoice_link.map(item => {
+                item.booking_id = responseFromRoomBookingUrl.data.booking_id;
+                return item;
+            });
+
+            // Now guestsForThisBooking is updated and you can use it for another post request if needed
+            linkBookingWithGuest(guestsForThisBooking, invoiceForThisBooking)
+
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
+    function linkBookingWithGuest(guestsForThisBooking, invoiceForThisBooking) {
+        let bookingLinkUrl = "/api/guest_booking_link";
+        axios.post(bookingLinkUrl, guestsForThisBooking).then((responseFromBookingLinkUrl) => {
+            // handle the second post response
+            linkInvoiceWithBooking(invoiceLinkUrl, invoiceForThisBooking)
+
+        }).catch((err) => {
+            console.log(err)
+        });
+    }
+
+    function linkInvoiceWithBooking(invoiceForThisBooking) {
+        let invoiceLinkUrl = "/api/booking_invoice_link";
+        axios.post(invoiceLinkUrl, invoiceForThisBooking).then((responseFromInvoiceLinkUrl) => {
+            // handle the third post response
+
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
 
     return (
         <div className='min-h-screen'>
@@ -472,14 +570,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             defaultValue={``}
                                             onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "guest_name")
-                                                setGuestDetail({
-                                                    ...guestDetail,
-                                                    guest_name: e.target.value,
-                                                })
-
                                             }
                                             }
-                                            error={guestDetailerror?.guest_name}
+                                            error={guestDetailerror[loopIndex]?.guest_name}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Name'}
@@ -493,14 +586,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             defaultValue={``}
                                             onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "guest_email")
-                                                setGuestDetail({
-                                                    ...guestDetail,
-                                                    guest_email: e.target.value,
-                                                })
                                             }
-
                                             }
-                                            error={guestDetailerror?.guest_email}
+                                            error={guestDetailerror[loopIndex]?.guest_email}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest email'}
@@ -513,30 +601,22 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) => {
-                                                handleChangeInGuest(e, i.index, "phone_number")
-                                                setGuestDetail({
-                                                    ...guestDetail,
-                                                    guest_phone: e.target.value,
-                                                })
+                                                handleChangeInGuest(e, i.index, "guest_phone_number")
                                             }}
-                                            error={guestDetailerror?.guest_phone}
+                                            error={guestDetailerror[loopIndex]?.guest_phone_number}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Phone'}
                                             tooltip={true}
                                         />
                                         <InputText
-                                            label={'Guest Age'}
+                                            label={'Guest Age [in years] '}
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) => {
                                                 handleChangeInGuest(e, i.index, "guest_age")
-                                                setGuestDetail({
-                                                    ...guestDetail,
-                                                    guest_age: e.target.value,
-                                                })
                                             }}
-                                            error={guestDetailerror?.guest_age}
+                                            error={guestDetailerror[loopIndex]?.guest_age}
                                             color={Color?.light}
                                             req={true}
                                             title={'Guest Age'}
