@@ -411,7 +411,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         let bookingLinkUrl = "/api/guest_booking_link";
         axios.post(bookingLinkUrl, guestsForThisBooking).then((responseFromBookingLinkUrl) => {
             // handle the second post response
-            linkInvoiceWithBooking(invoiceLinkUrl, invoiceForThisBooking)
+            linkInvoiceWithBooking(invoiceForThisBooking)
 
         }).catch((err) => {
             console.log(err)
