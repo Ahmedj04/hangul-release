@@ -9,7 +9,7 @@ import { AiOutlineClose } from "react-icons/ai";
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
+import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails } from '../redux/hangulSlice';
 
 // validation
 import GuestDetailValidation from '../validation/bookingEngine/GuestDetailValidation'
@@ -286,6 +286,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         }
         else {
             setGuestDetailError({})
+            dispatch(setGuestDetails(guest))
             //network call
             bookingRoom()
             setDisplay(3)

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
+import { clearRoomsSelected, setAddMoreRoom, clearGuestDetails } from '../redux/hangulSlice'
 
 function BookingModal({ title, description, setShowModal, setDisplay, setSearched }) {
 
@@ -68,6 +68,7 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
                                 setDisplay(0)
                                 dispatch(setAddMoreRoom(false))
                                 dispatch(clearRoomsSelected())
+                                dispatch(clearGuestDetails())
                                 setSearched(false)
                                 deleteRoomDetails()
                             }}

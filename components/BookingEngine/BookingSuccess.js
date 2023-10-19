@@ -3,11 +3,14 @@ import React from 'react'
 import { AiOutlineClose } from "react-icons/ai";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice';
+import { clearRoomsSelected, setAddMoreRoom, clearGuestDetails } from '../redux/hangulSlice';
 
 function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinDate, checkoutDate }) {
 
     let dispatch = useDispatch();
+
+    const guestdetails = useSelector(state => state.guestDetails)
+    console.log("guest details stored in redux state", guestdetails)
 
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
     console.log("this is roomSelected set using redux", roomsSelected)
@@ -55,9 +58,12 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
                         <div>
                             <h2 className='text-5xl text-cyan-700'> BOOKING SUCCESSFULL</h2>
                             <p className='pt-8 text-lg'>The hotel booking has been successfully completed for :</p>
-                            <div className='pt-5'>
+                            <div className='pt-5 capitalize font-medium text-lg'>
+                                {guestdetails.length > 1 ? <p>{guestdetails[0]?.guest_name + " +" + (guestdetails.length - 1)}</p> : <p>{guestdetails[0]?.guest_name}</p>}
+                            </div>
+                            <div className='pt-2'>
                                 <p>{selectedRoomsArray?.map((room, index) => {
-                                    return <p key={index} className='text-lg font-medium'>{room?.room_name}</p>
+                                    return <p key={index} className=' font-medium text-slate-400'>{room?.room_name}</p>
                                 })}</p>
                             </div>
                             <div className='flex pt-5'>
@@ -80,6 +86,7 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
                                         setSearched(false)
                                         dispatch(setAddMoreRoom(false))
                                         dispatch(clearRoomsSelected())
+                                        dispatch(clearGuestDetails())
                                         deleteRoomDetails()
                                     }}
                                     className='bg-blue-600 py-3 px-2 text-white rounded-xl'> Go to Home</button>

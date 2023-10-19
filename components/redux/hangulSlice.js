@@ -5,6 +5,7 @@ const initialState = {
     addMoreRoom: false,
     inventoryDetail: {},
     reserveRoom: false,
+    guestDetails: {},
 }
 
 
@@ -38,7 +39,14 @@ export const hangulSlice = createSlice({
         },
         setReserveRoom: (state, action) => {
             state.reserveRoom = action.payload
+        },
+        setGuestDetails: (state, action) => {
+            state.guestDetails = action.payload
+        },
+        clearGuestDetails: (state, action) => {
+            state.guestDetails = {};
         }
+
     }
 })
 
@@ -48,7 +56,9 @@ export const {
     clearRoomsSelected,
     setAddMoreRoom,
     addInventoryDetail,
-    setReserveRoom
+    setReserveRoom,
+    setGuestDetails,
+    clearGuestDetails
 } = hangulSlice.actions  //to be used in component files
 
 export default hangulSlice.reducer //this will be used to put in store
