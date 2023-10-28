@@ -167,7 +167,7 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
                 />
             </div>
 
-        </div >
+        </div>
     )
 }
 

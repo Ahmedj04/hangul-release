@@ -68,9 +68,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
 
     const inventoryDetail = useSelector(state => state.inventoryDetail)
-    // console.log("available inventory using  redux :", inventoryDetail)
 
-    let inventory_available = inventoryDetail?.[0]?.inventory_available;
+    //  stored the lowest inventory available in the inventory_available variable.
+    const inventory_available = Math.min(...inventoryDetail.map((item) => item.available_inventory))
 
     const dispatch = useDispatch();
 

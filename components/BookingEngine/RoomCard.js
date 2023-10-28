@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux';
-import { setRoomsSelected, setReserveRoom } from '../redux/hangulSlice';
+import { setRoomsSelected, setReserveRoom, addInventoryDetail } from '../redux/hangulSlice';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 
@@ -55,6 +55,18 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
   }
 
 
+  // get inventory details for the rooms between the checkin and checkout date
+  function getInventoryDetail() {
+    let roomID = roomRates?.room_id;
+    let url = `/api/inv_data/${roomID}/${checkinDate}/${checkoutDate}`;
+    axios.get(url).then((response) => {
+      // setting value to inventory detail using redux reducer function
+      dispatch(addInventoryDetail(response.data))
+      console.log("inventory data loaded successfully")
+    }).catch((err) => {
+      console.log("error in loading inventory data", err)
+    })
+  }
 
   function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
     // Get the existing 'reservation_id's' from local storage
@@ -126,6 +138,8 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
             redirectToReviewPage(filteredRoomData, roomRates)
             reserveRoom({ "reserve_rooms": [{ "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) }] }, roomRates?.room_id)
             dispatch(setReserveRoom(true))
+            getInventoryDetail()
+
           }}
           style={{ fontSize: "14px" }}
           className='px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'
@@ -134,7 +148,10 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
         </button>
 
         <button
-          onClick={() => redirectToRoom(filteredRoomData, roomRates)}
+          onClick={() => {
+            redirectToRoom(filteredRoomData, roomRates)
+            getInventoryDetail()
+          }}
           style={{ fontSize: "11px" }}
           className='mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white'
         >

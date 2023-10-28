@@ -22,7 +22,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { setRoomsSelected, addInventoryDetail, setAddMoreRoom, clearRoomsSelected, setReserveRoom } from '../redux/hangulSlice';
 
-function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
+function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
   const [selectedRoom, setSelectedRoom] = useState({})
   const [rate, setRate] = useState({})
@@ -34,30 +34,13 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
   const inventoryDetail = useSelector(state => state.inventoryDetail)
   const roomsSelected = useSelector(state => state.roomsSelected)
 
-  // console.log("this is inventory details", inventoryDetail)
-
-  let inventory_available = inventoryDetail?.[0]?.inventory_available;
-
   useEffect(() => {
     let room = localStorage.getItem("room_data")
     let room_rates = localStorage.getItem("temp_room_rate")
     setSelectedRoom(JSON.parse(room))
     setRate(JSON.parse(room_rates))
-    getInventoryDetail()
+
   }, []);
-
-  function getInventoryDetail() {
-
-    let roomID = selectedRoom?.room_id;
-    let url = `/api/inv_data/:${roomID}`;
-    axios.get(url).then((response) => {
-      // setting value to inventory detail using redux reducer function
-      dispatch(addInventoryDetail(response.data.inventory))
-      console.log("inventory data loaded successfully")
-    }).catch((err) => {
-      console.log("error in loading inventory data", err)
-    })
-  }
 
   function redirectToReviewPage(room_rates) {
 
@@ -128,6 +111,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
   }
 
   function reserveRoom(roomdata, roomId) {
+    // alert(JSON.stringify(roomdata))
     let url = "/api/reserve_rooms";
     axios.post(url, roomdata).then((response) => {
       // alert(response.data.message)
@@ -139,6 +123,62 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
     })
 
   }
+
+  function generateBookingObjects(start_date, end_date, otherData) {
+    const bookingObjects = [];
+    let currentDate = new Date(start_date); // Start with the start_date
+
+    while (currentDate <= new Date(end_date)) {
+      const bookingDate = new Date(currentDate);
+      const bookingDateString = bookingDate.toISOString().split('T')[0]; // Format the date as YYYY-MM-DD
+
+      const bookingObject = {
+        booking_date: bookingDateString,
+        ...otherData
+      };
+
+      bookingObjects.push(bookingObject);
+
+      // Move to the next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return bookingObjects;
+  }
+
+  // // Example usage:
+  // const start_date = '2023-10-15';
+  // const end_date = '2023-10-20';
+  // const price = 100;
+
+  // const generatedBookings = generateBookingObjects(start_date, end_date, price);
+
+  // console.log(generatedBookings);
+
+
+  function toCheckInventoryAvailable() {
+    let roomAvailable = true;
+
+    for (const room of inventoryDetail) {
+      if (room.available_inventory === 0) {
+        roomAvailable = false;
+        break;
+      }
+    }
+
+    if (roomAvailable) {
+      redirectToReviewPage(rate)
+      dispatch(setRoomsSelected([selectedRoom?.room_id]))
+
+      reserveRoom({
+        "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": selectedRoom?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
+      }, selectedRoom?.room_id)
+      dispatch(setReserveRoom(true))
+    } else {
+      toast.error(`APP: Inventory for ${selectedRoom.room_name} not available for the selected days`);
+    }
+  }
+
 
   function Booknow() {
     return (<>
@@ -156,10 +196,8 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
             <button
               className='w-full mt-auto px-1 py-2 bg-green-700 hover:bg-green-900 text-white rounded-md'
               onClick={() => {
-                redirectToReviewPage(rate)
-                dispatch(setRoomsSelected([selectedRoom?.room_id]))
-                reserveRoom({ "reserve_rooms": [{ "room_id": selectedRoom?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) }] }, selectedRoom?.room_id)
-                dispatch(setReserveRoom(true))
+                // this method will check the inventory available for the selected room and if the inventory is available then the rest of the methods will be called inside it.
+                toCheckInventoryAvailable()
               }}
             >
               Book Now
@@ -181,7 +219,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, }) {
         </div>
 
         <div className='my-auto mr-10 text-base italic flex gap-10'>
-          <p className='my-auto'>Available Inventory: {inventory_available}</p>
+          {/* <p className='my-auto'>Available Inventory: {inventory_available}</p> */}
           <i className='cursor-pointer'
             onClick={() => {
               if (roomsSelected.length === 0) {
