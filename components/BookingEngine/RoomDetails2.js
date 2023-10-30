@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CarousalComponent from "../NewTheme/CarousalComponent"
+import { ButtonLoader } from './ButtonLoader';
 
 import { english } from '../Languages/Languages';
 import { BsFillPeopleFill } from "react-icons/bs";
@@ -20,9 +21,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 // redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { setRoomsSelected, addInventoryDetail, setAddMoreRoom, clearRoomsSelected, setReserveRoom } from '../redux/hangulSlice';
+import { setRoomsSelected, setAddMoreRoom, clearRoomsSelected, setReserveRoom, setReservationIdentity } from '../redux/hangulSlice';
 
 function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
+
+  const [searchBookingInventory, setSearchBookingInventory] = useState(false)
 
   const [selectedRoom, setSelectedRoom] = useState({})
   const [rate, setRate] = useState({})
@@ -31,7 +34,6 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
 
   const dispatch = useDispatch();
 
-  const inventoryDetail = useSelector(state => state.inventoryDetail)
   const roomsSelected = useSelector(state => state.roomsSelected)
 
   useEffect(() => {
@@ -83,7 +85,6 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
     localStorage.removeItem('reservation_ids');
   }
 
-
   function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
     // Get the existing 'reservation_id's' from local storage
     let existingData = localStorage.getItem('reservation_ids');
@@ -117,6 +118,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
       // alert(response.data.message)
       toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
       dispatch(setReserveRoom(false))
+      setSearchBookingInventory(false)
 
     }).catch((err) => {
       console.log(err)
@@ -146,39 +148,6 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
     return bookingObjects;
   }
 
-  // // Example usage:
-  // const start_date = '2023-10-15';
-  // const end_date = '2023-10-20';
-  // const price = 100;
-
-  // const generatedBookings = generateBookingObjects(start_date, end_date, price);
-
-  // console.log(generatedBookings);
-
-
-  function toCheckInventoryAvailable() {
-    let roomAvailable = true;
-
-    for (const room of inventoryDetail) {
-      if (room.available_inventory === 0) {
-        roomAvailable = false;
-        break;
-      }
-    }
-
-    if (roomAvailable) {
-      redirectToReviewPage(rate)
-      dispatch(setRoomsSelected([selectedRoom?.room_id]))
-
-      reserveRoom({
-        "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": selectedRoom?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
-      }, selectedRoom?.room_id)
-      dispatch(setReserveRoom(true))
-    } else {
-      toast.error(`APP: Inventory for ${selectedRoom.room_name} not available for the selected days`);
-    }
-  }
-
 
   function Booknow() {
     return (<>
@@ -193,15 +162,36 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
           <div className='flex justify-between text-blue-900 text-xl font-bold border-t py-3 border-gray-300'><h2 className=''>Total Price</h2> <span className=''>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</span></div>
 
           <div className='border-t border-gray-300  md:pt-8 relative pt-4'>
-            <button
-              className='w-full mt-auto px-1 py-2 bg-green-700 hover:bg-green-900 text-white rounded-md'
-              onClick={() => {
-                // this method will check the inventory available for the selected room and if the inventory is available then the rest of the methods will be called inside it.
-                toCheckInventoryAvailable()
-              }}
-            >
-              Book Now
-            </button>
+            {searchBookingInventory === true ?
+              <ButtonLoader
+                classes="w-full mt-auto px-1 py-2 bg-green-700 hover:bg-green-900 text-white rounded-md"
+                text="Book Now"
+              /> :
+              <button
+                className='w-full mt-auto px-1 py-2 bg-green-700 hover:bg-green-900 text-white rounded-md'
+                onClick={() => {
+                  setSearchBookingInventory(true)
+                  redirectToReviewPage(rate)
+                  dispatch(setRoomsSelected([selectedRoom?.room_id]))
+
+                  let reservationIdentity = {
+                    room_id: selectedRoom?.room_id,
+                    reservation_time: formatDateToCustomFormat(new Date())
+                  }
+                  dispatch(setReservationIdentity([reservationIdentity]))
+
+                  reserveRoom({
+                    // "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": selectedRoom?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
+                    "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_count": 1, ...reservationIdentity })
+                  }, selectedRoom?.room_id)
+
+                  dispatch(setReserveRoom(true))
+                }}
+              >
+                Book Now
+              </button>
+            }
+
           </div>
         </div>
       </div>
@@ -237,6 +227,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
               dispatch(clearRoomsSelected())
               deleteRoomDetails()
             }}>
+
             <AiOutlineClose color='red' size={20} /> </i>
         </div>
       </div>

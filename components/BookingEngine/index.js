@@ -69,7 +69,7 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowMod
 
             {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
             {/* {display === 1 ? <RoomPriceDetails setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e)=>setSearched(false)} /> : undefined} */}
-            {display === 1 ? <RoomDetails2 setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
+            {display === 1 ? <RoomDetails2 setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} x /> : undefined}
             {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
 
             {display === 3 ? <BookingSuccess setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}

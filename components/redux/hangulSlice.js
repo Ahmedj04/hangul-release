@@ -5,6 +5,7 @@ const initialState = {
     addMoreRoom: false,
     inventoryDetail: {},
     reserveRoom: false,
+    reservationIdentity: [],
     guestDetails: {},
 }
 
@@ -40,6 +41,14 @@ export const hangulSlice = createSlice({
         setReserveRoom: (state, action) => {
             state.reserveRoom = action.payload
         },
+        setReservationIdentity: (state, action) => {
+            const roomsToReserve = action.payload
+            state.reservationIdentity = [...state.reservationIdentity, ...roomsToReserve];
+        },
+        clearReservationIdentity: (state) => {
+            state.reservationIdentity = [];
+        },
+
         setGuestDetails: (state, action) => {
             state.guestDetails = action.payload
         },
@@ -57,6 +66,8 @@ export const {
     setAddMoreRoom,
     addInventoryDetail,
     setReserveRoom,
+    setReservationIdentity,
+    clearReservationIdentity,
     setGuestDetails,
     clearGuestDetails
 } = hangulSlice.actions  //to be used in component files

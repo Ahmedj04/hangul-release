@@ -1,14 +1,25 @@
 // import { red } from '@mui/material/colors'
 
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setRoomsSelected, setReserveRoom, addInventoryDetail } from '../redux/hangulSlice';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
+import { ButtonLoader } from './ButtonLoader';
+
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinDate, checkoutDate }) {
 
   const dispatch = useDispatch();
+
+  const inventoryDetail = useSelector(state => state.inventoryDetail)
+
+  const [searchInventory, setSearchInventory] = useState(false)
+  const [searchBookingInventory, setSearchBookingInventory] = useState(false)
+
 
   const startDate = new Date(checkinDate); // Booking start date
   const endDate = new Date(checkoutDate); // Booking end date
@@ -20,7 +31,6 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
   function redirectToRoom(room_data, room_rates) {
     localStorage.setItem('room_data', JSON.stringify(room_data))
     localStorage.setItem('temp_room_rate', JSON.stringify(room_rates))
-
     setDisplay(1)
   }
 
@@ -56,15 +66,33 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
 
   // get inventory details for the rooms between the checkin and checkout date
-  function getInventoryDetail() {
+  function getInventoryDetail(actionFrom) {
     let roomID = roomRates?.room_id;
     let url = `/api/inv_data/${roomID}/${checkinDate}/${checkoutDate}`;
     axios.get(url).then((response) => {
       // setting value to inventory detail using redux reducer function
       dispatch(addInventoryDetail(response.data))
+
+      setSearchInventory(false)
+      setSearchBookingInventory(false)
+
+
       console.log("inventory data loaded successfully")
+
+      if (actionFrom === "bookNow") {
+        // redirections to review page
+        toCheckInventoryAvailable()
+      } else {
+        //  redirection to room details
+        redirectToRoom(filteredRoomData, roomRates)
+      }
+
     }).catch((err) => {
       console.log("error in loading inventory data", err)
+      setSearchInventory(false)
+      setSearchBookingInventory(false)
+
+      toast.error(`API: Inventory for the ${filteredRoomData?.room_name} is not registered`);
     })
   }
 
@@ -108,8 +136,52 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
   }
 
-  console.log(roomRates)
+  function generateBookingObjects(start_date, end_date, otherData) {
+    const bookingObjects = [];
+    let currentDate = new Date(start_date); // Start with the start_date
 
+    while (currentDate <= new Date(end_date)) {
+      const bookingDate = new Date(currentDate);
+      const bookingDateString = bookingDate.toISOString().split('T')[0]; // Format the date as YYYY-MM-DD
+
+      const bookingObject = {
+        booking_date: bookingDateString,
+        ...otherData
+      };
+
+      bookingObjects.push(bookingObject);
+
+      // Move to the next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return bookingObjects;
+  }
+
+
+  function toCheckInventoryAvailable() {
+
+    let roomAvailable = true;
+
+    for (const room of inventoryDetail) {
+      if (room.available_inventory === 0) {
+        roomAvailable = false;
+        break;
+      }
+    }
+    if (roomAvailable) {
+      redirectToReviewPage(filteredRoomData, roomRates)
+      dispatch(setReserveRoom(true))
+      reserveRoom({
+        "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
+      }, roomRates?.room_id)
+
+    } else {
+      toast.error(`APP: Inventory for ${filteredRoomData?.room_name} not available for the selected days`);
+    }
+  }
+
+  console.log(roomRates)
 
   return (
     <div className=' w-100 h-1/4 text-black border border-gray-500 bg-white rounded-2xl p-4 m-4 flex flex-wrap justify-center items-center lg:flex-row md:flex-row flex-col'>
@@ -132,31 +204,43 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
           <p className='text-xs py-1 text-center'>+ tax For {numberOfDays} Days</p>
         </div>
 
+        {searchBookingInventory === true ?
+          <ButtonLoader
+            style={{ fontSize: '14px' }}
+            classes="px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold"
+            text="Book Now"
+          /> :
+          <button
+            style={{ fontSize: "14px" }}
+            className='px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'
+            onClick={() => {
+              setSearchBookingInventory(true)
+              getInventoryDetail("bookNow") // this method will check the inventory available for the selected room and if the inventory is available then the rest of the methods will be called inside it.
+            }}
 
-        <button
-          onClick={() => {
-            redirectToReviewPage(filteredRoomData, roomRates)
-            reserveRoom({ "reserve_rooms": [{ "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) }] }, roomRates?.room_id)
-            dispatch(setReserveRoom(true))
-            getInventoryDetail()
+          >
+            Book Now
+          </button>}
 
-          }}
-          style={{ fontSize: "14px" }}
-          className='px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'
-        >
-          Book Now
-        </button>
 
-        <button
-          onClick={() => {
-            redirectToRoom(filteredRoomData, roomRates)
-            getInventoryDetail()
-          }}
-          style={{ fontSize: "11px" }}
-          className='mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white'
-        >
-          Learn More
-        </button>
+        {searchInventory === true ?
+          <ButtonLoader
+            style={{ fontSize: '11px' }}
+            classes=" mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white"
+            text="Learn More"
+          /> :
+          <button
+            onClick={() => {
+              setSearchInventory(true)
+              getInventoryDetail("LearnMore")
+
+            }}
+            style={{ fontSize: "11px" }}
+            className='mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white'
+          >
+            Learn More
+          </button>}
+
       </div>
 
 

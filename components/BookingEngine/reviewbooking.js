@@ -9,7 +9,7 @@ import { AiOutlineClose } from "react-icons/ai";
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails } from '../redux/hangulSlice';
+import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails, clearReservationIdentity } from '../redux/hangulSlice';
 
 // validation
 import GuestDetailValidation from '../validation/bookingEngine/GuestDetailValidation'
@@ -59,6 +59,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const numberOfNights = Math.round((endDate - startDate) / oneDay);
 
 
+
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
     console.log("this is roomSelected set using redux", roomsSelected)
 
@@ -70,7 +71,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const inventoryDetail = useSelector(state => state.inventoryDetail)
 
     //  stored the lowest inventory available in the inventory_available variable.
-    const inventory_available = Math.min(...inventoryDetail.map((item) => item.available_inventory))
+    const inventory_available = inventoryDetail && Math.min(...inventoryDetail.map((item) => item.available_inventory))
 
     const dispatch = useDispatch();
 
@@ -86,7 +87,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     // check the boolean value of reserveRoom state and based on this changed the css of payNow button
     const reserveRoom = useSelector(state => state.reserveRoom);
 
-
+    const reservationIdentity = useSelector(state => state.reservationIdentity)
 
     // for getting the data from the local storage and setting the data
     useEffect(() => {
@@ -458,6 +459,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                             setSearched(false)
                             dispatch(setAddMoreRoom(false))
                             dispatch(clearRoomsSelected())
+                            dispatch(clearReservationIdentity())
                             deleteRoomDetails()
                         }}>
                         <AiOutlineClose color='red' size={20} /> </i>
@@ -505,7 +507,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             onChange={(e) => {
                                                 const newQuantity = parseInt(e.target.value);
                                                 updateSelectedQuantity(room?.room_id, newQuantity); // Update selected quantity in the Map
-                                                updateReserveRoom({ "reserve_rooms": [{ "reservation_id": fetchReservationid(room?.room_id), "room_count": newQuantity }] })
+                                                // updateReserveRoom({ "reserve_rooms": [{ "reservation_id": fetchReservationid(room?.room_id), "room_count": newQuantity }] })
+                                                let reservationData = reservationIdentity.filter((item) => item.room_id === room?.room_id)[0]
+                                                updateReserveRoom({ "reserve_rooms": [{ "room_count": newQuantity, ...reservationData }] })
                                                 setDisabled(true)
                                             }}
                                         >
