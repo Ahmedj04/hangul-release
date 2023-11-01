@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { setRoomsSelected, setReserveRoom, addInventoryDetail } from '../redux/hangulSlice';
+import { setRoomsSelected, setReserveRoom, setReservationIdentity, addInventoryDetail } from '../redux/hangulSlice';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 import { ButtonLoader } from './ButtonLoader';
@@ -76,13 +76,12 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
       setSearchInventory(false)
       setSearchBookingInventory(false)
 
-
       console.log("inventory data loaded successfully")
 
       if (actionFrom === "bookNow") {
         // redirections to review page
         toCheckInventoryAvailable()
-      } else {
+      } else {    //if action is learn more
         //  redirection to room details
         redirectToRoom(filteredRoomData, roomRates)
       }
@@ -170,11 +169,23 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
       }
     }
     if (roomAvailable) {
+      let reservationIdentity = {
+        room_id: roomRates?.room_id,
+        reservation_time: formatDateToCustomFormat(new Date())
+      }
       redirectToReviewPage(filteredRoomData, roomRates)
+
       dispatch(setReserveRoom(true))
+
+      dispatch(setReservationIdentity([reservationIdentity]))
+
       reserveRoom({
-        "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
+        "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_count": 1, ...reservationIdentity })
       }, roomRates?.room_id)
+
+      // reserveRoom({
+      //   "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
+      // }, roomRates?.room_id)
 
     } else {
       toast.error(`APP: Inventory for ${filteredRoomData?.room_name} not available for the selected days`);

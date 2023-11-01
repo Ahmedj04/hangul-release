@@ -1,10 +1,14 @@
 import React from 'react'
-import { useDispatch } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom, clearGuestDetails, clearReservationIdentity } from '../redux/hangulSlice'
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearRoomsSelected, setAddMoreRoom, clearGuestDetails, clearReservationIdentity, clearInventoryDetail } from '../redux/hangulSlice'
 
 function BookingModal({ title, description, setShowModal, setDisplay, setSearched }) {
 
     const dispatch = useDispatch();
+
+    const reservationIdentity = useSelector(state => state.reservationIdentity)
+
 
     // Function to delete room_rates and room_data from local storage
     function deleteRoomDetails() {
@@ -17,6 +21,26 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
 
         // Remove the room reservation_ids key from local storage
         localStorage.removeItem('reservation_ids');
+    }
+
+    function removeReservationFromDB(room_id, reservation_time) {
+        let url = `/api/reserve_rooms/${room_id}/${reservation_time}`;
+        axios.delete(url).then((response) => {
+            // once the reservations are removed from DB then these functions will take place 
+            setShowModal(0)
+            setDisplay(0)
+            setSearched(false)
+            dispatch(setAddMoreRoom(false))
+            dispatch(clearRoomsSelected())
+            dispatch(clearGuestDetails())
+            dispatch(clearReservationIdentity())
+            dispatch(clearInventoryDetail())
+            deleteRoomDetails()
+
+        }).catch((err) => {
+            console.log("Error in deleting reservation from DB", err)
+        })
+
     }
 
     return (
@@ -64,14 +88,22 @@ function BookingModal({ title, description, setShowModal, setDisplay, setSearche
                         <button
                             className="text-white bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-0"
                             onClick={() => {
-                                setShowModal(0)
-                                setDisplay(0)
-                                dispatch(setAddMoreRoom(false))
-                                dispatch(clearRoomsSelected())
-                                dispatch(clearGuestDetails())
-                                dispatch(clearReservationIdentity())
-                                setSearched(false)
-                                deleteRoomDetails()
+                                if (reservationIdentity.length > 0) {
+                                    reservationIdentity?.map((room) => {
+                                        removeReservationFromDB(room?.room_id, room?.reservation_time)
+                                    })
+                                } else {
+                                    setShowModal(0)
+                                    setDisplay(0)
+                                    setSearched(false)
+                                    dispatch(setAddMoreRoom(false))
+                                    dispatch(clearRoomsSelected())
+                                    dispatch(clearGuestDetails())
+                                    dispatch(clearReservationIdentity())
+                                    dispatch(clearInventoryDetail())
+                                    deleteRoomDetails()
+                                }
+
                             }}
                         >
                             Close

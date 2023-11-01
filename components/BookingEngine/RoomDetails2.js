@@ -21,7 +21,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 // redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { setRoomsSelected, setAddMoreRoom, clearRoomsSelected, setReserveRoom, setReservationIdentity } from '../redux/hangulSlice';
+import { setRoomsSelected, setAddMoreRoom, clearRoomsSelected, clearInventoryDetail, setReserveRoom, clearReservationIdentity, setReservationIdentity } from '../redux/hangulSlice';
 
 function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
@@ -35,6 +35,8 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
   const dispatch = useDispatch();
 
   const roomsSelected = useSelector(state => state.roomsSelected)
+  const reservationIdentity = useSelector(state => state.reservationIdentity)
+
 
   useEffect(() => {
     let room = localStorage.getItem("room_data")
@@ -85,43 +87,58 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
     localStorage.removeItem('reservation_ids');
   }
 
-  function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
-    // Get the existing 'reservation_id's' from local storage
-    let existingData = localStorage.getItem('reservation_ids');
+  // function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
+  //   // Get the existing 'reservation_id's' from local storage
+  //   let existingData = localStorage.getItem('reservation_ids');
 
-    // Check if there is existing data in local storage
-    if (existingData) {
-      // Parse the existing data from JSON
-      existingData = JSON.parse(existingData);
+  //   // Check if there is existing data in local storage
+  //   if (existingData) {
+  //     // Parse the existing data from JSON
+  //     existingData = JSON.parse(existingData);
 
-      // Update the reservation ID for the specific room ID
-      existingData[roomId] = reservation_id;
+  //     // Update the reservation ID for the specific room ID
+  //     existingData[roomId] = reservation_id;
 
-    } else {
-      // If there is no existing data, create a new object with the new data
-      existingData = {
-        // [reservation_id]: 'reservation_id'
-        [roomId]: reservation_id
-      };
-    }
+  //   } else {
+  //     // If there is no existing data, create a new object with the new data
+  //     existingData = {
+  //       // [reservation_id]: 'reservation_id'
+  //       [roomId]: reservation_id
+  //     };
+  //   }
 
-    console.log("this is reservation data", existingData)
+  //   console.log("this is reservation data", existingData)
 
-    // Store the updated data back in local storage
-    localStorage.setItem('reservation_ids', JSON.stringify(existingData));
-  }
+  //   // Store the updated data back in local storage
+  //   localStorage.setItem('reservation_ids', JSON.stringify(existingData));
+  // }
 
   function reserveRoom(roomdata, roomId) {
-    // alert(JSON.stringify(roomdata))
     let url = "/api/reserve_rooms";
     axios.post(url, roomdata).then((response) => {
-      // alert(response.data.message)
-      toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
+      // toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
       dispatch(setReserveRoom(false))
       setSearchBookingInventory(false)
 
     }).catch((err) => {
       console.log(err)
+    })
+
+  }
+
+  function removeReservationFromDB(room_id, reservation_time) {
+    let url = `/api/reserve_rooms/${room_id}/${reservation_time}`;
+    axios.delete(url).then((response) => {
+      setDisplay(0)
+      setShowModal(0)
+      setSearched(false)
+      dispatch(setAddMoreRoom(false))
+      dispatch(clearRoomsSelected())
+      dispatch(clearReservationIdentity())
+      dispatch(clearInventoryDetail())
+      deleteRoomDetails()
+    }).catch((err) => {
+      console.log("Error in deleting reservation from DB", err)
     })
 
   }
@@ -209,7 +226,6 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
         </div>
 
         <div className='my-auto mr-10 text-base italic flex gap-10'>
-          {/* <p className='my-auto'>Available Inventory: {inventory_available}</p> */}
           <i className='cursor-pointer'
             onClick={() => {
               if (roomsSelected.length === 0) {
@@ -220,12 +236,19 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
             }}> <AiOutlineShoppingCart color='black' size={20} /> </i>
           <i className='cursor-pointer my-auto'
             onClick={() => {
-              setDisplay(0)
-              setShowModal(0)
-              setSearched(false)
-              dispatch(setAddMoreRoom(false))
-              dispatch(clearRoomsSelected())
-              deleteRoomDetails()
+              if (reservationIdentity.length > 0) {
+                reservationIdentity?.map((room) => {
+                  removeReservationFromDB(room?.room_id, room?.reservation_time)
+                })
+              } else {
+                setDisplay(0)
+                setShowModal(0)
+                setSearched(false)
+                dispatch(setAddMoreRoom(false))
+                dispatch(clearRoomsSelected())
+                dispatch(clearInventoryDetail())
+                deleteRoomDetails()
+              }
             }}>
 
             <AiOutlineClose color='red' size={20} /> </i>

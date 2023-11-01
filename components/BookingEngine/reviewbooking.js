@@ -9,7 +9,7 @@ import { AiOutlineClose } from "react-icons/ai";
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails, clearReservationIdentity } from '../redux/hangulSlice';
+import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails, clearInventoryDetail, clearReservationIdentity } from '../redux/hangulSlice';
 
 // validation
 import GuestDetailValidation from '../validation/bookingEngine/GuestDetailValidation'
@@ -20,6 +20,7 @@ import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 
 
 import axios from 'axios';
+import { identity } from 'lodash';
 
 function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
@@ -58,8 +59,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const oneDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
     const numberOfNights = Math.round((endDate - startDate) / oneDay);
 
-
-
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
     console.log("this is roomSelected set using redux", roomsSelected)
 
@@ -71,7 +70,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const inventoryDetail = useSelector(state => state.inventoryDetail)
 
     //  stored the lowest inventory available in the inventory_available variable.
-    const inventory_available = inventoryDetail && Math.min(...inventoryDetail.map((item) => item.available_inventory))
+    const inventory_available = Math.min(...inventoryDetail.map((item) => item.available_inventory))
 
     const dispatch = useDispatch();
 
@@ -88,6 +87,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const reserveRoom = useSelector(state => state.reserveRoom);
 
     const reservationIdentity = useSelector(state => state.reservationIdentity)
+
+
 
     // for getting the data from the local storage and setting the data
     useEffect(() => {
@@ -220,25 +221,25 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     }
 
     // function to delete the reservation id of the room from the local storage
-    function removeReservationIdFromLocalStorage(roomId) {
-        // Get the existing 'reservation_ids' from local storage
-        let existingData = localStorage.getItem('reservation_ids');
+    // function removeReservationIdFromLocalStorage(roomId) {
+    //     // Get the existing 'reservation_ids' from local storage
+    //     let existingData = localStorage.getItem('reservation_ids');
 
-        if (existingData) {
-            // Parse the existing data from JSON
-            existingData = JSON.parse(existingData);
+    //     if (existingData) {
+    //         // Parse the existing data from JSON
+    //         existingData = JSON.parse(existingData);
 
-            // Remove the reservation ID for the specific room ID
-            delete existingData[roomId];
+    //         // Remove the reservation ID for the specific room ID
+    //         delete existingData[roomId];
 
-            // Store the updated data back in local storage
-            localStorage.setItem('reservation_ids', JSON.stringify(existingData));
+    //         // Store the updated data back in local storage
+    //         localStorage.setItem('reservation_ids', JSON.stringify(existingData));
 
-            console.log("Reservation ID for room", roomId, "has been removed.");
-        } else {
-            console.log("No reservation IDs found in local storage.");
-        }
-    }
+    //         console.log("Reservation ID for room", roomId, "has been removed.");
+    //     } else {
+    //         console.log("No reservation IDs found in local storage.");
+    //     }
+    // }
 
     function updateReserveRoom(roomdata) {
         let url = "/api/reserve_rooms";
@@ -250,32 +251,53 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         })
     }
 
-    function fetchReservationid(roomId) {
-        // Get the existing 'reservation_ids' from local storage
-        let data = localStorage.getItem("reservation_ids");
-
-        // Check if there is existing data in local storage
-        if (data) {
-            // Parse the existing data from JSON
-            let existingData = JSON.parse(data);
-
-            // Access the reservation ID for the specific room ID
-            let reservationId = existingData[roomId];
-
-            // Check if the room ID exists in the local storage
-            if (reservationId) {
-                // console.log("Reservation ID for room " + roomId + ": " + reservationId);
-                return reservationId;
-            } else {
-                console.log("No reservation ID found for room " + roomId);
+    function removeReservationFromDB(room_id, reservation_time, action) {
+        let url = `/api/reserve_rooms/${room_id}/${reservation_time}`;
+        axios.delete(url).then((response) => {
+            console.log(response)
+            if (action === "close") {
+                setDisplay(0)
+                setShowModal(0)
+                setSearched(false)
+                dispatch(setAddMoreRoom(false))
+                dispatch(clearRoomsSelected())
+                dispatch(clearReservationIdentity())
+                dispatch(clearInventoryDetail())
+                deleteRoomDetails()
             }
-        } else {
-            alert("No reservation IDs found in local storage.");
-        }
+        }).catch((err) => {
+            console.log("Error in deleting reservation from DB", err)
+        })
+
     }
+
+    // function fetchReservationid(roomId) {
+    //     // Get the existing 'reservation_ids' from local storage
+    //     let data = localStorage.getItem("reservation_ids");
+
+    //     // Check if there is existing data in local storage
+    //     if (data) {
+    //         // Parse the existing data from JSON
+    //         let existingData = JSON.parse(data);
+
+    //         // Access the reservation ID for the specific room ID
+    //         let reservationId = existingData[roomId];
+
+    //         // Check if the room ID exists in the local storage
+    //         if (reservationId) {
+    //             // console.log("Reservation ID for room " + roomId + ": " + reservationId);
+    //             return reservationId;
+    //         } else {
+    //             console.log("No reservation ID found for room " + roomId);
+    //         }
+    //     } else {
+    //         alert("No reservation IDs found in local storage.");
+    //     }
+    // }
 
 
     // these below functions will work when the pay now button is clicked
+
     function SubmitGuestDetails() {
         // let isGuestDetailsValid = GuestDetailValidation(guestDetail);
         let isGuestDetailsValid = GuestDetailValidation(guest);
@@ -454,13 +476,17 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                     <h1 className='text-xl my-auto font-bold'>Review Booking</h1>
                     <i className='cursor-pointer my-auto mr-5'
                         onClick={() => {
-                            setDisplay(0)
-                            setShowModal(0)
-                            setSearched(false)
-                            dispatch(setAddMoreRoom(false))
-                            dispatch(clearRoomsSelected())
-                            dispatch(clearReservationIdentity())
-                            deleteRoomDetails()
+                            reservationIdentity?.map((room) => {
+                                removeReservationFromDB(room?.room_id, room?.reservation_time, "close")
+                            })
+                            // setDisplay(0)
+                            // setShowModal(0)
+                            // setSearched(false)
+                            // dispatch(setAddMoreRoom(false))
+                            // dispatch(clearRoomsSelected())
+                            // dispatch(clearReservationIdentity())
+                            // dispatch(clearInventoryDetail())
+                            // deleteRoomDetails()
                         }}>
                         <AiOutlineClose color='red' size={20} /> </i>
                 </div>
@@ -527,7 +553,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             onClick={() => {
                                                 dispatch(removeRoomFromSelected(room?.room_id))
                                                 removeRoomRateByRoomId(room?.room_id)  //remove room_rate from local storage
-                                                removeReservationIdFromLocalStorage(room?.room_id)
+                                                // removeReservationIdFromLocalStorage(room?.room_id)
+                                                let reservationdata = reservationIdentity.filter((item) => item.room_id === room?.room_id)[0]
+                                                removeReservationFromDB(room?.room_id, reservationdata?.reservation_time)
                                             }}
                                         >
                                             <svg
@@ -703,18 +731,19 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>{totalSelectedQuantities} Room for {numberOfNights === 0 ? '1 Day' : numberOfNights === 1 ? '1 Night' : `${numberOfNights} Nights`}<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalFinalRate}</div></div>
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Taxes</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalTaxAmount}</div></div>
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Other Fees</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalOtherFees}</div></div>
-                        <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {couponDiscount}.00</div></div>
+                        {/* <div className='flex  items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>Coupon Discounts</div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {couponDiscount}.00</div></div> */}
                         <div className='flex justify-start items-start my-4'> <div className='p-2 w-4/5 font-bold'>Total Amount To Be Paid</div> <div className='mx-2 flex justify-end w-full text-2xl font-bold'>₹ {(totalFinalRate + totalTaxAmount + totalOtherFees) - couponDiscount}</div></div>
                     </div>
 
-                    <div className='border border-gray rounded-lg w-full h-1/2 my-2 py-2 px-4'>
+                    {/* coupon code section */}
+                    {/* <div className='border border-gray rounded-lg w-full h-1/2 my-2 py-2 px-4'>
                         <h2 className='h-12 w-fit mx-3 p-2 font-semibold'>Coupon Codes</h2>
                         <div className='flex justify-between'>
                             <input className='my-1 border border-gray h-12 w-full mx-4 p-2' onChange={(e) => console.log(e.target.value)} placeholder='Have Coupon Code' />
                             <button className='bg-blue-600 rounded-lg text-white px-4 h-9 my-auto font-medium'>Apply</button>
                         </div>
 
-                    </div>
+                    </div> */}
 
                     <button
                         disabled={reserveRoom || disabled}

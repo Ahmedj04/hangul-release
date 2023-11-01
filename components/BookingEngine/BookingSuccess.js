@@ -86,6 +86,8 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
                                         setSearched(false)
                                         dispatch(setAddMoreRoom(false))
                                         dispatch(clearRoomsSelected())
+                                        dispatch(clearReservationIdentity())
+                                        dispatch(clearInventoryDetail())
                                         dispatch(clearGuestDetails())
                                         deleteRoomDetails()
                                     }}

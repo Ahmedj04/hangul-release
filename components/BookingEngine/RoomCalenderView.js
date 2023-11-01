@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import axios from 'axios';
 import RoomCard from '../BookingEngine/RoomCard';
 import Carousel from 'better-react-carousel';
 import { AiOutlineShoppingCart, AiOutlineClose } from "react-icons/ai";
 
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom } from '../redux/hangulSlice'
+import { useDispatch, useSelector } from 'react-redux';
+import { clearRoomsSelected, setAddMoreRoom, clearReservationIdentity, clearInventoryDetail } from '../redux/hangulSlice'
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +14,7 @@ import "react-toastify/dist/ReactToastify.css";
 function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
 
     const [selectedDate, setSelectedDate] = useState([]);
+    const reservationIdentity = useSelector(state => state.reservationIdentity)
 
     const dispatch = useDispatch()
 
@@ -292,6 +293,23 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
 
     }
 
+    function removeReservationFromDB(room_id, reservation_time) {
+        let url = `/api/reserve_rooms/${room_id}/${reservation_time}`;
+        axios.delete(url).then((response) => {
+            setDisplay(0)
+            setShowModal(0)
+            setSearched(false)
+            dispatch(setAddMoreRoom(false))
+            dispatch(clearRoomsSelected())
+            dispatch(clearReservationIdentity())
+            dispatch(clearInventoryDetail())
+            deleteRoomDetails()
+        }).catch((err) => {
+            console.log("Error in deleting reservation from DB", err)
+        })
+
+    }
+
     return (
         <div
             id="main-content"
@@ -395,12 +413,21 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                             > <AiOutlineShoppingCart color='black' size={20} /> </i>
                             <i className='cursor-pointer'
                                 onClick={() => {
-                                    setDisplay(0)
-                                    setShowModal(0)
-                                    setSearched(false)
-                                    dispatch(setAddMoreRoom(false))
-                                    dispatch(clearRoomsSelected())
-                                    deleteRoomDetails()
+                                    if (reservationIdentity.length > 0) {
+                                        reservationIdentity?.map((room) => {
+                                            removeReservationFromDB(room?.room_id, room?.reservation_time)
+                                        })
+                                    } else {
+                                        setDisplay(0)
+                                        setShowModal(0)
+                                        setSearched(false)
+                                        dispatch(setAddMoreRoom(false))
+                                        dispatch(clearRoomsSelected())
+                                        dispatch(clearReservationIdentity())
+                                        dispatch(clearInventoryDetail())
+                                        deleteRoomDetails()
+                                    }
+
                                 }}>
                                 <AiOutlineClose color='red' size={20} /> </i>
                         </div>

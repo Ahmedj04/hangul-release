@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     roomsSelected: [],
     addMoreRoom: false,
-    inventoryDetail: {},
+    inventoryDetail: [],
     reserveRoom: false,
     reservationIdentity: [],
     guestDetails: {},
@@ -38,6 +38,9 @@ export const hangulSlice = createSlice({
         addInventoryDetail: (state, action) => {
             state.inventoryDetail = action.payload
         },
+        clearInventoryDetail: (state, action) => {
+            state.inventoryDetail = []
+        },
         setReserveRoom: (state, action) => {
             state.reserveRoom = action.payload
         },
@@ -65,6 +68,7 @@ export const {
     clearRoomsSelected,
     setAddMoreRoom,
     addInventoryDetail,
+    clearInventoryDetail,
     setReserveRoom,
     setReservationIdentity,
     clearReservationIdentity,
