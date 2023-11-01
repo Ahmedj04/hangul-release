@@ -99,9 +99,6 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
                 <div className='my-auto w-6/12'>
                     <img src='/payment_done.jpg' className='h-96 mx-auto'></img>
                 </div>
-
-
-
             </div>
         </section>
     )

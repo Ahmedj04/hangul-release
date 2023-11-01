@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from "react";
-import Button from "./Button";
+import Button from "../../../components/Button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Capsule from '../components/utils/Capsule'
+import Capsule from '../../../components/utils/Capsule'
 var checked = [];
 
-const Table = (args) => {
+const InventoryTable = (args) => {
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [page, setPage] = useState(1);
     const [error, setError] = useState({});
@@ -141,32 +141,13 @@ const Table = (args) => {
                         {/* icons end*/}
                     </div>
 
-                    {((args?.name != "Services") && (args?.name != "ARI") && (args?.name != "Inventory")) ?
-                        <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
-                            <button className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex  
+                    <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
+                        <button className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex  
                              font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150" onClick={args?.add} >
-                                {args?.common?.Add}</button>
-                            {/* <span className={`w-1/2 ${args?.color?.text} ${args?.color?.whitebackground} border border-gray-300 ${args?.color?.hover} focus:ring-4 focus:ring-cyan-200 font-semibold inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto`}>
-                                <svg className="-ml-1 mr-2 h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd"></path></svg>
-                                {args?.common?.Import}
-                            </span> */}
-                        </div> : <>
-                        </>}
-                    {args?.name === "ARI" ?
-                        <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
-                            <button className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex  
-                             font-semibold
-                                rounded-lg text-sm px-5 py-2 text-center 
-                              items-center ease-linear transition-all duration-150" onClick={args?.addNotif} >
-                                {args?.lang?.addratenotif}</button>
-                            <span onClick={args?.add} className={`w-1/2 ${args?.color?.text} ${args?.color?.whitebackground} border hover:cursor-pointer border-gray-300 ${args?.color?.hover}  focus:ring-4 focus:ring-cyan-200 font-semibold inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto`}>
-                                {args?.lang?.generatetransaction}
-                            </span>
-                        </div> :
-                        args?.name === "Inventory" ?
-                            <></>
-                            : <>
-                            </>}
+                            {args?.common?.Add}</button>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -180,33 +161,35 @@ const Table = (args) => {
                             <table className="table data table-fixed min-w-full divide-y divide-gray-200" id="myTable">
                                 <thead className={` ${args?.color?.tableheader} `}>
                                     <tr>
-                                        {args?.name != "Services" ?
-                                            <th scope="col" className="p-4">
-                                                <div className="flex items-center">
-                                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
-                                                        name="allSelect" checked={args?.gen?.filter(item => item?.isChecked !== true).length < 1}
-                                                        onChange={(e) => { handlecheckbox(e); setViewDel(1); }}
-                                                        className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
-                                                    <label htmlFor="checkbox-all" className="sr-only">checkbox</label>
-                                                </div>
-                                            </th> : <></>}
+                                        <th scope="col" className="p-4">
+                                            <div className="flex items-center">
+                                                <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
+                                                    name="allSelect" checked={args?.gen?.filter(item => item?.isChecked !== true).length < 1}
+                                                    onChange={(e) => { handlecheckbox(e); setViewDel(1); }}
+                                                    className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
+                                                <label htmlFor="checkbox-all" className="sr-only">checkbox</label>
+                                            </div>
+                                        </th>
                                         <th scope="col"
                                             className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col1}</th>
+                                        <th scope="col"
+                                            className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col2}</th>
+                                        <th scope="col"
+                                            className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col3}</th>
+                                        <th scope="col"
+                                            className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col4}</th>
 
-                                        {args?.name != "Packages" ?
-                                            <th scope="col"
-                                                className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col2}</th>
-                                            :
-                                            <></>}
-                                        {args?.status != "matchstatus" && args?.mark != "beds" ?
+                                        {/* {args?.status != "matchstatus" && args?.mark != "beds" ?
                                             <th scope="col"
                                                 className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.common?.Status}</th>
-                                            : <></>}
+                                            : <></>} */}
                                         <th scope="col"
                                             className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.common?.Action}
                                         </th>
                                     </tr>
                                 </thead>
+
+
                                 <tbody className={` ${args?.color?.whitebackground} divide-y  divide-gray-200 `} id="TableList" >
                                     {displayData?.map((item, idx) => (
                                         <>
@@ -216,31 +199,24 @@ const Table = (args) => {
                                                 <>
                                                     <tr className={`${args?.color?.hover}`}>
                                                         {/* first col when editing starts */}
-                                                        {args?.name != "Services" ?
-                                                            <td className="p-4 w-4">
-                                                                <span className="flex items-center">
-                                                                    <input id="checkbox-1" aria-describedby="checkbox-1" type="checkbox"
-                                                                        className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
-                                                                    <label htmlFor="checkbox-1" className="sr-only">checkbox</label>
-                                                                </span>
-                                                            </td> : <></>}
-                                                        {(args?.name != "Additional Services" && args?.name != "Package Miles" && args?.name != "Elite Rewards") ?
-                                                            <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${args?.color?.text}`}>
 
-                                                                {args.name == 'Services' ? <>{item.name}</> : <><input type="text"
-                                                                    onChange={(e) => setEditContact({ ...editContact, type: e.target.value }, setFlag(1))}
-                                                                    className={`shadow-sm  ${args?.color?.whitebackground} border border-gray-300 ${args?.color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-64 p-2.5`}
-                                                                    defaultValue={item?.type}></input></>}</td>
-                                                            :
-                                                            <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${args?.color?.text}`}>
-                                                                {args.name === 'Additional Services' ? <>{item.name}</> : <input type="text"
-                                                                    onChange={(e) => setEditContact({ ...editContact, name: e.target.value }, setFlag(1))} className={`shadow-sm capitalize ${args?.color?.whitebackground} border border-gray-300 ${args?.color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-64 p-2.5`}
-                                                                    defaultValue={item?.name}></input>}
-                                                            </td>}
+                                                        <td className="p-4 w-4">
+                                                            <span className="flex items-center">
+                                                                <input id="checkbox-1" aria-describedby="checkbox-1" type="checkbox"
+                                                                    className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
+                                                                <label htmlFor="checkbox-1" className="sr-only">checkbox</label>
+                                                            </span>
+                                                        </td>
+
+                                                        <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${args?.color?.text}`}>
+
+                                                            {args.name == 'Services' ? <>{item.name}</> : <><input type="text"
+                                                                onChange={(e) => setEditContact({ ...editContact, type: e.target.value }, setFlag(1))}
+                                                                className={`shadow-sm  ${args?.color?.whitebackground} border border-gray-300 ${args?.color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-64 p-2.5`}
+                                                                defaultValue={item?.type}></input></>}</td>
+
                                                         {/* second col  */}
                                                         {args?.name != "Services" ?
-
-
                                                             <td className="data text-left text-sm ">
                                                                 {args.name !== 'Additional Services' ? <>{item.name}</> : <input type="text"
                                                                     onChange={(e) => setEditContact({ ...editContact, type: e.target.value }, setFlag(1))}
@@ -581,6 +557,6 @@ const Table = (args) => {
         </>
     )
 }
-export default Table
+export default InventoryTable
 
 
