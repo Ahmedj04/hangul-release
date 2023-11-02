@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import Router from 'next/router';
 import axios from "axios";
+import { ButtonLoader } from './ButtonLoader'
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+import InventoryModal from "./inventory";
+
 import Title from "../../../components/title";
 import colorFile from "../../../components/colors/Color";
 import LoaderDarkTable from "../../../components/loaders/darktableloader";
@@ -22,6 +28,7 @@ import Headloader from "../../../components/loaders/headloader";
 import LoaderTable from "../../../components/loadertable";
 import GenericTable from "../../../components/utils/Tables/GenericTable";
 import InventoryTable from "./InventoryTable";
+import { response } from "msw";
 const logger = require("../../../services/logger");
 var currentLogged;
 var i = 0;
@@ -42,6 +49,15 @@ function Inventory() {
     const [flag, setFlag] = useState([]);
     const [contact, setContact] = useState([]);
     const [deleteMultiple, setDeleteMultiple] = useState(0);
+
+    const [inventories, setInventories] = useState([]);
+    const [edit, setEdit] = useState({
+        'value': 0,
+        'idx': undefined
+    })
+    const [editInventory, setEditInventory] = useState({})
+    const [newInventory, setNewInventory] = useState({})
+    const [saveLoader, setSaveLoader] = useState(false)
 
     useEffect(() => {
         firstfun();
@@ -101,368 +117,80 @@ function Inventory() {
         firstfun();
         Router.push('./contact')
     }
+
     // Fetch Hotel Details
     const fetchHotelDetails = async () => {
-        var genData = [];
-        const url = `/api/${currentProperty.address_province.replace(
-            /\s+/g,
-            "-"
-        )}/${currentProperty.address_city}/${currentProperty.property_category
-            }s/${currentProperty.property_id}`;
+        const url = `/api/inventory/${currentProperty.property_id}`;
         axios.get(url)
             .then((response) => {
-                setContacts(response.data.contacts);
-                setCountryCode(response.data.address?.[i]?.address_country);
-                propertyName = response.data.property_name;
-                {
-                    response.data?.contacts?.map((item) => {
-                        // var temp = {
-                        //   "checkbox": { operation: undefined },
-                        //   "Contact Details": {
-                        //     "value": item.contact_data,
-                        //     "inputType": "text",
-                        //     "onChangeAction": () => alert("hello")
-                        //   },
-                        //   "Contact Type": {
-                        //     "value": item.contact_type,
-                        //     "inputType": undefined,
-                        //     "onChangeAction": undefined
-                        //   },
-                        //   "status": item.status,
-                        //   "id": item.contact_id,
-                        //   "Actions": [
-
-                        //     {
-                        //       type: "button",
-                        //       label: "Edit",
-                        //       operation: (item) => { currentRoom(item) }
-                        //     },
-                        //     {
-                        //       type: "button",
-                        //       label: "Delete",
-                        //       operation: (item) => { currentRoom(item) }
-                        //     }
-
-                        //   ]
-
-
-                        // }
-                        var temp = {
-                            name: item.contact_type,
-                            type: item.contact_data,
-                            status: item.status,
-                            id: item.contact_id
-                        }
-                        genData.push(temp)
-                    })
-
-                    setGen(genData);
+                alert(response.data.length > 0, JSON.stringify(response.data))
+                if (response.data.length > 0) {
+                    setInventories(response.data)
+                } else {
+                    setInventories([])
                 }
                 setVisible(1);
             })
-            .catch((error) => { logger.error("url to fetch property details, failed") });
-
-
-    }
-    /* Function Add Contact*/
-    function contactDeleteMultiple(checked, setDeleteMultiple) {
-        const data = checked?.map((item) => { return ({ contact_id: item, property_id: currentProperty?.property_id }) })
-        setSpinner(1);
-        const contactdata = data;
-        const finalContact = { contacts: contactdata };
-        axios
-            .post(`/api/deleteall/contacts`, finalContact, {
-                headers: { "content-type": "application/json" },
-            })
-            .then((response) => {
-                setSpinner(0)
-                toast.success("API: Contact delete success.", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                fetchHotelDetails();
-                Router.push("./contact");
-                setDeleteMultiple(0);
-            })
             .catch((error) => {
-                setSpinner(0)
-                toast.error("API: Contact add error.", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                setDeleteMultiple(0);
-
+                logger.error("url to fetch property details, failed")
             });
 
 
     }
 
-    /* Function Add Contact*/
-    function submitContactAdd() {
-        if (flag === 1) {
-            setSpinner(1);
-            if (contact.contact_type !== undefined) {
-                const contactdata = [{
-                    property_id: currentProperty?.property_id,
-                    contact_type: contact?.contact_type,
-                    contact_data: contact?.contact_data,
-                    status: true
-                }];
-                const finalContact = { contacts: contactdata };
-                axios
-                    .post(`/api/contact`, finalContact, {
-                        headers: { "content-type": "application/json" },
-                    })
-                    .then((response) => {
-                        setSpinner(0)
-                        toast.success("API: Contact add success.", {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                        });
-                        document.getElementById('addcontactform').reset();
-                        setView(0)
-                        fetchHotelDetails();
-                        Router.push("./contact");
-                        setContact([]);
-                        setSpin(0)
-                        setError({});
-                        setFlag([]);
-                    })
-                    .catch((error) => {
-                        setSpinner(0)
-                        toast.error("API: Contact add error.", {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                        });
-                        setView(0)
-                        setFlag([]);
-                    });
+    function updateInventory(inventorydata) {
+        let url = `/api/inventory`
+        axios.put(url, inventorydata,
+            {
+                header: { "content-type": "application/json" }
             }
-        }
-    }
-
-    /* Function Edit Contact*/
-    const submitContactEdit = (props, noChange) => {
-        if (objChecker.isEqual(props, noChange)) {
-            toast.warn('No change in contacts detected. ', {
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        }
-        else {
-            setError({})
-            var result = validateContactEdit(props, countryCode)
-            if (result === true) {
-                submitContactAdd();
-
-                const final_data = {
-                    contact_id: props.id,
-                    contact_data: props.type,
-                    status: props.status
-                };
-                const url = "/api/contact";
-                axios
-                    .put(url, final_data, { header: { "content-type": "application/json" } })
-                    .then((response) => {
-                        toast.success("API: Contact update success.", {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                        });
-                        fetchHotelDetails();
-                        Router.push("./contact");
-                    })
-                    .catch((error) => {
-                        setSpinner(0)
-                        toast.error("API:Contact update error.", {
-                            position: "top-center",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                            progress: undefined,
-                        });
-                    });
-            }
-            else {
-                toast.warn(result?.type, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-
-                setError(result)
-            }
-        }
-    };
-
-    // Add Validation Contact Delete
-    const submitContactDelete = (props) => {
-        const url = `/api/${props}`;
-        axios
-            .delete(url)
-            .then((response) => {
-                setSpin(0);
-                toast.success("API:Contact delete success.", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                fetchHotelDetails();
-                setDeleteContact(0)
-                Router.push("./contact");
+        ).then((response) => {
+            console.log(response.data);
+            fetchHotelDetails();
+            setSaveLoader(false)
+            // Reset the editInventory state after the update
+            setEditInventory({});
+            setEdit({
+                value: 0,
+                idx: undefined
             })
-            .catch((error) => {
-                toast.error("API: Contact delete error.", {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                setDeleteContact(0)
-            });
-    };
+            toast.success('Inventory updated successfully')
 
-    // Add Validation Contact
-    const validationContact = () => {
-        setError({})
-        var result = validateContact(contact, countryCode)
-        console.log("Result" + JSON.stringify(result))
-        if (result === true) {
-            submitContactAdd();
-        }
-        else {
-            setError(result)
-        }
+        }).catch((err) => {
+            console.log(err)
+            setSaveLoader(false)
+            // Reset the editInventory state after the update
+            setEditInventory({});
+            setEdit({
+                value: 0,
+                idx: undefined
+            })
+            toast.error('Not Able to update the inventory at the moment.')
+
+        })
     }
-
-    // ---------------------------------------------------
-
-    // function searchFunction() {
-    //     // Declare variables
-    //     let input, filter, table, tr, td, i, txtValue;
-    //     input = document.getElementById("myInput");
-    //     filter = input.value.toUpperCase();
-    //     table = document.getElementById("myTable");
-    //     tr = table.getElementsByTagName("tr");
-
-    //     // Loop through all table rows, and hide those who don't match the search query
-    //     for (i = 1; i < tr.length; i++) {
-    //         td = tr[i];
-    //         if (td) {
-    //             txtValue = td.textContent || td.innerText;
-    //             if (txtValue.toUpperCase().indexOf(filter) > -1) {
-    //                 tr[i].style.display = "";
-    //             } else {
-    //                 tr[i].style.display = "none";
-    //             }
-    //         }
-    //     }
-    // }
-
-    // const [viewDel, setViewDel] = useState(0);
-
-    // const handlecheckbox = (e) => {
-    //     console.log(e.target)
-    //     const { name, checked } = e.target;
-    //     setViewDel(1);
-    //     if (name === "allSelect") {
-    //         let tempCon = gen.map((item) => {
-    //             return { ...item, isChecked: checked }
-    //         });
-    //         setGen(tempCon)
-    //     }
-    //     else {
-    //         let tempCon = gen.map((item) =>
-    //             item.id === name ? { ...item, isChecked: checked } : item
-    //         );
-    //         setGen(tempCon)
-    //     }
-
-    // }
-
-    // var checked = [];
-    // const allDelete = async () => {
-    //     checked = [];
-    //     checked = gen.filter(i => i.isChecked === true).map(j => { return (j.id) })
-    //     if (checked?.length > 0) {
-    //         setDeleteMultiple(1);
-    //     }
-    //     else {
-    //         toast.warn("No contact selected", {
-    //             position: "top-center",
-    //             autoClose: 5000,
-    //             hideProgressBar: false,
-    //             closeOnClick: true,
-    //             pauseOnHover: true,
-    //             draggable: true,
-    //             progress: undefined,
-    //         });
-    //     }
-    // }
-
-    // const [update, setUpdate] = useState({
-    //     "edit": 0,
-    //     "id": ''
-    // });
-
-    // const displayData = useMemo(() => {
-    //     const start = (page - 1) * itemsPerPage;
-    //     return gen.slice(start, start + itemsPerPage);
-    // }, [page, gen, itemsPerPage]);
-
-
-
-
 
 
     return (
         <>
             <Title name={`Engage |  ${language?.contact}`} />
-            <Header color={color} Primary={english?.Side1} Type={currentLogged?.user_type}
-                Sec={colorToggler} mode={mode} setMode={setMode} />
-            <Sidebar color={color} Primary={english?.Side1} Type={currentLogged?.user_type} />
+
+            <Header
+                color={color}
+                Primary={english?.Side1}
+                Type={currentLogged?.user_type}
+                Sec={colorToggler}
+                mode={mode}
+                setMode={setMode}
+
+            />
+
+            <Sidebar
+                color={color}
+                Primary={english?.Side1}
+                Type={currentLogged?.user_type}
+
+            />
 
             <div
                 id="main-content"
@@ -505,19 +233,6 @@ function Inventory() {
                 <div className={(visible === 0 && colorToggle == true ? 'block' : 'hidden')}><LoaderDarkTable /></div>
                 <div className={visible === 1 ? 'block' : 'hidden'}>
 
-                    {/* <GenericTable
-                            inlineTable={true}
-                            color={color}
-                            language={language}
-                            addButton={true}
-                            addButtonAction={() => setView(1)}
-                            tableName={language?.contact}
-                            cols={["checkbox", "Contact Details", "Contact Type", "status", "Actions"]}
-                            data={gen}
-                            deleteAll={() => { alert("feature not functional"); }}
-                        /> */}
-
-
                     {/* <Table
                         gen={gen}
                         setGen={setGen}
@@ -539,46 +254,253 @@ function Inventory() {
                         name="Contact"
                     /> */}
 
-                    <InventoryTable
-                        gen={gen}
-                        setGen={setGen}
-                        add={() => setView(1)}
-                        edit={submitContactEdit}
-                        delSpin={language?.SpinnerDelete}
-                        saveSpinner={language?.SpinnerSave}
-                        spinner={spinner}
-                        setSpinner={setSpinner}
-                        color={color}
-                        language={language}
-                        deleteAll={contactDeleteMultiple}
-                        spin={spin}
-                        property_id={currentProperty?.property_id}
-                        delete={submitContactDelete}
-                        common={language?.common}
-                        cols={language?.InventoryCols}
-                        name="Inventory"
-                    />
+                    <div className="mx-4">
+                        <h1 className={`text-xl sm:text-2xl font-semibold ${color?.text}`}>{"Inventory"}</h1>
+                        <div className="sm:flex">
+                            <div className=" sm:flex items-center sm:divide-x sm:divide-gray-100 mb-3 sm:mb-0">
+                                {/* search form */}
+                                <form className="lg:pr-3" action="#" method="GET">
+                                    <label htmlFor="users-search" className="sr-only">{'search'} Search</label>
+                                    <div className="mt-1 relative lg:w-64 xl:w-96">
+                                        <input type="text" name="email" id="myInput" onKeyUp={() => alert('searchFunction')}
+                                            className={`${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`} placeholder={'Search'}>
+                                        </input>
+                                    </div>
+                                </form>
+                                {/* search form end */}
+                                {/* icons start */}
+                                <div className="flex space-x-1 pl-0 sm:pl-2 mt-3 sm:mt-0">
+                                    <span className={`${color?.textgray} hover:${color?.text} cursor-pointer p-1 ${color?.hover} rounded inline-flex justify-center`}>
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"></path></svg>
+                                    </span>
+
+                                    <button onClick={() => alert('allDelete')} data-tooltip="Delete" aria-label="Delete" className={`${color?.textgray} hover:${color?.text} cursor-pointer p-1 ${color?.hover} rounded inline-flex justify-center`}>
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path></svg>
+                                    </button>
 
 
 
+                                    <span className={`${color?.textgray} hover:${color?.text} cursor-pointer p-1 ${color?.hover} rounded inline-flex justify-center`}>
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path></svg>
+                                    </span>
+                                    <span className={`${color?.textgray} hover:${color?.text} cursor-pointer p-1 ${color?.hover} rounded inline-flex justify-center`}>
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                    </span>
+                                </div>
+                                {/* icons end*/}
+                            </div>
+
+                            <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
+                                <button
+                                    className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                    onClick={() => {
+                                        setView(1)
+                                    }}
+                                >
+                                    {'Add'}</button>
+
+                            </div>
+
+                        </div>
+                    </div>
 
                 </div>
 
+                <div className="flex  flex-col mt-8 lg:-mr-20 sm:mr-0 w-full ">
+                    <div className="overflow-x-auto">
+                        <div className="align-middle inline-block min-w-full">
+                            <div className="shadow overflow-hidden">
+                                <table className="table data table-fixed min-w-full divide-y divide-gray-200" id="myTable">
+                                    <thead className={` ${color?.tableheader} `}>
+                                        <tr>
+                                            {/* <th scope="col" className="p-4">
+                                                <div className="flex items-center">
+                                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
+                                                        name="allSelect" checked={args?.gen?.filter(item => item?.isChecked !== true).length < 1}
+                                                        onChange={(e) => { handlecheckbox(e); setViewDel(1); }}
+                                                        className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
+                                                    <label htmlFor="checkbox-all" className="sr-only">checkbox</label>
+                                                </div>
+                                            </th> */}
+                                            <th scope="col"
+                                                className={`p-4 text-left text-xs font-semibold ${color?.textgray} uppercase`}>{"Room Name"}</th>
+                                            <th scope="col"
+                                                className={`p-4 text-left text-xs font-semibold ${color?.textgray} uppercase`}>{"Start Date"}</th>
+                                            <th scope="col"
+                                                className={`p-4 text-left text-xs font-semibold ${color?.textgray} uppercase`}>{"End Date"}</th>
+                                            <th scope="col"
+                                                className={`p-4 text-left text-xs font-semibold ${color?.textgray} uppercase`}>{"inventory Available"}</th>
+                                            <th scope="col"
+                                                className={`p-4 text-left text-xs font-semibold ${color?.textgray} uppercase`}>{"Action"}
+                                            </th>
+                                        </tr>
+                                    </thead>
 
+
+                                    <tbody className={` ${color?.whitebackground} divide-y divide-gray-200 `} id="TableList" >
+                                        {inventories.map((inv, index) => (
+                                            <>
+                                                {
+                                                    edit.value === 1 && edit.idx === index ?
+                                                        //After Edit Clicked
+                                                        <>
+                                                            <tr className={`${color?.hover}`}>
+                                                                {/* first col when editing starts */}
+                                                                <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${color?.text}`}>
+                                                                    {inv.room_name}
+                                                                </td>
+
+                                                                <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${color?.text}`}>
+                                                                    {/* <input type="text"
+                                                                        onChange={(e) => {
+                                                                            setEditInventory({
+                                                                                ...editInventory,
+                                                                                'start_date': e.target.value
+                                                                            })
+                                                                        }}
+                                                                        className={`shadow-sm  ${color?.whitebackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-32 p-2.5`}
+                                                                        defaultValue={inv.start_date}>
+                                                                    </input> */}
+
+                                                                    <ReactDatePicker
+                                                                        selected={new Date(editInventory.start_date || inv.start_date)}
+                                                                        minDate={new Date()}
+
+                                                                        onChange={(date) => {
+                                                                            const formattedDate = date.toISOString().substring(0, 10);
+
+                                                                            setEditInventory({
+                                                                                ...editInventory,
+                                                                                'start_date': formattedDate
+                                                                            })
+                                                                        }}
+                                                                        className={`shadow-sm  ${color?.whitebackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-32 p-2.5`}
+                                                                    />
+
+
+                                                                </td>
+
+                                                                <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${color?.text}`}>
+                                                                    {/* <input type="text"
+                                                                        onChange={(e) => {
+                                                                            setEditInventory({
+                                                                                ...editInventory,
+                                                                                'end_date': e.target.value
+                                                                            })
+                                                                        }}
+                                                                        className={`shadow-sm  ${color?.whitebackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-32 p-2.5`}
+                                                                        defaultValue={inv.end_date}>
+                                                                    </input> */}
+                                                                    <ReactDatePicker
+                                                                        selected={new Date(editInventory.end_date || inv.end_date)}
+                                                                        onChange={(date) => {
+                                                                            const formattedDate = date.toISOString().substring(0, 10);
+                                                                            setEditInventory({
+                                                                                ...editInventory,
+                                                                                'end_date': formattedDate
+                                                                            });
+                                                                        }}
+                                                                        minDate={new Date(editInventory.start_date || inv.start_date)}
+                                                                        className={`shadow-sm  ${color?.whitebackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-32 p-2.5`}
+                                                                    />
+                                                                </td>
+                                                                <td className={`p-4 whitespace-nowrap capitalize text-base font-normal ${color?.text}`}>
+                                                                    <input type="text"
+                                                                        onChange={(e) => {
+                                                                            setEditInventory({
+                                                                                ...editInventory,
+                                                                                'inventory_count': e.target.value
+                                                                            })
+                                                                        }} className={`shadow-sm  ${color?.whitebackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-32 p-2.5`}
+                                                                        defaultValue={inv.inventory_count}>
+                                                                    </input>
+                                                                </td>
+                                                                <td className="py-4 whitespace-nowrap capitalize">
+                                                                    {saveLoader === true ?
+                                                                        <ButtonLoader
+                                                                            classes="bg-gradient-to-r bg-green-600 hover:bg-green-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                            text="Save"
+                                                                        /> :
+                                                                        <>
+                                                                            <button
+                                                                                disabled={Object.keys(editInventory).length === 0}
+                                                                                className="bg-gradient-to-r bg-green-600 hover:bg-green-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                                onClick={() => {
+                                                                                    setSaveLoader(true)
+                                                                                    updateInventory({ "inventory": [{ ...editInventory, "room_id": inv.room_id }] })
+                                                                                }}
+                                                                            >{'Save'}
+                                                                            </button>
+                                                                        </>
+                                                                    }
+
+                                                                    <button
+                                                                        className="ml-5 bg-gradient-to-r bg-red-600 hover:bg-red-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                        onClick={() => {
+                                                                            setEdit({
+                                                                                'value': 0,
+                                                                                'idx': undefined
+                                                                            })
+                                                                        }}
+                                                                    >{'Cancel'} </button>
+                                                                </td>
+                                                            </tr>
+                                                        </>
+
+                                                        : <>
+                                                            {/* before editiing */}
+                                                            <tr key={index} >
+                                                                <td className={`p-4 whitespace-nowrap capitalize  text-base font-normal ${color?.text}`}>
+                                                                    {inv.room_name}
+                                                                </td>
+                                                                <td className={`p-4 whitespace-nowrap capitalize  text-base font-normal ${color?.text}`}>
+                                                                    {inv.start_date}
+                                                                </td>
+                                                                <td className={`p-4 whitespace-nowrap capitalize  text-base font-normal ${color?.text}`}>
+                                                                    {inv.end_date}
+                                                                </td>
+                                                                <td className={`p-4 whitespace-nowrap capitalize  text-base font-normal ${color?.text}`}>
+                                                                    {inv.inventory_count}
+                                                                </td>
+                                                                <td className="py-4 whitespace-nowrap capitalize">
+                                                                    <button
+                                                                        className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                        onClick={() => {
+                                                                            setEdit({
+                                                                                'value': 1,
+                                                                                'idx': index
+                                                                            })
+                                                                        }}
+                                                                    >{'Edit'} </button>
+                                                                    <button className="ml-5 bg-gradient-to-r bg-red-600 hover:bg-red-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150" >{'Delete'} </button>
+                                                                </td>
+                                                            </tr>
+                                                        </>
+                                                }
+                                            </>
+                                        )
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Modal Add */}
                 <div className={view === 1 ? "block" : "hidden"}>
-                    <div className="overflow-x-hidden overflow-y-auto fixed top-4 left-0 right-0 backdrop-blur-xl bg-black/30 md:inset-0 z-50 flex justify-center items-center h-modal sm:h-full">
-                        <div className="relative w-full max-w-2xl px-4 h-full md:h-auto">
+                    {/* <div className="overflow-x-hidden overflow-y-auto fixed top-4 left-0 right-0 backdrop-blur-xl bg-black/30 md:inset-0 z-50 flex justify-center items-center h-modal sm:h-full"> */}
+                    <div className="overflow-x-hidden overflow-y-auto fixed top-4 left-0 right-0 backdrop-blur-xl bg-black/30 md:inset-0 z-50 flex justify-center items-center  sm:h-full">
+                        {/* <div className="relative w-full max-w-2xl px-4 h-full md:h-auto"> */}
+                        <div className="relative w-full px-4 md:w-5/6 h-full ">
                             <div className={`${color?.whitebackground} rounded-lg shadow relative`}>
                                 <div className="flex items-start justify-between p-5 border-b rounded-t">
-                                    <h3 className={`${color?.text} text-xl font-semibold`}>{language?.add} {language?.new} {language?.contact}</h3>
+                                    {/* <h3 className={`${color?.text} text-xl font-semibold`}>{language?.add} {language?.new} {language?.contact}</h3> */}
+                                    <h3 className={`${color?.text} text-xl font-semibold`}>{'Add New Inventory'}</h3>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            document.getElementById('addcontactform').reset();
-                                            setContact([]);
-                                            setError({});
+
                                             setView(0);
                                         }}
                                         className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -597,7 +519,7 @@ function Inventory() {
                                         </svg>
                                     </button>
                                 </div>
-                                <form id='addcontactform'>
+                                {/* <form id='addcontactform'>
                                     <div className="p-6 space-y-6" >
                                         <div className="grid grid-cols-6 gap-6">
                                             <div className="col-span-6 sm:col-span-3">
@@ -615,8 +537,7 @@ function Inventory() {
                                                             contact_type: e.target.value,
                                                         }, setFlag(1))
                                                     }
-                                                    className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg 
-                        focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
+                                                    className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
                                                 >
                                                     <option selected disabled>{language?.select}</option>
                                                     <option value="phone">Phone</option>
@@ -649,8 +570,7 @@ function Inventory() {
                                                         }, setFlag(1))
                                                     }
 
-                                                    className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg 
-                        focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
+                                                    className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
                                                     required
                                                 />
                                                 <p className="text-sm  text-red-700 font-light">
@@ -669,8 +589,30 @@ function Inventory() {
                                     <div className={spinner === 1 && flag === 1 ? 'block' : 'hidden'}>
                                         <Button Primary={language?.SpinnerAdd} />
                                     </div>
-                                </div>
+                                </div> */}
+
+                                <InventoryModal
+                                    setView={(e) => setView(e)}
+                                    fetchHotelDetail={(e) => fetchHotelDetails(e)}
+
+                                />
+
+                                {/* <div className="items-center p-6 border-t border-gray-200 rounded-b">
+
+                                    <button
+                                        onClick={() => {
+                                            updateInventory({ "inventory": [{ ...newInventory, "room_id": inv.room_id }] })
+
+                                        }}
+                                        className={`bg-gradient-to-r  bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150`}
+                                    >
+                                        Add
+                                    </button>
+
+                                </div> */}
+
                             </div>
+
                         </div>
                     </div>
                 </div>

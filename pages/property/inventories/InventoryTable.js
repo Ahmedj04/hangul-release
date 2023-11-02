@@ -8,7 +8,7 @@ var checked = [];
 const InventoryTable = (args) => {
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [page, setPage] = useState(1);
-    const [error, setError] = useState({});
+    // const [error, setError] = useState({});
     const [viewDel, setViewDel] = useState(0);
     const [flag, setFlag] = useState([]);
 
@@ -106,7 +106,7 @@ const InventoryTable = (args) => {
         <>
             {/* TableHeader */}
             <div className="mx-4">
-                <h1 className={`text-xl sm:text-2xl font-semibold ${args?.color?.text}`}>{(args?.name !== "ARI") ? <>{args?.cols?.name}</> : <>{args?.name}</>}</h1>
+                <h1 className={`text-xl sm:text-2xl font-semibold ${args?.color?.text}`}>{args?.cols?.name}</h1>
                 <div className="sm:flex">
                     <div className=" sm:flex items-center sm:divide-x sm:divide-gray-100 mb-3 sm:mb-0">
                         {/* search form */}
@@ -161,15 +161,15 @@ const InventoryTable = (args) => {
                             <table className="table data table-fixed min-w-full divide-y divide-gray-200" id="myTable">
                                 <thead className={` ${args?.color?.tableheader} `}>
                                     <tr>
-                                        <th scope="col" className="p-4">
-                                            <div className="flex items-center">
-                                                <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
-                                                    name="allSelect" checked={args?.gen?.filter(item => item?.isChecked !== true).length < 1}
-                                                    onChange={(e) => { handlecheckbox(e); setViewDel(1); }}
-                                                    className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
-                                                <label htmlFor="checkbox-all" className="sr-only">checkbox</label>
-                                            </div>
-                                        </th>
+                                        {/* <th scope="col" className="p-4">
+                                                <div className="flex items-center">
+                                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
+                                                        name="allSelect" checked={args?.gen?.filter(item => item?.isChecked !== true).length < 1}
+                                                        onChange={(e) => { handlecheckbox(e); setViewDel(1); }}
+                                                        className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
+                                                    <label htmlFor="checkbox-all" className="sr-only">checkbox</label>
+                                                </div>
+                                            </th> */}
                                         <th scope="col"
                                             className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col1}</th>
                                         <th scope="col"
@@ -178,11 +178,6 @@ const InventoryTable = (args) => {
                                             className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col3}</th>
                                         <th scope="col"
                                             className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.cols?.col4}</th>
-
-                                        {/* {args?.status != "matchstatus" && args?.mark != "beds" ?
-                                            <th scope="col"
-                                                className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.common?.Status}</th>
-                                            : <></>} */}
                                         <th scope="col"
                                             className={`p-4 text-left text-xs font-semibold ${args?.color?.textgray} uppercase`}>{args?.common?.Action}
                                         </th>
@@ -190,7 +185,7 @@ const InventoryTable = (args) => {
                                 </thead>
 
 
-                                <tbody className={` ${args?.color?.whitebackground} divide-y  divide-gray-200 `} id="TableList" >
+                                <tbody className={` ${args?.color?.whitebackground} divide-y divide-gray-200 `} id="TableList" >
                                     {displayData?.map((item, idx) => (
                                         <>
 
@@ -362,7 +357,7 @@ const InventoryTable = (args) => {
                                                 //Before Edit is clicked
                                                 <>
                                                     <tr>
-                                                        {args?.name != "Services" ?
+                                                        {/* {args?.name != "Services" ?
                                                             <td className="p-4 w-4">
                                                                 <span className="flex items-center">
                                                                     <input id="checkbox-1" name={item?.id} checked={item.isChecked || false}
@@ -371,8 +366,8 @@ const InventoryTable = (args) => {
                                                                         className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
                                                                     <label htmlFor="checkbox-1" className="sr-only">checkbox</label>
                                                                 </span>
-                                                            </td> : <></>}
-                                                        <td className={`p-4 whitespace-nowrap ${args.name === "Contact" ? undefined : `capitalize`}  text-base font-normal ${args?.color?.text}`}>
+                                                            </td> : <></>} */}
+                                                        <td className={`p-4 whitespace-nowrap capitalize  text-base font-normal ${args?.color?.text}`}>
                                                             {args.name != "Contact" ? item?.name : item?.type}
                                                         </td>
                                                         {args?.name === "Packages" ? <></> :
