@@ -29,7 +29,7 @@ var currentLogged;
 var days_of_week = 'mtwtfsu';
 const logger = require("../../../services/logger");
 
-function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
+function InventoryModal({ error, setError, setView, setInventories, setVisibility, view }) {
   const [darkModeSwitcher, setDarkModeSwitcher] = useState()
   const [inventory, setInventory] = useState([])
   // const [gen, setGen] = useState([])
@@ -107,13 +107,40 @@ function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
       }
     }
     firstfun();
-  }, [])
+  }, [view])
+
 
 
   useEffect(() => {
     setColor(DarkModeLogic(darkModeSwitcher))
   }, [darkModeSwitcher])
 
+
+
+  // Fetch Hotel Details
+  const fetchHotelDetails = async () => {
+    const url = `/api/inventory/${currentProperty.property_id}`;
+    axios.get(url)
+      .then((response) => {
+        if (response.data.length > 0) {
+          setInventories(response.data)
+          setView(0)
+          fetchInventoryRooms()
+
+        } else {
+          setInventories([])
+          fetchInventoryRooms()
+
+        }
+        // setVisible(1);
+        // setVisibility(1);
+      })
+      .catch((error) => {
+        logger.error("url to fetch property details, failed")
+      });
+
+
+  }
   // Inventory
   const submitInventory = () => {
     const current = new Date();
@@ -133,7 +160,7 @@ function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
     const url = '/api/inventory'
     axios.post(url, final_data, { header: { "content-type": "application/json" } }).then
       ((response) => {
-        toast.success("Inventory success", {
+        toast.success("Inventory Added successfully", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -147,13 +174,11 @@ function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
         document.getElementById("inventoryAddForm").reset();
         setError({})
         setAddLoader(false)
-        setView(0)
         fetchHotelDetails()
       })
       .catch((error) => {
         setAddLoader(false)
-
-        toast.error("Inventory  error", {
+        toast.error("There was some Error in adding the Inventory ", {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -193,6 +218,7 @@ function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
   //   days_of_week = days_present.toString().replaceAll(',', '');
   // }
   // Validate Inventory
+
   const validationInventory = () => {
     var result = validateInventory(inventory, 'mtwtfss')
     console.log("Result" + JSON.stringify(result))
@@ -201,6 +227,7 @@ function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
     }
     else {
       setError(result)
+      setAddLoader(false)
     }
   }
   return (

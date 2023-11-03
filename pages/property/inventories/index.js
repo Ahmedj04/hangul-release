@@ -651,10 +651,13 @@ function Inventory() {
                                 </div> */}
 
                                 <InventoryModal
+                                    view={view}
                                     setView={(e) => setView(e)}
                                     error={error}
                                     setError={(e) => setError(e)}
-                                    fetchHotelDetail={(e) => fetchHotelDetails(e)}
+                                    // fetchHotelDetail={(e) => fetchHotelDetails(e)}
+                                    setInventories={(e) => { setInventories(e) }}
+                                    setVisibility={(e) => { setVisible(e) }}
 
                                 />
 
