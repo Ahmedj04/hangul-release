@@ -29,13 +29,13 @@ var currentLogged;
 var days_of_week = 'mtwtfsu';
 const logger = require("../../../services/logger");
 
-function InventoryModal({ error, setError, setView, setInventories, setVisibility, view }) {
+function InventoryModal({ error, setError, setView, setInventories, setVisibility, view, color, language }) {
   const [darkModeSwitcher, setDarkModeSwitcher] = useState()
   const [inventory, setInventory] = useState([])
   // const [gen, setGen] = useState([])
   const [visible, setVisible] = useState(0);
   // const [error, setError] = useState({})
-  const [color, setColor] = useState({})
+  // const [color, setColor] = useState({})
   const [allRooms, setAllRooms] = useState([])
 
   const [addLoader, setAddLoader] = useState(false)
@@ -84,20 +84,20 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
   useEffect(() => {
     const firstfun = () => {
       if (typeof window !== 'undefined') {
-        var locale = localStorage.getItem("Language");
-        const colorToggle = JSON.parse(localStorage.getItem("ColorToggle"));
-        const color = JSON.parse(localStorage.getItem("Color"));
-        setColor(color);
-        setDarkModeSwitcher(colorToggle);
-        if (locale === "ar") {
-          language = arabic;
-        }
-        if (locale === "en") {
-          language = english;
-        }
-        if (locale === "fr") {
-          language = french;
-        }
+        // var locale = localStorage.getItem("Language");
+        // const colorToggle = JSON.parse(localStorage.getItem("ColorToggle"));
+        // const color = JSON.parse(localStorage.getItem("Color"));
+        // setColor(color);
+        // setDarkModeSwitcher(colorToggle);
+        // if (locale === "ar") {
+        //   language = arabic;
+        // }
+        // if (locale === "en") {
+        //   language = english;
+        // }
+        // if (locale === "fr") {
+        //   language = french;
+        // }
         /** Current Property Basic Details fetched from the local storage **/
         currentProperty = JSON.parse(localStorage.getItem('property'))
         currentLogged = JSON.parse(localStorage.getItem("Signin Details"));
@@ -111,9 +111,9 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
 
 
 
-  useEffect(() => {
-    setColor(DarkModeLogic(darkModeSwitcher))
-  }, [darkModeSwitcher])
+  // useEffect(() => {
+  //   setColor(DarkModeLogic(darkModeSwitcher))
+  // }, [darkModeSwitcher])
 
 
 
@@ -273,6 +273,7 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
                           {error?.start_date}</p></div>
                     </div>
                   </div>
+
                   <div className="w-full lg:w-6/12 px-4">
                     <div className="relative w-full mb-3">
                       <label className={`text-sm font-medium ${color?.text} block mb-2`}
@@ -295,30 +296,6 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
                       </div>
                     </div>
                   </div>
-
-                  {/* available days */}
-                  {/* <div className="w-full lg:w-6/12 px-4">
-                  <div className="relative w-full mb-3">
-                    <label
-                      className={`text-sm capitalize font-medium ${color?.text} block mb-2`}
-                      htmlFor="grid-password">
-                      {language?.available} {language?.days} <span style={{ color: "#ff0000" }}>*</span>
-                    </label>
-                    <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
-                    <div className={visible === 1 ? 'block' : 'hidden'}>
-                      <Multiselect
-                        className={` shadow-sm ${color?.greybackground} ${color?.text} mb-3 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full`}
-                        isObject={true}
-                        options={lang?.DaysData}
-                        onRemove={(event) => { days(event) }}
-                        onSelect={(event) => { days(event) }}
-                        selectedValues={lang?.DaysData}
-                        displayValue="day" />
-                      <p className="text-sm text-red-700 font-light">
-                        {error?.days}</p>
-                    </div>
-                  </div>
-                </div> */}
 
                   <div className="w-full lg:w-6/12 px-4">
                     <div className="relative w-full mb-3">
@@ -343,20 +320,22 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
                     </div>
                   </div>
 
-                  <div className="w-full lg:w-6/12 px-4">
+                  <div className={`w-full  lg:w-6/12 px-4`}>
                     <div className="relative w-full mb-3">
                       <label className={`text-sm font-medium ${color?.text} block mb-2`}
                         htmlFor="grid-password">
                         {language?.rooms}  <span style={{ color: "#ff0000" }}>*</span>
                       </label>
                       <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
-                      <div className={visible === 1 ? 'block' : 'hidden'}>
+
+                      <div className={visible === 1 ? `block ` : 'hidden'}>
                         <select
                           onClick={(e) => (
                             setInventory({ ...inventory, room_id: e.target.value })
                           )
                           }
-                          className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                          className={`shadow-sm ${color?.greybackground} ${color?.text}  border border-gray-300  sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
+                        // className={`shadow-sm ${color.greybackground} ${color?.text} border border-gray-300 text-white sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
                         >
                           <option selected>Select rooms</option>
                           {allRooms?.map((i) => {
@@ -382,7 +361,7 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
               </form>
             </div>
           </div>
-        </div>
+        </div >
 
         <ToastContainer position="top-center"
           autoClose={5000}
@@ -393,7 +372,7 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
           pauseOnFocusLoss
           draggable
           pauseOnHover />
-      </div>
+      </div >
 
       <div className='p-5 flex justify-end'>
         {addLoader === true ?

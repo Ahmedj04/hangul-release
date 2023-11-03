@@ -655,6 +655,8 @@ function Inventory() {
                                     setView={(e) => setView(e)}
                                     error={error}
                                     setError={(e) => setError(e)}
+                                    color={color}
+                                    language={language}
                                     // fetchHotelDetail={(e) => fetchHotelDetails(e)}
                                     setInventories={(e) => { setInventories(e) }}
                                     setVisibility={(e) => { setVisible(e) }}
