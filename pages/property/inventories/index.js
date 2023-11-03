@@ -55,9 +55,15 @@ function Inventory() {
         'value': 0,
         'idx': undefined
     })
+    const [deleteInventory, setDeleteInventory] = useState({
+        'value': 0,
+        'idx': undefined
+    })
+
     const [editInventory, setEditInventory] = useState({})
     const [newInventory, setNewInventory] = useState({})
     const [saveLoader, setSaveLoader] = useState(false)
+    const [deleteLoader, setDeleteLoader] = useState(false)
 
     useEffect(() => {
         firstfun();
@@ -123,7 +129,6 @@ function Inventory() {
         const url = `/api/inventory/${currentProperty.property_id}`;
         axios.get(url)
             .then((response) => {
-                alert(response.data.length > 0, JSON.stringify(response.data))
                 if (response.data.length > 0) {
                     setInventories(response.data)
                 } else {
@@ -170,6 +175,22 @@ function Inventory() {
         })
     }
 
+    function deleteInventoryFromDB(room_id) {
+        let url = `/api/inventory/${room_id}`
+        axios.delete(url, room_id).then((response) => {
+            fetchHotelDetails()
+            setDeleteLoader(false)
+            toast.success('Inventory has been deleted')
+            setDeleteInventory({
+                'value': 0,
+                'idx': undefined
+            })
+
+        }).catch((err) => {
+            console.log(err)
+            setDeleteLoader(false)
+        })
+    }
 
     return (
         <>
@@ -462,18 +483,55 @@ function Inventory() {
                                                                 <td className={`p-4 whitespace-nowrap capitalize  text-base font-normal ${color?.text}`}>
                                                                     {inv.inventory_count}
                                                                 </td>
-                                                                <td className="py-4 whitespace-nowrap capitalize">
-                                                                    <button
-                                                                        className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
-                                                                        onClick={() => {
-                                                                            setEdit({
-                                                                                'value': 1,
-                                                                                'idx': index
-                                                                            })
-                                                                        }}
-                                                                    >{'Edit'} </button>
-                                                                    <button className="ml-5 bg-gradient-to-r bg-red-600 hover:bg-red-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150" >{'Delete'} </button>
-                                                                </td>
+
+                                                                {deleteInventory.value === 1 && deleteInventory.idx === index ?
+                                                                    <td className="py-4 whitespace-nowrap capitalize">
+                                                                        <button
+                                                                            className="bg-gradient-to-r bg-green-600 hover:bg-green-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                            onClick={() => {
+                                                                                setDeleteInventory({
+                                                                                    'value': 0,
+                                                                                    'idx': undefined
+                                                                                })
+                                                                            }}
+                                                                        >{'Cancel'} </button>
+                                                                        {deleteLoader === true ?
+                                                                            <ButtonLoader
+                                                                                classes="ml-5 bg-gradient-to-r bg-red-600 hover:bg-red-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                                text="Yes, I Confirm"
+                                                                            />
+                                                                            : <button
+                                                                                className="ml-5 bg-gradient-to-r bg-red-600 hover:bg-red-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                                onClick={() => {
+                                                                                    setDeleteLoader(true)
+                                                                                    deleteInventoryFromDB(inv.room_id)
+
+                                                                                }}
+                                                                            >{'Yes, I Confirm'} </button>
+                                                                        }
+
+                                                                    </td>
+                                                                    : <td className="py-4 whitespace-nowrap capitalize">
+                                                                        <button
+                                                                            className="bg-gradient-to-r bg-cyan-600 hover:bg-cyan-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                            onClick={() => {
+                                                                                setEdit({
+                                                                                    'value': 1,
+                                                                                    'idx': index
+                                                                                })
+                                                                            }}
+                                                                        >{'Edit'} </button>
+                                                                        <button
+                                                                            className="ml-5 bg-gradient-to-r bg-red-600 hover:bg-red-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+                                                                            onClick={() => {
+                                                                                setDeleteInventory({
+                                                                                    'value': 1,
+                                                                                    'idx': index
+                                                                                })
+                                                                            }}
+                                                                        >{'Delete'} </button>
+                                                                    </td>}
+
                                                             </tr>
                                                         </>
                                                 }
@@ -492,7 +550,7 @@ function Inventory() {
                     {/* <div className="overflow-x-hidden overflow-y-auto fixed top-4 left-0 right-0 backdrop-blur-xl bg-black/30 md:inset-0 z-50 flex justify-center items-center h-modal sm:h-full"> */}
                     <div className="overflow-x-hidden overflow-y-auto fixed top-4 left-0 right-0 backdrop-blur-xl bg-black/30 md:inset-0 z-50 flex justify-center items-center  sm:h-full">
                         {/* <div className="relative w-full max-w-2xl px-4 h-full md:h-auto"> */}
-                        <div className="relative w-full px-4 md:w-5/6 h-full ">
+                        <div className="relative w-full px-4 md:w-3/5 h-full md:h-auto ">
                             <div className={`${color?.whitebackground} rounded-lg shadow relative`}>
                                 <div className="flex items-start justify-between p-5 border-b rounded-t">
                                     {/* <h3 className={`${color?.text} text-xl font-semibold`}>{language?.add} {language?.new} {language?.contact}</h3> */}
@@ -500,7 +558,8 @@ function Inventory() {
                                     <button
                                         type="button"
                                         onClick={() => {
-
+                                            fetchHotelDetails()
+                                            setError({})
                                             setView(0);
                                         }}
                                         className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -593,6 +652,8 @@ function Inventory() {
 
                                 <InventoryModal
                                     setView={(e) => setView(e)}
+                                    error={error}
+                                    setError={(e) => setError(e)}
                                     fetchHotelDetail={(e) => fetchHotelDetails(e)}
 
                                 />

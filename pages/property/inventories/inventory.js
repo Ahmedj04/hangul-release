@@ -21,6 +21,7 @@ import Textboxloader from '../../../components/loaders/textboxloader';
 import Link from "next/link";
 // import validateInventory from '../../../components/Validation/inventory';
 import validateInventory from '../../../components/validation/validateInventory';
+import { ButtonLoader } from './ButtonLoader';
 var language;
 var currentProperty;
 var currentRoom;
@@ -28,15 +29,16 @@ var currentLogged;
 var days_of_week = 'mtwtfsu';
 const logger = require("../../../services/logger");
 
-function InventoryModal({ setView, fetchHotelDetails }) {
+function InventoryModal({ error, setError, setView, fetchHotelDetails }) {
   const [darkModeSwitcher, setDarkModeSwitcher] = useState()
   const [inventory, setInventory] = useState([])
-  const [gen, setGen] = useState([])
+  // const [gen, setGen] = useState([])
   const [visible, setVisible] = useState(0);
-  const [error, setError] = useState({})
+  // const [error, setError] = useState({})
   const [color, setColor] = useState({})
   const [allRooms, setAllRooms] = useState([])
 
+  const [addLoader, setAddLoader] = useState(false)
 
   //fetch rooms with inventory
   const fetchInventoryRooms = async () => {
@@ -101,7 +103,6 @@ function InventoryModal({ setView, fetchHotelDetails }) {
         currentLogged = JSON.parse(localStorage.getItem("Signin Details"));
         currentRoom = localStorage.getItem('RoomId');
         fetchInventoryRooms()
-
         setVisible(1);
       }
     }
@@ -122,7 +123,7 @@ function InventoryModal({ setView, fetchHotelDetails }) {
         "property_id": currentProperty?.property_id,
         "start_date": inventory?.start_date,
         "end_date": inventory?.end_date,
-        "days_of_week": days_of_week.toString().replaceAll(',', ''),
+        "days_of_week": 'mtwtfss',
         "room_id": inventory?.room_id,
         "inventory_count": inventory?.inventory_count,
         "inventory_type": 2
@@ -141,11 +142,17 @@ function InventoryModal({ setView, fetchHotelDetails }) {
           draggable: true,
           progress: undefined,
         });
+
+        setInventory([])
+        document.getElementById("inventoryAddForm").reset();
+        setError({})
+        setAddLoader(false)
         setView(0)
         fetchHotelDetails()
-
       })
       .catch((error) => {
+        setAddLoader(false)
+
         toast.error("Inventory  error", {
           position: "top-center",
           autoClose: 5000,
@@ -158,36 +165,36 @@ function InventoryModal({ setView, fetchHotelDetails }) {
       })
   }
   // Days
-  const days = (days) => {
-    var days_present = ['-', '-', '-', '-', '-', '-', '-'];
-    days.map(day => {
-      if (day.day === 'mon') {
-        days_present[0] = 'm'
-      }
-      else if (day.day === 'tue') {
-        days_present[1] = 't'
-      }
-      else if (day.day === 'weds') {
-        days_present[2] = 'w'
-      }
-      else if (day.day === 'thur') {
-        days_present[3] = 't'
-      }
-      else if (day.day === 'fri') {
-        days_present[4] = 'f'
-      }
-      else if (day.day === 'sat') {
-        days_present[5] = 's'
-      }
-      else if (day.day === 'sun') {
-        days_present[6] = 's'
-      }
-    })
-    days_of_week = days_present.toString().replaceAll(',', '');
-  }
+  // const days = (days) => {
+  //   var days_present = ['-', '-', '-', '-', '-', '-', '-'];
+  //   days.map(day => {
+  //     if (day.day === 'mon') {
+  //       days_present[0] = 'm'
+  //     }
+  //     else if (day.day === 'tue') {
+  //       days_present[1] = 't'
+  //     }
+  //     else if (day.day === 'weds') {
+  //       days_present[2] = 'w'
+  //     }
+  //     else if (day.day === 'thur') {
+  //       days_present[3] = 't'
+  //     }
+  //     else if (day.day === 'fri') {
+  //       days_present[4] = 'f'
+  //     }
+  //     else if (day.day === 'sat') {
+  //       days_present[5] = 's'
+  //     }
+  //     else if (day.day === 'sun') {
+  //       days_present[6] = 's'
+  //     }
+  //   })
+  //   days_of_week = days_present.toString().replaceAll(',', '');
+  // }
   // Validate Inventory
   const validationInventory = () => {
-    var result = validateInventory(inventory, days_of_week)
+    var result = validateInventory(inventory, 'mtwtfss')
     console.log("Result" + JSON.stringify(result))
     if (result === true) {
       submitInventory();
@@ -212,54 +219,58 @@ function InventoryModal({ setView, fetchHotelDetails }) {
           </h6>
           <div className="pt-6">
             <div className=" md:px-4 mx-auto w-full">
-              <div className="flex flex-wrap">
+              <form id='inventoryAddForm'>
+                <div className="flex flex-wrap">
 
-                <div className="w-full lg:w-6/12 px-4">
-                  <div className="relative w-full mb-3">
-                    <label
-                      className={`text-sm font-medium ${color?.text} block mb-2`}
-                      htmlFor="grid-password"
-                    >
-                      {language?.startdate} <span style={{ color: "#ff0000" }}>*</span>
-                    </label>
-                    <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
-                    <div className={visible === 1 ? 'block' : 'hidden'}>
-                      <input
-                        type="date"
-                        className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
-                        onChange={
-                          (e) => (
-                            setInventory({ ...inventory, start_date: e.target.value })
-                          )
-                        }
-                      />
-                      <p className="text-sm  text-red-700 font-light">
-                        {error?.start_date}</p></div>
-                  </div>
-                </div>
-                <div className="w-full lg:w-6/12 px-4">
-                  <div className="relative w-full mb-3">
-                    <label className={`text-sm font-medium ${color?.text} block mb-2`}
-                      htmlFor="grid-password">
-                      {language?.enddate} <span style={{ color: "#ff0000" }}>*</span>
-                    </label>
-                    <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
-                    <div className={visible === 1 ? 'block' : 'hidden'}>
-                      <input
-                        type="date"
-                        className={`shadow-sm ${color?.greybackground} ${color?.text}  border border-gray-300  sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
-                        onChange={
-                          (e) => (
-                            setInventory({ ...inventory, end_date: e.target.value })
-                          )
-                        }
-                      />
-                      <p className="text-sm text-red-700 font-light">
-                        {error?.end_date}</p>
+
+                  <div className="w-full lg:w-6/12 px-4">
+                    <div className="relative w-full mb-3">
+                      <label
+                        className={`text-sm font-medium ${color?.text} block mb-2`}
+                        htmlFor="grid-password"
+                      >
+                        {language?.startdate} <span style={{ color: "#ff0000" }}>*</span>
+                      </label>
+                      <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
+                      <div className={visible === 1 ? 'block' : 'hidden'}>
+                        <input
+                          type="date"
+                          className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
+                          onChange={
+                            (e) => (
+                              setInventory({ ...inventory, start_date: e.target.value })
+                            )
+                          }
+                        />
+                        <p className="text-sm  text-red-700 font-light">
+                          {error?.start_date}</p></div>
                     </div>
                   </div>
-                </div>
-                <div className="w-full lg:w-6/12 px-4">
+                  <div className="w-full lg:w-6/12 px-4">
+                    <div className="relative w-full mb-3">
+                      <label className={`text-sm font-medium ${color?.text} block mb-2`}
+                        htmlFor="grid-password">
+                        {language?.enddate} <span style={{ color: "#ff0000" }}>*</span>
+                      </label>
+                      <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
+                      <div className={visible === 1 ? 'block' : 'hidden'}>
+                        <input
+                          type="date"
+                          className={`shadow-sm ${color?.greybackground} ${color?.text}  border border-gray-300  sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
+                          onChange={
+                            (e) => (
+                              setInventory({ ...inventory, end_date: e.target.value })
+                            )
+                          }
+                        />
+                        <p className="text-sm text-red-700 font-light">
+                          {error?.end_date}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* available days */}
+                  {/* <div className="w-full lg:w-6/12 px-4">
                   <div className="relative w-full mb-3">
                     <label
                       className={`text-sm capitalize font-medium ${color?.text} block mb-2`}
@@ -280,66 +291,68 @@ function InventoryModal({ setView, fetchHotelDetails }) {
                         {error?.days}</p>
                     </div>
                   </div>
-                </div>
-                <div className="w-full lg:w-6/12 px-4">
-                  <div className="relative w-full mb-3">
-                    <label className={`text-sm font-medium ${color?.text} block mb-2`}
-                      htmlFor="grid-password">
-                      {language?.rooms}  {language?.count} <span style={{ color: "#ff0000" }}>*</span>
-                    </label>
-                    <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
-                    <div className={visible === 1 ? 'block' : 'hidden'}>
-                      <input
-                        type="number" min={1}
-                        className={`shadow-sm ${color?.greybackground} ${color?.text}  border border-gray-300  sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
-                        onChange={
-                          (e) => (
-                            setInventory({ ...inventory, inventory_count: e.target.value })
+                </div> */}
+
+                  <div className="w-full lg:w-6/12 px-4">
+                    <div className="relative w-full mb-3">
+                      <label className={`text-sm font-medium ${color?.text} block mb-2`}
+                        htmlFor="grid-password">
+                        {language?.rooms}  {language?.count} <span style={{ color: "#ff0000" }}>*</span>
+                      </label>
+                      <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
+                      <div className={visible === 1 ? 'block' : 'hidden'}>
+                        <input
+                          type="number" min={1}
+                          className={`shadow-sm ${color?.greybackground} ${color?.text}  border border-gray-300  sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
+                          onChange={
+                            (e) => (
+                              setInventory({ ...inventory, inventory_count: e.target.value })
+                            )
+                          }
+                        />
+                        <p className="text-sm  text-red-700 font-light">
+                          {error?.inventory_count}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full lg:w-6/12 px-4">
+                    <div className="relative w-full mb-3">
+                      <label className={`text-sm font-medium ${color?.text} block mb-2`}
+                        htmlFor="grid-password">
+                        {language?.rooms}  <span style={{ color: "#ff0000" }}>*</span>
+                      </label>
+                      <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
+                      <div className={visible === 1 ? 'block' : 'hidden'}>
+                        <select
+                          onClick={(e) => (
+                            setInventory({ ...inventory, room_id: e.target.value })
                           )
-                        }
-                      />
-                      <p className="text-sm  text-red-700 font-light">
-                        {error?.inventory_count}</p>
+                          }
+                          className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                        >
+                          <option selected>Select rooms</option>
+                          {allRooms?.map((i) => {
+                            return (
+                              <option key={i} value={i.room_id}>
+                                {i.room_name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <p className="text-sm  text-red-700 font-light">
+                          {error?.room}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="w-full lg:w-6/12 px-4">
-                  <div className="relative w-full mb-3">
-                    <label className={`text-sm font-medium ${color?.text} block mb-2`}
-                      htmlFor="grid-password">
-                      {language?.rooms}  <span style={{ color: "#ff0000" }}>*</span>
-                    </label>
-                    <div className={visible === 0 ? 'block' : 'hidden'}><Lineloader /></div>
-                    <div className={visible === 1 ? 'block' : 'hidden'}>
-                      <select
-                        onClick={(e) => (
-                          setInventory({ ...inventory, room_id: e.target.value })
-                        )
-                        }
-                        className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
-                      >
-                        <option selected>Select rooms</option>
-                        {allRooms?.map((i) => {
-                          return (
-                            <option key={i} value={i.room_id}>
-                              {i.room_name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                      <p className="text-sm  text-red-700 font-light">
-                        {error?.room}</p>
-                    </div>
-                  </div>
-                </div>
 
 
-                {/* <div className="flex items-center justify-end space-x-2 sm:space-x-3 ml-auto">
+                  {/* <div className="flex items-center justify-end space-x-2 sm:space-x-3 ml-auto">
                   <Button Primary={language?.Submit} onClick={validationInventory} />
                 </div> */}
 
-              </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -355,16 +368,23 @@ function InventoryModal({ setView, fetchHotelDetails }) {
           pauseOnHover />
       </div>
 
-      <div className='p-5'>
-        <button
-          onClick={() => {
-            validationInventory()
-            // updateInventory({ "inventory": [{ ...inventory, "room_id": inventory.room_id }] })
-          }}
-          className={`bg-gradient-to-r  bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150`}
-        >
-          Add
-        </button>
+      <div className='p-5 flex justify-end'>
+        {addLoader === true ?
+          <ButtonLoader
+            classes="bg-gradient-to-r  bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
+            text="Add"
+          />
+          : <button
+            onClick={() => {
+              setAddLoader(true)
+              validationInventory()
+              // updateInventory({ "inventory": [{ ...inventory, "room_id": inventory.room_id }] })
+            }}
+            className={`bg-gradient-to-r  bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150`}
+          >
+            Add
+          </button>}
+
       </div>
 
 
