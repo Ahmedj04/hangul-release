@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import CarousalComponent from "../NewTheme/CarousalComponent"
 import { ButtonLoader } from './ButtonLoader';
-
 import { english } from '../Languages/Languages';
-import { BsFillPeopleFill } from "react-icons/bs";
-import { BiArrowBack } from "react-icons/bi";
-import { AiOutlineClose, AiOutlineShoppingCart } from "react-icons/ai";
-
-
-import BedIcon from '@mui/icons-material/Bed';
-import LandscapeIcon from '@mui/icons-material/Landscape';
-import GroupsIcon from '@mui/icons-material/Groups';
-import SquareFootIcon from '@mui/icons-material/SquareFoot';
-
+import { SquareFootIcon, GroupsIcon, LandscapeIcon, BedIcon, AiOutlineClose, AiOutlineShoppingCart, BiArrowBack, BsFillPeopleFill } from './Icons'
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 
@@ -21,16 +11,14 @@ import "react-toastify/dist/ReactToastify.css";
 
 // redux imports
 import { useDispatch, useSelector } from 'react-redux';
-import { setRoomsSelected, setAddMoreRoom, clearRoomsSelected, clearInventoryDetail, setReserveRoom, clearReservationIdentity, setReservationIdentity } from '../redux/hangulSlice';
+import { setRoomsSelected, setAddMoreRoom, clearRoomsSelected, clearInventoryDetail, setReserveRoom, clearReservationIdentity, clearGuestDetails, setReservationIdentity } from '../redux/hangulSlice';
 
-function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
+function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
   const [searchBookingInventory, setSearchBookingInventory] = useState(false)
 
   const [selectedRoom, setSelectedRoom] = useState({})
   const [rate, setRate] = useState({})
-
-  const [lang, setLang] = useState(english)
 
   const dispatch = useDispatch();
 
@@ -87,43 +75,14 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
     localStorage.removeItem('reservation_ids');
   }
 
-  // function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
-  //   // Get the existing 'reservation_id's' from local storage
-  //   let existingData = localStorage.getItem('reservation_ids');
-
-  //   // Check if there is existing data in local storage
-  //   if (existingData) {
-  //     // Parse the existing data from JSON
-  //     existingData = JSON.parse(existingData);
-
-  //     // Update the reservation ID for the specific room ID
-  //     existingData[roomId] = reservation_id;
-
-  //   } else {
-  //     // If there is no existing data, create a new object with the new data
-  //     existingData = {
-  //       // [reservation_id]: 'reservation_id'
-  //       [roomId]: reservation_id
-  //     };
-  //   }
-
-  //   console.log("this is reservation data", existingData)
-
-  //   // Store the updated data back in local storage
-  //   localStorage.setItem('reservation_ids', JSON.stringify(existingData));
-  // }
-
-  function reserveRoom(roomdata, roomId) {
+  function reserveRoom(roomdata) {
     let url = "/api/reserve_rooms";
     axios.post(url, roomdata).then((response) => {
-      // toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
       dispatch(setReserveRoom(false))
       setSearchBookingInventory(false)
-
     }).catch((err) => {
       console.log(err)
     })
-
   }
 
   function removeReservationFromDB(room_id, reservation_time) {
@@ -166,18 +125,36 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
   }
 
 
+  function closeButtonAction() {
+    // if there is any reservation in DB then remove them first else perform the other funtions
+    if (reservationIdentity.length > 0) {
+      reservationIdentity?.map((room) => {
+        removeReservationFromDB(room?.room_id, room?.reservation_time);
+      });
+    }
+    else {
+      setShowModal(0)
+      setDisplay(0)
+      setSearched(false)
+      dispatch(setAddMoreRoom(false))
+      dispatch(clearRoomsSelected())
+      dispatch(clearGuestDetails())
+      dispatch(clearReservationIdentity())
+      dispatch(clearInventoryDetail())
+      deleteRoomDetails()
+    }
+  }
+
   function Booknow() {
     return (<>
       <div className='flex justify-end'>
         <div className='w-96 h-full mr-3 py-6 px-5 flex flex-col bg-slate-100 shadow-2xl rounded-xl text-slate-600 font-semibold'>
           <h1 className='text-black-900 py-2 text-xl'>Price for {selectedRoom?.room_name}</h1>
           <h2 className='text-red-800 flex gap-2 py-3 items-center text-lg'>For {selectedRoom?.maximum_number_of_occupants} <BsFillPeopleFill /> <span className='text-xs'>Per Night</span></h2>
-
           <div className='flex justify-between border-t py-3 border-gray-300'><h2 className='text-black'>Base Amount</h2> <span className=''>₹ {rate?.total_final_rate}</span></div>
           <div className='flex justify-between border-t py-3 border-gray-300'><h2 className='text-black'>Tax Amount</h2> <span className=''>₹ {rate?.total_tax_amount}</span></div>
           <div className='flex justify-between border-t py-3 border-gray-300'><h2 className='text-black'>Other Fees</h2> <span className=''>₹ {rate?.total_otherfees_amount}</span></div>
           <div className='flex justify-between text-blue-900 text-xl font-bold border-t py-3 border-gray-300'><h2 className=''>Total Price</h2> <span className=''>₹ {rate?.total_final_rate + rate?.total_otherfees_amount + rate?.total_tax_amount}</span></div>
-
           <div className='border-t border-gray-300  md:pt-8 relative pt-4'>
             {searchBookingInventory === true ?
               <ButtonLoader
@@ -198,7 +175,6 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
                   dispatch(setReservationIdentity([reservationIdentity]))
 
                   reserveRoom({
-                    // "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": selectedRoom?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
                     "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_count": 1, ...reservationIdentity })
                   }, selectedRoom?.room_id)
 
@@ -212,9 +188,10 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
           </div>
         </div>
       </div>
-
     </>)
   }
+
+
   return (
     <section>
 
@@ -226,6 +203,7 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
         </div>
 
         <div className='my-auto mr-10 text-base italic flex gap-10'>
+          {/* cart icon */}
           <i className='cursor-pointer'
             onClick={() => {
               if (roomsSelected.length === 0) {
@@ -233,25 +211,13 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
               } else {
                 setDisplay(2)
               }
-            }}> <AiOutlineShoppingCart color='black' size={20} /> </i>
-          <i className='cursor-pointer my-auto'
-            onClick={() => {
-              if (reservationIdentity.length > 0) {
-                reservationIdentity?.map((room) => {
-                  removeReservationFromDB(room?.room_id, room?.reservation_time)
-                })
-              } else {
-                setDisplay(0)
-                setShowModal(0)
-                setSearched(false)
-                dispatch(setAddMoreRoom(false))
-                dispatch(clearRoomsSelected())
-                dispatch(clearInventoryDetail())
-                deleteRoomDetails()
-              }
-            }}>
+            }}> <AiOutlineShoppingCart color='black' size={20} />
+          </i>
 
-            <AiOutlineClose color='red' size={20} /> </i>
+          {/* back icon */}
+          <i className='cursor-pointer my-auto' onClick={closeButtonAction}>
+            <AiOutlineClose color='red' size={20} />
+          </i>
         </div>
       </div>
 
@@ -327,7 +293,6 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
         {/* right div with price details */}
         <div className='w-5/12'>
           <div className='my-36 hidden lg:block md:hidden lg:w-full md:w-full'><Booknow /></div>
-
         </div>
       </div>
 
@@ -335,4 +300,4 @@ function RoomDetails2({ setDisplay, setShowModal, setSearched, checkinDate, chec
   )
 }
 
-export default RoomDetails2
+export default RoomSummary

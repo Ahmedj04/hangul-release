@@ -1,180 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import RoomCard from '../BookingEngine/RoomCard';
-import Carousel from 'better-react-carousel';
 import { AiOutlineShoppingCart, AiOutlineClose } from "react-icons/ai";
-
+// useDispatch is used to store the data in the store of the redux, while useSelector is used to get the data from the store.
 import { useDispatch, useSelector } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom, clearReservationIdentity, clearInventoryDetail } from '../redux/hangulSlice'
-
+// reducer functions are being imported from the redux
+import { clearRoomsSelected, setAddMoreRoom, clearReservationIdentity, clearInventoryDetail, clearGuestDetails } from '../redux/hangulSlice'
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
 function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
 
-    const [selectedDate, setSelectedDate] = useState([]);
     const reservationIdentity = useSelector(state => state.reservationIdentity)
+    const dispatch = useDispatch() //creating object of dispatch 
 
-    const dispatch = useDispatch()
-
-    const addMoreRooms = useSelector(state => state.addMoreRoom)
+    const addMoreRooms = useSelector(state => state.addMoreRoom) //reads addMoreRoom from state into const
     const roomsSelected = useSelector(state => state.roomsSelected)
-    console.log("boolean value for add more rooms: ", addMoreRooms)
-
-    // const data = {
-    //     "2023-09-19": [
-    //         {
-    //             "room_id": "r004",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-19",
-    //             "final_rate": 1499,
-    //             "tax_amount": 248,
-    //             "otherfees_amount": 209
-    //         },
-    //         {
-    //             "room_id": "r005",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-19",
-    //             "final_rate": 1200,
-    //             "tax_amount": 230,
-    //             "otherfees_amount": 200
-    //         },
-    //         {
-    //             "room_id": "r006",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-19",
-    //             "final_rate": 2999,
-    //             "tax_amount": 301,
-    //             "otherfees_amount": 256
-    //         },
-    //         {
-    //             "room_id": "r0011",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-19",
-    //             "final_rate": 999,
-    //             "tax_amount": 199,
-    //             "otherfees_amount": 100
-    //         },
-    //         {
-    //             "room_id": "r003",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-19",
-    //             "final_rate": 2000,
-    //             "tax_amount": 240,
-    //             "otherfees_amount": 110
-    //         }
-    //     ],
-    //     "2023-09-20": [
-    //         {
-    //             "room_id": "r004",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-20",
-    //             "final_rate": 1499,
-    //             "tax_amount": 248,
-    //             "otherfees_amount": 209
-    //         },
-    //         {
-    //             "room_id": "r005",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-20",
-    //             "final_rate": 1200,
-    //             "tax_amount": 230,
-    //             "otherfees_amount": 200
-    //         },
-    //         {
-    //             "room_id": "r006",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-20",
-    //             "final_rate": 2999,
-    //             "tax_amount": 301,
-    //             "otherfees_amount": 256
-    //         },
-    //         {
-    //             "room_id": "r0011",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-20",
-    //             "final_rate": 999,
-    //             "tax_amount": 199,
-    //             "otherfees_amount": 100
-    //         },
-    //         {
-    //             "room_id": "r003",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-20",
-    //             "final_rate": 2000,
-    //             "tax_amount": 240,
-    //             "otherfees_amount": 110
-    //         }
-    //     ],
-    //     "2023-09-21": [
-    //         {
-    //             "room_id": "r004",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-21",
-    //             "final_rate": 1499,
-    //             "tax_amount": 248,
-    //             "otherfees_amount": 209
-    //         },
-    //         {
-    //             "room_id": "r005",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-21",
-    //             "final_rate": 1200,
-    //             "tax_amount": 230,
-    //             "otherfees_amount": 200
-    //         },
-    //         {
-    //             "room_id": "r006",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-21",
-    //             "final_rate": 2999,
-    //             "tax_amount": 301,
-    //             "otherfees_amount": 256
-    //         },
-    //         {
-    //             "room_id": "r0011",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-21",
-    //             "final_rate": 999,
-    //             "tax_amount": 199,
-    //             "otherfees_amount": 100
-    //         },
-    //         {
-    //             "room_id": "r003",
-    //             "property_id": "t2k004",
-    //             "rate_date": "2023-09-21",
-    //             "final_rate": 2000,
-    //             "tax_amount": 240,
-    //             "otherfees_amount": 110
-    //         }
-    //     ]
-    // }
-
-    console.log("this is rooms", rooms)
 
     // Create an object to group room rates by room_id and calculate the total final rate for each room
     const roomData = {};
 
-    // Object.values(data).forEach((roomRates) => {
-    //     roomRates.forEach((rate) => {
-    //         const { room_id, property_id, final_rate, tax_amount, otherfees_amount } = rate;
-    //         if (!roomData[room_id]) {
-    //             roomData[room_id] = {
-    //                 room_id,
-    //                 property_id,
-    //                 total_final_rate: final_rate,
-    //                 total_tax_amount: tax_amount,
-    //                 total_otherfees_amount: otherfees_amount
-    //             };
-    //         } else {
-    //             roomData[room_id].total_final_rate += final_rate;
-    //             roomData[room_id].total_tax_amount += tax_amount;
-    //             roomData[room_id].total_otherfees_amount += otherfees_amount;
-    //         }
-    //     });
-    // });
-
+    // taking out the data from the dataOfRoomsAsPerDateSelected and storing them in roomData object.
     dataOfRoomsAsPerDateSelected.forEach((rate) => {
         const { room_id, property_id, final_rate, tax_amount, otherfees_amount } = rate;
         if (!roomData[room_id]) {
@@ -194,11 +41,11 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
 
     // Convert the grouped data into an array of rooms
     const roomsArray = Object.values(roomData);
-    console.log("this is rooms array ", roomsArray)
+    // console.log("this is rooms array ", roomsArray)
 
     // Sort the roomsArray in ascending order based on total_final_rate
     const sortedFinalRate = roomsArray.slice().sort((room1, room2) => room1.total_final_rate - room2.total_final_rate);
-    console.log("this is the sorted final rate", sortedData)
+    // console.log("this is the sorted final rate", sortedData)
 
 
     // only those rooms whose room_id is not in roomsSelected state
@@ -209,21 +56,10 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
 
     useEffect(() => {
         groupingByDate()
-        findingLowestRate()
-        // Check if resultArray has at least one element
-        if (findingLowestRate().length > 0) {
-            const firstDate = findingLowestRate()[0][0];
-            setSelectedDate(firstDate)
-            // console.log("The date from the first array is:", firstDate);
-        } else {
-            console.log("The array is empty.");
-        }
     }, [allRoomRateDetails])
 
     // Create an object to store room details grouped by rate_date
     const groupedByDate = {};
-
-    const lowestRatesByDate = {};
 
     function groupingByDate() {
         // Loop through the roomDetails array
@@ -239,45 +75,30 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
         });
 
         // Now, groupedByDate will contain separate arrays for each rate_date
-        console.log("grouped by date:- ", groupedByDate);
-
+        // console.log("grouped by date:- ", groupedByDate);
         return groupedByDate;
     }
+    // console.log("returning group", groupingByDate())
 
-    console.log("returning group", groupingByDate())
+    // if incase we need this function in future, this function is used to take out the lowest rate on the particular date
+    // function findingLowestRate() {
+    //     // Loop through the grouped data
+    //     for (const rate_date in groupedByDate) {
+    //         const roomsForDate = groupedByDate[rate_date];
 
-    // Use the selected date to filter the data
-    // filteredData will contain an array of objects for the selected date
-    const filteredData = groupingByDate()[selectedDate] || []
+    //         // Find the room with the lowest final_rate for the current date
+    //         const lowestRoom = roomsForDate.reduce((lowest, room) => {
+    //             return room.final_rate < lowest.final_rate ? room : lowest;
+    //         });
+    //         // Store the lowest rate for the current date
+    //         lowestRatesByDate[rate_date] = lowestRoom.final_rate;
+    //     }
 
-    console.log("this is filtered data ", filteredData)
-
-    // Sort the filteredData array by final_rate in ascending order
-    const sortedData = filteredData.slice().sort((a, b) => a.final_rate - b.final_rate);
-
-    console.log("this is the sorted filtered data", sortedData)
-
-    function findingLowestRate() {
-        // Loop through the grouped data
-        for (const rate_date in groupedByDate) {
-            const roomsForDate = groupedByDate[rate_date];
-
-            // Find the room with the lowest final_rate for the current date
-            const lowestRoom = roomsForDate.reduce((lowest, room) => {
-                return room.final_rate < lowest.final_rate ? room : lowest;
-            });
-
-            // Store the lowest rate for the current date
-            lowestRatesByDate[rate_date] = lowestRoom.final_rate;
-        }
-
-        // Now, lowestRatesByDate will contain the lowest rate for each date
-        console.log("lowest rate by date:- ", lowestRatesByDate);
-
-        const lowestRatesArray = Object.entries(lowestRatesByDate);
-
-        return lowestRatesArray;
-    }
+    //     // Now, lowestRatesByDate will contain the lowest rate for each date
+    //     // console.log("lowest rate by date:- ", lowestRatesByDate);
+    //     const lowestRatesArray = Object.entries(lowestRatesByDate);
+    //     return lowestRatesArray;
+    // }
 
     // Function to delete room_rates and room_data from local storage
     function deleteRoomDetails() {
@@ -305,103 +126,42 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
             dispatch(clearInventoryDetail())
             deleteRoomDetails()
         }).catch((err) => {
-            console.log("Error in deleting reservation from DB", err)
+            toast.error("API:Error in deleting reservation from DB")
         })
 
     }
 
+    function closeButtonAction() {
+        // if there is any reservation in DB then remove them first else perform the other funtions
+        if (reservationIdentity.length > 0) {
+            reservationIdentity?.map((room) => {
+                removeReservationFromDB(room?.room_id, room?.reservation_time);
+            });
+        }
+        else {
+            setShowModal(0)
+            setDisplay(0)
+            setSearched(false)
+            dispatch(setAddMoreRoom(false))
+            dispatch(clearRoomsSelected())
+            dispatch(clearGuestDetails())
+            dispatch(clearReservationIdentity())
+            dispatch(clearInventoryDetail())
+            deleteRoomDetails()
+        }
+    }
+
+
     return (
-        <div
-            id="main-content"
-            // className={`${color?.greybackground} px-4 pt-2 pb-2 `}
-            className={`${color?.light} px-4 pt-2 pb-2 `}
-        >
-            {/* price info */}
-            {/* <Carousel cols={9} rows={1} gap={0} autoPlay={false} loop={false}
-                responsiveLayout={[
-                    {
-                        breakpoint: 480,
-                        cols: 5,
-                        rows: 1,
-                        gap: 0,
-                        loop: false,
-                        autoplay: false
-                    },
-                    {
-                        breakpoint: 810,
-                        cols: 4,
-                        rows: 1,
-                        gap: 0,
-                        loop: false,
-                        autoplay: false
-                    },
-                    {
-                        breakpoint: 980,
-                        cols: 4,
-                        rows: 1,
-                        gap: 0,
-                        loop: false,
-                        autoplay: false
-                    },
-                    // {
-                    //     breakpoint: 1020,
-                    //     cols: 4,
-                    //     rows: 1,
-                    //     gap: 0,
-                    //     loop: false,
-                    //     autoplay: false
-                    // },
-                    {
-                        breakpoint: 1024,
-                        cols: 7,
-                        rows: 1,
-                        gap: 0,
-                        loop: false,
-                        autoplay: false
-                    },
-                    {
-                        breakpoint: 1280,
-                        cols: 8,
-                        rows: 1,
-                        gap: 0,
-                        loop: false,
-                        autoplay: false
-                    },
-                ]}
-            >
-                {findingLowestRate()?.map(([date, rate], index) => {
-                    return (
-                        <Carousel.Item key={index} >
-                            <div
-                                onClick={() => {
-                                    setSelectedDate(date)
-                                }}
-                                className='text-white border h-14 w-32 text-center'>
-                                <h4 className='font-bold text-white'>{date}</h4>
-                                <p>₹ {rate}</p>
-                            </div>
-                        </Carousel.Item>
-                    )
-                })}
-            </Carousel> */}
-
-
-            {/* Basic Details Form */}
-
-            <div
-                // className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}
-                className={`${color?.light} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}
-            >
-
+        <div id="main-content" className={`${color?.light} px-4 pt-2 pb-2 `}>
+            <div className={`${color?.light} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
                 <div className='flex justify-between'>
-                    <h6
-                        // className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} 
-                        className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
-                    >
+                    <h6 className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
                         Rooms For Booking
                     </h6>
                     <div className='my-auto'>
                         <div className='flex gap-10'>
+                            {/* cart option */}
                             <i className='cursor-pointer'
                                 onClick={() => {
                                     if (roomsSelected.length === 0) {
@@ -410,31 +170,17 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                                         setDisplay(2)
                                     }
                                 }}
-                            > <AiOutlineShoppingCart color='black' size={20} /> </i>
+                            > <AiOutlineShoppingCart color='black' size={20} />
+                            </i>
+
+                            {/* back option */}
                             <i className='cursor-pointer'
-                                onClick={() => {
-                                    if (reservationIdentity.length > 0) {
-                                        reservationIdentity?.map((room) => {
-                                            removeReservationFromDB(room?.room_id, room?.reservation_time)
-                                        })
-                                    } else {
-                                        setDisplay(0)
-                                        setShowModal(0)
-                                        setSearched(false)
-                                        dispatch(setAddMoreRoom(false))
-                                        dispatch(clearRoomsSelected())
-                                        dispatch(clearReservationIdentity())
-                                        dispatch(clearInventoryDetail())
-                                        deleteRoomDetails()
-                                    }
-
-                                }}>
-                                <AiOutlineClose color='red' size={20} /> </i>
+                                onClick={closeButtonAction}>
+                                <AiOutlineClose color='red' size={20} />
+                            </i>
                         </div>
-
                     </div>
                 </div>
-
 
                 {addMoreRooms === true ?
                     <> {
@@ -466,34 +212,7 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                             />
                         })
                     }</>}
-
-
-
             </div>
-
-            {/* {selectedDate.length != 0 ?
-                <div className={`${color?.whitebackground} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
-                    <h6 className={`${color?.text} text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`} >
-                        Rooms For Booking
-                    </h6>
-
-                    {sortedData.map((room, index) => {
-                        return <RoomCard
-                            key={index}
-                            roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
-                            filteredRoomData={rooms?.filter((item) => item.room_id == room.room_id)[0]}
-                            roomRates={room}
-                            setDisplay={(e) => setDisplay(e)}
-                        // roomName={rooms?.filter((item) => item.room_id == room.room_id)[0].room_name}
-                        // roomDescription={rooms?.filter((item) => item.room_id == room.room_id)[0]?.room_description}     
-                        />
-                    })}
-
-                </div>
-                : <> </>
-            } */}
-
-
         </div>
     )
 }

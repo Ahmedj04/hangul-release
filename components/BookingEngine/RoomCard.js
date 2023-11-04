@@ -1,13 +1,9 @@
-// import { red } from '@mui/material/colors'
-
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setRoomsSelected, setReserveRoom, setReservationIdentity, addInventoryDetail } from '../redux/hangulSlice';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 import { ButtonLoader } from './ButtonLoader';
-
-
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,7 +15,6 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
   const [searchInventory, setSearchInventory] = useState(false)
   const [searchBookingInventory, setSearchBookingInventory] = useState(false)
-
 
   const startDate = new Date(checkinDate); // Booking start date
   const endDate = new Date(checkoutDate); // Booking end date
@@ -81,8 +76,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
       if (actionFrom === "bookNow") {
         // redirections to review page
         toCheckInventoryAvailable()
-      } else {    //if action is learn more
-        //  redirection to room details
+      } else {    //if action is learn more redirection to room details
         redirectToRoom(filteredRoomData, roomRates)
       }
 
@@ -95,38 +89,9 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
     })
   }
 
-  function toCheckForReservationIdInLocalStorage(reservation_id, roomId) {
-    // Get the existing 'reservation_id's' from local storage
-    let existingData = localStorage.getItem('reservation_ids');
-
-    // Check if there is existing data in local storage
-    if (existingData) {
-      // Parse the existing data from JSON
-      existingData = JSON.parse(existingData);
-
-      // Update the reservation ID for the specific room ID
-      existingData[roomId] = reservation_id;
-
-    } else {
-      // If there is no existing data, create a new object with the new data
-      existingData = {
-        // [reservation_id]: 'reservation_id'
-        [roomId]: reservation_id
-      };
-    }
-
-    console.log("this is reservation data", existingData)
-
-    // Store the updated data back in local storage
-    localStorage.setItem('reservation_ids', JSON.stringify(existingData));
-  }
-
-  function reserveRoom(roomdata, roomId) {
+  function reserveRoom(roomdata) {
     let url = "/api/reserve_rooms";
     axios.post(url, roomdata).then((response) => {
-      // alert(response.data.message)
-      // alert(response.data.reservation_id)
-      toCheckForReservationIdInLocalStorage(response.data.reservation_id, roomId)
       dispatch(setReserveRoom(false))
 
     }).catch((err) => {
@@ -135,6 +100,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
   }
 
+  // generate data to be fed for booking
   function generateBookingObjects(start_date, end_date, otherData) {
     const bookingObjects = [];
     let currentDate = new Date(start_date); // Start with the start_date
@@ -159,7 +125,6 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
 
   function toCheckInventoryAvailable() {
-
     let roomAvailable = true;
 
     for (const room of inventoryDetail) {
@@ -174,25 +139,16 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
         reservation_time: formatDateToCustomFormat(new Date())
       }
       redirectToReviewPage(filteredRoomData, roomRates)
-
       dispatch(setReserveRoom(true))
-
       dispatch(setReservationIdentity([reservationIdentity]))
-
       reserveRoom({
         "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_count": 1, ...reservationIdentity })
       }, roomRates?.room_id)
-
-      // reserveRoom({
-      //   "reserve_rooms": generateBookingObjects(checkinDate, checkoutDate, { "room_id": roomRates?.room_id, "room_count": 1, "reservation_time": formatDateToCustomFormat(new Date()) })
-      // }, roomRates?.room_id)
 
     } else {
       toast.error(`APP: Inventory for ${filteredRoomData?.room_name} not available for the selected days`);
     }
   }
-
-  console.log(roomRates)
 
   return (
     <div className=' w-100 h-1/4 text-black border border-gray-500 bg-white rounded-2xl p-4 m-4 flex flex-wrap justify-center items-center lg:flex-row md:flex-row flex-col'>
@@ -212,7 +168,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
       <div className='flex flex-col items-center justify-center w-fit lg:w-1/6 md:w-1/6'>
         <div className='py-2'>
           <h3 className='text-3xl font-bold  text-center'>₹ {roomRates.total_final_rate}</h3>
-          <p className='text-xs py-1 text-center'>+ tax For {numberOfDays} Days</p>
+          <p className='text-xs py-1 text-center'>+ tax For {numberOfDays} Day{numberOfDays === 1 ? '' : 's'}</p>
         </div>
 
         {searchBookingInventory === true ?
@@ -228,7 +184,6 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
               setSearchBookingInventory(true)
               getInventoryDetail("bookNow") // this method will check the inventory available for the selected room and if the inventory is available then the rest of the methods will be called inside it.
             }}
-
           >
             Book Now
           </button>}
@@ -250,11 +205,9 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
             className='mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white'
           >
             Learn More
-          </button>}
-
+          </button>
+        }
       </div>
-
-
     </div>
   )
 }

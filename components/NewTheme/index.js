@@ -43,8 +43,8 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
         getRoomDetails();
 
     }, []);
-    console.log("this is the hotel details: ", allHotelDetails)
-    console.log("this is the rooms details: ", rooms)
+    // console.log("this is the hotel details: ", allHotelDetails)
+    // console.log("this is the rooms details: ", rooms)
 
     function getLanguage() {
 

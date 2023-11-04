@@ -48,6 +48,10 @@ export const hangulSlice = createSlice({
             const roomsToReserve = action.payload
             state.reservationIdentity = [...state.reservationIdentity, ...roomsToReserve];
         },
+        removeReservationFromReservationIdentity: (state, action) => {
+            const roomIdToRemove = action.payload;
+            state.reservationIdentity = state.reservationIdentity.filter(reservation => reservation.room_id !== roomIdToRemove);
+        },
         clearReservationIdentity: (state) => {
             state.reservationIdentity = [];
         },
@@ -71,6 +75,7 @@ export const {
     clearInventoryDetail,
     setReserveRoom,
     setReservationIdentity,
+    removeReservationFromReservationIdentity,
     clearReservationIdentity,
     setGuestDetails,
     clearGuestDetails

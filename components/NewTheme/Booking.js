@@ -50,7 +50,6 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
                 setErr(false)
             }
         }
-
     }, [enquiry.checkin, enquiry.checkout]);
 
     return (
@@ -156,16 +155,17 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
 
             </div>
 
-
-            <div className={showBookingEngine == "1" ? "block z-50" : "hidden"}>
-                <BookingModal
+            {/* this div will only show up when the showBookingEngine is equal to 1 else there will be no such div, and the functions inside this div will only work when showBookingEngine is equal to 1 */}
+            {showBookingEngine === 1 ? <div className="block z-50">
+                {allHotelDetails && <BookingModal
                     title="Booking Engine"
-                    description={<BookingEngine display={display} setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} setShowModal={(e) => setShowBookingEngine(e)} setSearched={(e) => setSearched(false)} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
+                    bookingComponent={<BookingEngine display={display} setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} setShowModal={(e) => setShowBookingEngine(e)} setSearched={(e) => setSearched(false)} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
                     setShowModal={(e) => setShowBookingEngine(e)}
                     setDisplay={(e) => setDisplay(e)}
                     setSearched={(e) => setSearched(false)}
-                />
-            </div>
+                />}
+            </div> : undefined}
+
 
         </div>
     )

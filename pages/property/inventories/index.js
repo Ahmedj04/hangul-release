@@ -578,77 +578,7 @@ function Inventory() {
                                         </svg>
                                     </button>
                                 </div>
-                                {/* <form id='addcontactform'>
-                                    <div className="p-6 space-y-6" >
-                                        <div className="grid grid-cols-6 gap-6">
-                                            <div className="col-span-6 sm:col-span-3">
-                                                <label
-                                                    htmlFor="first-name"
-                                                    className={`text-sm ${color?.text} font-medium  block mb-2`}
-                                                >
-                                                    {language?.contact} {language?.type}
-                                                    <span style={{ color: "#ff0000" }}>*</span>
-                                                </label>
-                                                <select
-                                                    onChange={(e) =>
-                                                        setContact({
-                                                            ...contact,
-                                                            contact_type: e.target.value,
-                                                        }, setFlag(1))
-                                                    }
-                                                    className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
-                                                >
-                                                    <option selected disabled>{language?.select}</option>
-                                                    <option value="phone">Phone</option>
-                                                    <option value="phone-manager">Phone-Manager</option>
-                                                    <option value="phone-reception">Phone-Reception</option>
-                                                    <option value="email">Email</option>
-                                                    <option value="website">Website</option>
-                                                    <option value="toll free number">
-                                                        Toll Free number
-                                                    </option>
-                                                    <option value="tdd number">TDD number</option>
-                                                </select>
-                                                <p className="text-sm text-red-700 font-light">
-                                                    {error?.contact_type}</p>
-                                            </div>
-                                            <div className="col-span-6 sm:col-span-3">
-                                                <label htmlFor="last-name"
-                                                    className={`text-sm ${color?.text} font-medium  block mb-2`}>
-                                                    {language?.contact} {language?.value}
-                                                    <span style={{ color: "#ff0000" }}>*</span>
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="last-name"
-                                                    id="last-name"
-                                                    onChange={(e) =>
-                                                        setContact({
-                                                            ...contact,
-                                                            contact_data: e.target.value,
-                                                        }, setFlag(1))
-                                                    }
 
-                                                    className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`}
-                                                    required
-                                                />
-                                                <p className="text-sm  text-red-700 font-light">
-                                                    {error?.contact_data}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <div className="items-center p-6 border-t border-gray-200 rounded-b">
-                                    <div className={flag !== 1 && spinner === 0 ? 'block' : 'hidden'}>
-                                        <Button Primary={language?.AddDisabled} /></div>
-                                    <div className={spinner === 0 && flag === 1 ? 'block' : 'hidden'}>
-                                        <Button Primary={language?.Add} onClick={() => { validationContact(contact) }} />
-                                    </div>
-                                    <div className={spinner === 1 && flag === 1 ? 'block' : 'hidden'}>
-                                        <Button Primary={language?.SpinnerAdd} />
-                                    </div>
-                                </div> */}
 
                                 <InventoryModal
                                     view={view}
@@ -663,19 +593,7 @@ function Inventory() {
 
                                 />
 
-                                {/* <div className="items-center p-6 border-t border-gray-200 rounded-b">
 
-                                    <button
-                                        onClick={() => {
-                                            updateInventory({ "inventory": [{ ...newInventory, "room_id": inv.room_id }] })
-
-                                        }}
-                                        className={`bg-gradient-to-r  bg-cyan-600 hover:bg-cyan-700 text-white  sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150`}
-                                    >
-                                        Add
-                                    </button>
-
-                                </div> */}
 
                             </div>
 

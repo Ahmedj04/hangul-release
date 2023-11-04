@@ -1,26 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import InputText from '../utils/InputText';
 import Color from '../colors/Color';
-import Modal from "../NewTheme/modal";
-import { RxCross2 } from "react-icons/rx";
-import { BiArrowBack } from "react-icons/bi";
-import { AiOutlineClose } from "react-icons/ai";
-
+import { RxCross2, BiArrowBack, AiOutlineClose } from './Icons';
 // redux libraries
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails, clearInventoryDetail, clearReservationIdentity } from '../redux/hangulSlice';
-
+import { removeRoomFromSelected, clearRoomsSelected, setAddMoreRoom, setGuestDetails, clearGuestDetails, clearInventoryDetail, clearReservationIdentity, removeReservationFromReservationIdentity } from '../redux/hangulSlice';
 // validation
 import GuestDetailValidation from '../validation/bookingEngine/GuestDetailValidation'
 import GstValidation from '../validation/bookingEngine/GstDetailValidation'
-
 // timestamp
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
-
-
-import axios from 'axios';
-import { identity } from 'lodash';
+import CountdownTimer from './CountDownTimer';
 
 function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
@@ -34,11 +26,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const [guestDetailerror, setGuestDetailError] = useState({})
     const [gstDetailerror, setGstDetailError] = useState({})
     const [guest, setGuest] = useState([{ ...guestTemplate, index: 0 }]);
-    // const [guest, setGuest] = useState([guestTemplate]?.map((i, id) => { return { ...i, index: id } }))
     const [addGst, setAddGst] = useState(false);
-    // const [gstDetails, setGstDetails] = useState({ "registation_number": "", "company_name": "", "company_address": "" })
     const [gstDetails, setGstDetails] = useState({})
-    const [addNewUser, setAddNewUser] = useState(0)
     const [guestIndex, setGuestIndex] = useState(0)
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
@@ -49,6 +38,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         totalTaxAmount: 0,
         totalOtherFees: 0,
     });
+
     const { totalFinalRate, totalTaxAmount, totalOtherFees } = totals;
     const couponDiscount = 0;
 
@@ -60,15 +50,14 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const numberOfNights = Math.round((endDate - startDate) / oneDay);
 
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
-    console.log("this is roomSelected set using redux", roomsSelected)
+    // console.log("this is roomSelected set using redux", roomsSelected)
 
     // Create an array of rooms that match the room_ids in roomsSelected
     const selectedRoomsArray = rooms.filter((room) => roomsSelected.has(room.room_id));
-    console.log("Selected rooms:", selectedRoomsArray);
+    // console.log("Selected rooms:", selectedRoomsArray);
 
 
     const inventoryDetail = useSelector(state => state.inventoryDetail)
-
     //  stored the lowest inventory available in the inventory_available variable.
     const inventory_available = Math.min(...inventoryDetail.map((item) => item.available_inventory))
 
@@ -77,15 +66,11 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     // Create a state variable for the Map
     const [selectedQuantitiesMap, setSelectedQuantitiesMap] = useState(new Map());
 
-    // Calculate the total sum of selected rooms
+    // Calculate the total sum of selected rooms, now totalSelectedQuantities contains the total sum of selected quantities
     const totalSelectedQuantities = [...selectedQuantitiesMap.values()].reduce((acc, quantity) => acc + quantity, 0);
-
-    // Now, totalSelectedQuantities contains the total sum of selected quantities
-    console.log("Total Selected Quantities:", totalSelectedQuantities);
 
     // check the boolean value of reserveRoom state and based on this changed the css of payNow button
     const reserveRoom = useSelector(state => state.reserveRoom);
-
     const reservationIdentity = useSelector(state => state.reservationIdentity)
 
 
@@ -106,8 +91,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     }, [rate])
 
-    console.log("total ye hai", totals)
-
     // to check for selected rooms whenever the page renders
     useEffect(() => {
         // Create a new Map with keys from roomsSelected and values as 1
@@ -125,8 +108,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         newMap.set(room_id, quantity);
         setSelectedQuantitiesMap(newMap);
     };
-
-    console.log("number of rooms selected", selectedQuantitiesMap)
 
     // Function to calculate the total final rate from multiple objects
     function calculateTotalFinalRate(rate, selectedQuantitiesMap) {
@@ -220,27 +201,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
     }
 
-    // function to delete the reservation id of the room from the local storage
-    // function removeReservationIdFromLocalStorage(roomId) {
-    //     // Get the existing 'reservation_ids' from local storage
-    //     let existingData = localStorage.getItem('reservation_ids');
-
-    //     if (existingData) {
-    //         // Parse the existing data from JSON
-    //         existingData = JSON.parse(existingData);
-
-    //         // Remove the reservation ID for the specific room ID
-    //         delete existingData[roomId];
-
-    //         // Store the updated data back in local storage
-    //         localStorage.setItem('reservation_ids', JSON.stringify(existingData));
-
-    //         console.log("Reservation ID for room", roomId, "has been removed.");
-    //     } else {
-    //         console.log("No reservation IDs found in local storage.");
-    //     }
-    // }
-
     function updateReserveRoom(roomdata) {
         let url = "/api/reserve_rooms";
         axios.put(url, roomdata).then((response) => {
@@ -270,33 +230,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         })
 
     }
-
-    // function fetchReservationid(roomId) {
-    //     // Get the existing 'reservation_ids' from local storage
-    //     let data = localStorage.getItem("reservation_ids");
-
-    //     // Check if there is existing data in local storage
-    //     if (data) {
-    //         // Parse the existing data from JSON
-    //         let existingData = JSON.parse(data);
-
-    //         // Access the reservation ID for the specific room ID
-    //         let reservationId = existingData[roomId];
-
-    //         // Check if the room ID exists in the local storage
-    //         if (reservationId) {
-    //             // console.log("Reservation ID for room " + roomId + ": " + reservationId);
-    //             return reservationId;
-    //         } else {
-    //             console.log("No reservation ID found for room " + roomId);
-    //         }
-    //     } else {
-    //         alert("No reservation IDs found in local storage.");
-    //     }
-    // }
-
-
-    // these below functions will work when the pay now button is clicked
 
     function SubmitGuestDetails() {
         // let isGuestDetailsValid = GuestDetailValidation(guestDetail);
@@ -452,6 +385,26 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         })
     }
 
+    // this function resets the values
+    function closeButtonAction() {
+        // if there is any reservation in DB then remove them first else perform the other funtions
+        if (reservationIdentity.length > 0) {
+            reservationIdentity?.map((room) => {
+                removeReservationFromDB(room?.room_id, room?.reservation_time, "close");
+            });
+        }
+        else {
+            setShowModal(0)
+            setDisplay(0)
+            setSearched(false)
+            dispatch(setAddMoreRoom(false))
+            dispatch(clearRoomsSelected())
+            dispatch(clearGuestDetails())
+            dispatch(clearReservationIdentity())
+            dispatch(clearInventoryDetail())
+            deleteRoomDetails()
+        }
+    }
 
     return (
         <div className='min-h-screen'>
@@ -474,21 +427,12 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                 <div className='flex justify-between w-full'>
                     <h1 className='text-xl my-auto font-bold'>Review Booking</h1>
-                    <i className='cursor-pointer my-auto mr-5'
-                        onClick={() => {
-                            reservationIdentity?.map((room) => {
-                                removeReservationFromDB(room?.room_id, room?.reservation_time, "close")
-                            })
-                            // setDisplay(0)
-                            // setShowModal(0)
-                            // setSearched(false)
-                            // dispatch(setAddMoreRoom(false))
-                            // dispatch(clearRoomsSelected())
-                            // dispatch(clearReservationIdentity())
-                            // dispatch(clearInventoryDetail())
-                            // deleteRoomDetails()
-                        }}>
-                        <AiOutlineClose color='red' size={20} /> </i>
+
+                    <CountdownTimer minutes={15} onTimerComplete={closeButtonAction} />
+
+                    <i className='cursor-pointer my-auto mr-5' onClick={closeButtonAction}>
+                        <AiOutlineClose color='red' size={20} />
+                    </i>
                 </div>
             </div>
 
@@ -553,9 +497,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             onClick={() => {
                                                 dispatch(removeRoomFromSelected(room?.room_id))
                                                 removeRoomRateByRoomId(room?.room_id)  //remove room_rate from local storage
-                                                // removeReservationIdFromLocalStorage(room?.room_id)
                                                 let reservationdata = reservationIdentity.filter((item) => item.room_id === room?.room_id)[0]
                                                 removeReservationFromDB(room?.room_id, reservationdata?.reservation_time)
+                                                dispatch(removeReservationFromReservationIdentity(room?.room_id))
                                             }}
                                         >
                                             <svg
