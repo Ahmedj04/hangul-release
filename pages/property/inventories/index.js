@@ -61,9 +61,43 @@ function Inventory() {
     })
 
     const [editInventory, setEditInventory] = useState({})
-    const [newInventory, setNewInventory] = useState({})
     const [saveLoader, setSaveLoader] = useState(false)
     const [deleteLoader, setDeleteLoader] = useState(false)
+
+    const [itemsPerPage, setItemsPerPage] = useState(1);
+    const [page, setPage] = useState(1);
+
+    function searchFunction() {
+        // Declare variables
+        let input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    const displayData = useMemo(() => {
+        const start = (page - 1) * itemsPerPage;
+        return inventories.slice(start, start + itemsPerPage);
+    }, [page, inventories, itemsPerPage]);
+
+
+    function ItemShow(event) {
+        setItemsPerPage(event.target.value);
+    }
 
     useEffect(() => {
         firstfun();
@@ -194,7 +228,7 @@ function Inventory() {
 
     return (
         <>
-            <Title name={`Engage |  ${language?.contact}`} />
+            <Title name={`Engage |  ${language?.inventory}`} />
 
             <Header
                 color={color}
@@ -283,7 +317,7 @@ function Inventory() {
                                 <form className="lg:pr-3" action="#" method="GET">
                                     <label htmlFor="users-search" className="sr-only">{'search'} Search</label>
                                     <div className="mt-1 relative lg:w-64 xl:w-96">
-                                        <input type="text" name="email" id="myInput" onKeyUp={() => alert('searchFunction')}
+                                        <input type="text" name="email" id="myInput" onKeyUp={searchFunction}
                                             className={`${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5`} placeholder={'Search'}>
                                         </input>
                                     </div>
@@ -334,15 +368,6 @@ function Inventory() {
                                 <table className="table data table-fixed min-w-full divide-y divide-gray-200" id="myTable">
                                     <thead className={` ${color?.tableheader} `}>
                                         <tr>
-                                            {/* <th scope="col" className="p-4">
-                                                <div className="flex items-center">
-                                                    <input id="checkbox-all" aria-describedby="checkbox-1" type="checkbox"
-                                                        name="allSelect" checked={args?.gen?.filter(item => item?.isChecked !== true).length < 1}
-                                                        onChange={(e) => { handlecheckbox(e); setViewDel(1); }}
-                                                        className="bg-gray-50 border-gray-300 text-cyan-600  focus:ring-3 focus:ring-cyan-200 h-4 w-4 rounded" />
-                                                    <label htmlFor="checkbox-all" className="sr-only">checkbox</label>
-                                                </div>
-                                            </th> */}
                                             <th scope="col"
                                                 className={`p-4 text-left text-xs font-semibold ${color?.textgray} uppercase`}>{"Room Name"}</th>
                                             <th scope="col"
@@ -359,7 +384,7 @@ function Inventory() {
 
 
                                     <tbody className={` ${color?.whitebackground} divide-y divide-gray-200 `} id="TableList" >
-                                        {inventories.map((inv, index) => (
+                                        {displayData.map((inv, index) => (
                                             <>
                                                 {
                                                     edit.value === 1 && edit.idx === index ?
@@ -545,6 +570,54 @@ function Inventory() {
                     </div>
                 </div>
 
+                {/* Pagination */}
+                <div className={`${color?.whitebackground} sticky sm:flex items-center w-full sm:justify-between bottom-0 right-0 border-t border-gray-200 p-4`}>
+                    <div className="flex items-center w-64 mb-4 sm:mb-0">
+                        {/* previous page arrow button*/}
+                        <button onClick={() => {
+                            if (page > 1) {
+                                setPage(page - 1);
+                            }
+                        }} className={`${color?.textgray} hover:${color?.text} cursor-pointer p-1 ${color?.hover} rounded inline-flex justify-center`}>
+                            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>
+                        </button>
+
+                        {/* next page arrow button */}
+                        <button onClick={() => {
+                            if (page < Math.ceil(inventories?.length / itemsPerPage)) {
+                                setPage(page + 1);
+                            }
+                        }} className={`${color?.textgray} hover:${color?.text} cursor-pointer p-1 ${color?.hover} rounded inline-flex justify-center mr-2`}>
+                            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path></svg>
+                        </button>
+
+                        <span className={`text-sm font-normal ${color?.textgray}`}>{language?.common?.Showing}
+
+                            <span className={`${color?.text} font-semibold ml-1`}>{page}</span> {language?.common?.Of} <span className={`${color?.text} font-semibold`}>
+                                {Math.ceil(inventories?.length / itemsPerPage)}
+                            </span>
+                        </span>
+
+                    </div>
+
+                    <div className="flex items-center w-42 space-x-3">
+                        <span className={`text-sm font-normal ${color?.textgray}`}>Entries per page</span>
+                        <select onChange={(e) => ItemShow(e)} className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block mr-2 w-12 px-3  py-1`}>
+                            <option selected disabled>{itemsPerPage}</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            {/* <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option> */}
+                        </select>
+
+                    </div>
+                </div>
+
                 {/* Modal Add */}
                 <div className={view === 1 ? "block" : "hidden"}>
                     {/* <div className="overflow-x-hidden overflow-y-auto fixed top-4 left-0 right-0 backdrop-blur-xl bg-black/30 md:inset-0 z-50 flex justify-center items-center h-modal sm:h-full"> */}
@@ -592,8 +665,6 @@ function Inventory() {
                                     setVisibility={(e) => { setVisible(e) }}
 
                                 />
-
-
 
                             </div>
 

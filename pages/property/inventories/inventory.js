@@ -372,7 +372,7 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
           pauseOnFocusLoss
           draggable
           pauseOnHover />
-      </div >
+      </div>
 
       <div className='p-5 flex justify-end'>
         {addLoader === true ?

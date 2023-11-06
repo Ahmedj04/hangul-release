@@ -171,7 +171,6 @@ const Table = (args) => {
             </div>
 
 
-
             {/* Table */}
             <div className="flex  flex-col mt-8 lg:-mr-20 sm:mr-0 w-full ">
                 <div className="overflow-x-auto">
@@ -210,7 +209,6 @@ const Table = (args) => {
                                 <tbody className={` ${args?.color?.whitebackground} divide-y  divide-gray-200 `} id="TableList" >
                                     {displayData?.map((item, idx) => (
                                         <>
-
                                             {update?.edit === 1 && update?.id === idx ?
                                                 //After Edit Clicked
                                                 <>
@@ -516,7 +514,9 @@ const Table = (args) => {
                     <span className={`text-sm font-normal ${args?.color?.textgray}`}>{args?.common?.Showing}
 
                         <span className={`${args?.color?.text} font-semibold ml-1`}>{page}</span> {args?.common?.Of} <span className={`${args?.color?.text} font-semibold`}>
-                            {Math.ceil(args?.gen?.length / itemsPerPage)}</span></span>
+                            {Math.ceil(args?.gen?.length / itemsPerPage)}
+                        </span>
+                    </span>
 
                 </div>
 
