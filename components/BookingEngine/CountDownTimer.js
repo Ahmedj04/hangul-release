@@ -6,24 +6,27 @@ const CountdownTimer = ({ minutes, onTimerComplete }) => {
     useEffect(() => {
         const timer = setInterval(() => {
             if (seconds > 0) {
-                setSeconds(prevSeconds => prevSeconds - 1);
-            } else {
-                clearInterval(timer);
-                onTimerComplete();
+                setSeconds(prevSeconds => {
+                    if (prevSeconds > 0) {
+                        return prevSeconds - 1;
+                    } else {
+                        clearInterval(timer);
+                        onTimerComplete();
+                        return 0;
+                    }
+                });
             }
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [seconds, minutes, onTimerComplete]);
+    }, []);
 
     const minutesDisplay = Math.floor(seconds / 60);
     const secondsDisplay = seconds % 60;
 
     return (
         <div>
-            <p>
-                Time Left: {minutesDisplay}:{secondsDisplay < 10 ? '0' : ''}{secondsDisplay}
-            </p>
+            <p> Time Left: {minutesDisplay}:{secondsDisplay < 10 ? '0' : ''}{secondsDisplay}</p>
         </div>
     );
 };

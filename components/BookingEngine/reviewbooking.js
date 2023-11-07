@@ -410,33 +410,31 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         <div className='min-h-screen'>
 
             {/* app bar  */}
-            <div className='flex py-5 border-b-2  bg-slate-100'>
-                <div className='flex cursor-pointer pl-2 pr-10 my-auto'
-                    onClick={() => {
-                        if (localStorage.getItem("temp_room_rate") === null) {
-                            setDisplay(0)
+            <div className='flex justify-between w-full py-5 px-5 border-b-2  bg-slate-100'>
+                <div className='flex'>
+                    <i className='my-auto'
+                        onClick={() => {
+                            if (localStorage.getItem("temp_room_rate") === null) {
+                                setDisplay(0)
 
-                        } else {
-                            setDisplay(1)
+                            } else {
+                                setDisplay(1)
 
-                        }
-                    }}>
-                    <i className='my-auto'><BiArrowBack size={30} /></i>
-                    <span className='my-auto pl-1 font-medium'>Back</span>
-                </div>
-
-                <div className='flex justify-between w-full'>
-                    <h1 className='text-xl my-auto font-bold'>Review Booking</h1>
-
-                    <CountdownTimer minutes={15} onTimerComplete={closeButtonAction} />
-
-                    <i className='cursor-pointer my-auto mr-5' onClick={closeButtonAction}>
-                        <AiOutlineClose color='red' size={20} />
+                            }
+                        }}
+                    ><BiArrowBack size={30} />
                     </i>
+                    <h1 className='text-xl my-auto font-bold ml-5'>Review Booking</h1>
                 </div>
+                <CountdownTimer minutes={15} onTimerComplete={closeButtonAction} />
+
+                <i className='cursor-pointer my-auto' onClick={closeButtonAction}>
+                    {/* <AiOutlineClose color='red' size={20} /> */}
+                    <span className='text-red-600 text-sm font-semibold'>Cancel Booking</span>
+                </i>
             </div>
 
-            <div id="main-content" className='h-fit text-white flex flex-wrap justify-around gap-2 mx-4 mt-10'>
+            <div id="main-content" className='h-fit text-white flex flex-wrap justify-around gap-2 mx-4 py-10'>
 
                 {/* left side div  */}
                 <div id="guest-detail-review" className='bg-white border border-gray-300 text-black h-fit w-full lg:w-6/12  rounded-2xl'>
@@ -698,7 +696,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                 </div>
             </div>
 
-        </div>
+        </div >
     )
 }
 

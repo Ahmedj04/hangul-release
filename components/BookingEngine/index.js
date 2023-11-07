@@ -12,7 +12,7 @@ const color = Color?.dark;
 let language = english;
 let visible = 1;
 
-function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowModal, setSearched, checkinDate, checkoutDate }) {
+function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowModal, setSearched, checkinDate, checkoutDate, roomsLoader, setRoomsLoader }) {
 
     const [allRoomRateDetails, setAllRoomRateDetails] = useState([]);
     const [dataAsPerDate, setDataAsPerDate] = useState([]);
@@ -45,6 +45,7 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowMod
         let url2 = `/api/rates/${allHotelDetails?.property_id}/${checkinDate}/${checkoutDate}`
         axios.get(url2).then((response) => {
             setDataAsPerDate(response.data)
+            setRoomsLoader(false)
         }).catch((err) => {
             console.log(JSON.stringify(err))
         })
@@ -54,7 +55,7 @@ function BookingEngine({ allHotelDetails, rooms, display, setDisplay, setShowMod
         <>
             <Title name={`Engage-${allHotelDetails?.property_name} | Booking Engine`} />
 
-            {display === 0 ? <RoomCalenderView color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
+            {display === 0 ? <RoomCalenderView roomsLoader={roomsLoader} setRoomsLoader={(e) => setRoomsLoader(e)} color={color} allRoomRateDetails={allRoomRateDetails} dataOfRoomsAsPerDateSelected={dataAsPerDate} rooms={rooms} setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
             {display === 1 ? <RoomSummary setDisplay={(e) => setDisplay(e)} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} x /> : undefined}
             {display === 2 ? <Reviewbooking setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}
             {display === 3 ? <BookingSuccess setDisplay={(e) => setDisplay(e)} rooms={rooms} setShowModal={(e) => setShowModal(e)} setSearched={(e) => setSearched(false)} checkinDate={checkinDate} checkoutDate={checkoutDate} /> : undefined}

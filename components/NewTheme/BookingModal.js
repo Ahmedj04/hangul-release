@@ -70,14 +70,14 @@ function BookingModal({ title, bookingComponent, setShowModal, setDisplay, setSe
                         {bookingComponent}
                     </p>
 
-                    <div className=" p-5">
+                    {/* <div className=" p-5">
                         <button
                             className="text-white bg-slate-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-0"
                             onClick={closeButtonAction}
                         >
                             Close
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

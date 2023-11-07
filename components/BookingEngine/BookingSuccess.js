@@ -3,7 +3,7 @@ import React from 'react'
 import { AiOutlineClose } from "react-icons/ai";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { clearRoomsSelected, setAddMoreRoom, clearGuestDetails } from '../redux/hangulSlice';
+import { clearRoomsSelected, clearReservationIdentity, setAddMoreRoom, clearGuestDetails } from '../redux/hangulSlice';
 
 function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinDate, checkoutDate }) {
 

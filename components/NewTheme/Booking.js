@@ -13,6 +13,9 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
 
     const [maxDate, setMaxDate] = useState('');
 
+    const [roomsLoader, setRoomsLoader] = useState(false);
+
+
     const [err, setErr] = useState(false);
     const [notSelectedErr, setNotSelectedErr] = useState({
         "forCheckin": false,
@@ -143,6 +146,7 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
                                     setNotSelectedErr((prevValue) => ({ ...prevValue, "forCheckin": false, "forCheckout": true }))
                                 }
                                 else {
+                                    setRoomsLoader(true)
                                     setSearched(!searched);
                                     setShowBookingEngine(1);
                                     setNotSelectedErr((prevValue) => ({ ...prevValue, "forCheckin": false, "forCheckout": false }))
@@ -159,7 +163,7 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
             {showBookingEngine === 1 ? <div className="block z-50">
                 {allHotelDetails && <BookingModal
                     title="Booking Engine"
-                    bookingComponent={<BookingEngine display={display} setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} setShowModal={(e) => setShowBookingEngine(e)} setSearched={(e) => setSearched(false)} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
+                    bookingComponent={<BookingEngine roomsLoader={roomsLoader} setRoomsLoader={(e) => setRoomsLoader(e)} display={display} setDisplay={(e) => setDisplay(e)} rooms={rooms} allHotelDetails={allHotelDetails} setShowModal={(e) => setShowBookingEngine(e)} setSearched={(e) => setSearched(false)} checkinDate={enquiry.checkin} checkoutDate={enquiry.checkout} />}
                     setShowModal={(e) => setShowBookingEngine(e)}
                     setDisplay={(e) => setDisplay(e)}
                     setSearched={(e) => setSearched(false)}

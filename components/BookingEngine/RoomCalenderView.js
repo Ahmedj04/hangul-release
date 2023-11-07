@@ -8,9 +8,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearRoomsSelected, setAddMoreRoom, clearReservationIdentity, clearInventoryDetail, clearGuestDetails } from '../redux/hangulSlice'
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import RoomLoader from './RoomLoader';
 
 
-function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
+function RoomCalenderView({ roomsLoader, rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelected, setDisplay, setShowModal, setSearched, color, checkinDate, checkoutDate }) {
 
     const reservationIdentity = useSelector(state => state.reservationIdentity)
     const dispatch = useDispatch() //creating object of dispatch 
@@ -153,10 +154,10 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
 
 
     return (
-        <div id="main-content" className={`${color?.light} px-4 pt-2 pb-2 `}>
-            <div className={`${color?.light} shadow rounded-lg px-12  sm:p-6 xl:p-8  2xl:col-span-2`}>
-                <div className='flex justify-between'>
-                    <h6 className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
+        <div id="main-content" className={`${color?.light} px-4 `}>
+            <div className={`${color?.light} shadow rounded-lg px-12  sm:p-6 lg:p-6 `}>
+                <div className='flex justify-between pb-6'>
+                    <h6 className={`text-xl flex leading-none lg:pt-2 pt-6  font-bold`}>
                         Rooms For Booking
                     </h6>
                     <div className='my-auto'>
@@ -200,17 +201,18 @@ function RoomCalenderView({ rooms, allRoomRateDetails, dataOfRoomsAsPerDateSelec
                     }
                     </> :
                     <>{
-                        sortedFinalRate.map((room, index) => {
-                            return <RoomCard
-                                key={index}
-                                roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
-                                filteredRoomData={rooms?.filter((item) => item.room_id == room.room_id)[0]}
-                                roomRates={room}
-                                setDisplay={(e) => setDisplay(e)}
-                                checkinDate={checkinDate}
-                                checkoutDate={checkoutDate}
-                            />
-                        })
+                        roomsLoader === true ? <><RoomLoader size={`w-full h-44  rounded-2xl p-4 mt-10 m-2 `} /> <RoomLoader size={`w-full h-44  rounded-2xl p-4 m-2 `} /> <RoomLoader size={`w-full h-44  rounded-2xl p-4 m-2 `} /></> : <>
+                            {sortedFinalRate.map((room, index) => {
+                                return <RoomCard
+                                    key={index}
+                                    roomImage={`https://images.unsplash.com/photo-1598928506311-c55ded91a20c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80`}
+                                    filteredRoomData={rooms?.filter((item) => item.room_id == room.room_id)[0]}
+                                    roomRates={room}
+                                    setDisplay={(e) => setDisplay(e)}
+                                    checkinDate={checkinDate}
+                                    checkoutDate={checkoutDate}
+                                />
+                            })}</>
                     }</>}
             </div>
         </div>

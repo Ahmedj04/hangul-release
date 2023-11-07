@@ -196,13 +196,13 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
     <section>
 
       {/* app bar */}
-      <div className='flex justify-between pt-3'>
-        <div className='flex cursor-pointer pr-10' onClick={() => { setDisplay(0) }}>
+      <div className='flex justify-between pt-5 mx-5'>
+        <div className='flex cursor-pointer' onClick={() => { setDisplay(0) }}>
           <i className='my-auto pl-1'><BiArrowBack size={30} /></i>
-          <span className='my-auto pl-1 font-medium'>Back</span>
+          {/* <span className='my-auto pl-1 font-medium'>Back</span> */}
         </div>
 
-        <div className='my-auto mr-10 text-base italic flex gap-10'>
+        <div className='my-auto text-base italic flex gap-10'>
           {/* cart icon */}
           <i className='cursor-pointer'
             onClick={() => {
@@ -216,7 +216,8 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
 
           {/* back icon */}
           <i className='cursor-pointer my-auto' onClick={closeButtonAction}>
-            <AiOutlineClose color='red' size={20} />
+            {/* <AiOutlineClose color='red' size={20} /> */}
+            <span className='text-red-600 text-sm font-semibold'>Cancel Booking</span>
           </i>
         </div>
       </div>
@@ -267,7 +268,7 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
 
           {/* room amenities div */}
           <div>
-            <div className='mb-5'>
+            <div className='mb-10'>
               <div className='mt-10 mb-2'>
                 <h4 className='text-3xl text-black font-light'>Room Amenities</h4>
               </div>
