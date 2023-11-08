@@ -13,6 +13,8 @@ import GstValidation from '../validation/bookingEngine/GstDetailValidation'
 // timestamp
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 import CountdownTimer from './CountDownTimer';
+import ButtonLoader from './ButtonLoader';
+import { v4 as uuidv4 } from 'uuid';
 
 function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
@@ -32,6 +34,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
     const [disabled, setDisabled] = useState(false)
+    const [cancelBookingLoader, setCancelBookingLoader] = useState(false)
 
     const [totals, setTotals] = useState({
         totalFinalRate: 0,
@@ -214,8 +217,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     function removeReservationFromDB(room_id, reservation_time, action) {
         let url = `/api/reserve_rooms/${room_id}/${reservation_time}`;
         axios.delete(url).then((response) => {
-            console.log(response)
             if (action === "close") {
+                setCancelBookingLoader(false)
                 setDisplay(0)
                 setShowModal(0)
                 setSearched(false)
@@ -232,7 +235,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     }
 
     function SubmitGuestDetails() {
-        // let isGuestDetailsValid = GuestDetailValidation(guestDetail);
         let isGuestDetailsValid = GuestDetailValidation(guest);
 
         // isGuestDetailsValid can be either true or an error object
@@ -245,7 +247,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             dispatch(setGuestDetails(guest))
             //network call
             bookingRoom()
-            setDisplay(3)
 
         }
 
@@ -375,15 +376,53 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         });
     }
 
+    // function linkInvoiceWithBooking(invoiceForThisBooking) {
+    //     let invoiceLinkUrl = "/api/booking_invoice_link";
+    //     axios.post(invoiceLinkUrl, invoiceForThisBooking).then((responseFromInvoiceLinkUrl) => {
+    //         // handle the third post response
+
+    //     }).catch((err) => {
+    //         console.log(err)
+    //     })
+    // }
+
     function linkInvoiceWithBooking(invoiceForThisBooking) {
         let invoiceLinkUrl = "/api/booking_invoice_link";
         axios.post(invoiceLinkUrl, invoiceForThisBooking).then((responseFromInvoiceLinkUrl) => {
             // handle the third post response
+            let paymentRefrenceNumber = PaymentGateway(invoiceForThisBooking.booking_invoice_link[0].booking_id, invoiceForThisBooking.booking_invoice_link[0].total_price)
+            addRefrenceToInvoice(paymentRefrenceNumber, responseFromInvoiceLinkUrl.data.invoice_id)
 
         }).catch((err) => {
             console.log(err)
         })
     }
+    //function to add payemtn gateway logic
+    function PaymentGateway(booking_id, total_price) {
+        let refrenceNumber = uuidv4(); // generating random id to replicate payment gateway response.
+        return refrenceNumber
+    }
+    //function to update invoice id 
+    function addRefrenceToInvoice(paymentRefrenceNumber, invoice_id) {
+        let invoiceLinkUrl = "/api/booking_invoice_link";
+        let invoiceForThisBooking = {
+            "booking_invoice_link": [{
+                "transaction_refrence_no": paymentRefrenceNumber,
+                "invoice_id": invoice_id
+            }]
+        }
+        axios.put(invoiceLinkUrl, invoiceForThisBooking, {
+            header: { "content-type": "application/json" },
+        }).then((responseFromInvoiceLinkUrl) => {
+            // handle the third post response
+            console.log('payment sucessful')
+            setDisplay(3)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
+
 
     // this function resets the values
     function closeButtonAction() {
@@ -394,6 +433,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             });
         }
         else {
+            setCancelBookingLoader(false)
             setShowModal(0)
             setDisplay(0)
             setSearched(false)
@@ -428,10 +468,18 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                 </div>
                 <CountdownTimer minutes={15} onTimerComplete={closeButtonAction} />
 
-                <i className='cursor-pointer my-auto' onClick={closeButtonAction}>
-                    {/* <AiOutlineClose color='red' size={20} /> */}
-                    <span className='text-red-600 text-sm font-semibold'>Cancel Booking</span>
-                </i>
+                {cancelBookingLoader === true ?
+                    <ButtonLoader
+                        classes='text-red-600 text-sm font-semibold cursor-pointer my-auto'
+                        text={'Cancel Booking'}
+                    />
+                    : <span className='text-red-600  italic text-sm font-semibold cursor-pointer my-auto'
+                        onClick={() => {
+                            setCancelBookingLoader(true);
+                            closeButtonAction();
+                        }}>Cancel Booking</span>
+                }
+
             </div>
 
             <div id="main-content" className='h-fit text-white flex flex-wrap justify-around gap-2 mx-4 py-10'>
@@ -475,7 +523,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             onChange={(e) => {
                                                 const newQuantity = parseInt(e.target.value);
                                                 updateSelectedQuantity(room?.room_id, newQuantity); // Update selected quantity in the Map
-                                                // updateReserveRoom({ "reserve_rooms": [{ "reservation_id": fetchReservationid(room?.room_id), "room_count": newQuantity }] })
                                                 let reservationData = reservationIdentity.filter((item) => item.room_id === room?.room_id)[0]
                                                 updateReserveRoom({ "reserve_rooms": [{ "room_count": newQuantity, ...reservationData }] })
                                                 setDisabled(true)
@@ -532,7 +579,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                     </div>
                     <div className="pt-6 pb-4">
                         <div className="md:px-4 mx-auto w-full">
-
                             {guest.map((i, loopIndex) => (
                                 <div className='border-2 border-white rounded-xl p-2 m-2' key={i.index}>
                                     {loopIndex != 0 ? <div className='flex justify-end'><button onClick={() => removeGuest(i.index)}><RxCross2 /></button></div> : <></>}
@@ -540,7 +586,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                                         {/* guest name  */}
                                         <InputText
-                                            label={'Guest Name'}
+                                            label={loopIndex === 0 ? 'Main Guest Name' : 'Guest Name'}
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) => {
@@ -565,7 +611,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             }
                                             error={guestDetailerror[loopIndex]?.guest_email}
                                             color={Color?.light}
-                                            req={true}
+                                            req={loopIndex === 0}  // make it required only for the first guest
                                             title={'Guest email'}
                                             tooltip={true}
                                         />
@@ -580,7 +626,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             }}
                                             error={guestDetailerror[loopIndex]?.guest_phone_number}
                                             color={Color?.light}
-                                            req={true}
+                                            req={loopIndex === 0}  // make it required only for the first guest
                                             title={'Guest Phone'}
                                             tooltip={true}
                                         />
@@ -599,8 +645,10 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                         />
                                     </div>
                                 </div>
-
                             ))}
+
+
+
                             <input type="checkbox" name="add_gst" onClick={() => setAddGst(!addGst)} />
                             <span className='font-semibold text-base mx-2'>Add GST Details (optional)</span>
                             {addGst === true ?
@@ -696,7 +744,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                 </div>
             </div>
 
-        </div >
+        </div>
     )
 }
 

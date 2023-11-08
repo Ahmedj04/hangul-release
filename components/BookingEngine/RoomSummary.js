@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CarousalComponent from "../NewTheme/CarousalComponent"
-import { ButtonLoader } from './ButtonLoader';
+import ButtonLoader from './ButtonLoader';
 import { english } from '../Languages/Languages';
 import { SquareFootIcon, GroupsIcon, LandscapeIcon, BedIcon, AiOutlineClose, AiOutlineShoppingCart, BiArrowBack, BsFillPeopleFill } from './Icons'
 import axios from 'axios';
@@ -25,6 +25,7 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
   const roomsSelected = useSelector(state => state.roomsSelected)
   const reservationIdentity = useSelector(state => state.reservationIdentity)
 
+  const [cancelBookingLoader, setCancelBookingLoader] = useState(false)
 
   useEffect(() => {
     let room = localStorage.getItem("room_data")
@@ -88,6 +89,7 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
   function removeReservationFromDB(room_id, reservation_time) {
     let url = `/api/reserve_rooms/${room_id}/${reservation_time}`;
     axios.delete(url).then((response) => {
+      setCancelBookingLoader(false)
       setDisplay(0)
       setShowModal(0)
       setSearched(false)
@@ -131,8 +133,10 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
       reservationIdentity?.map((room) => {
         removeReservationFromDB(room?.room_id, room?.reservation_time);
       });
+
     }
     else {
+      setCancelBookingLoader(false)
       setShowModal(0)
       setDisplay(0)
       setSearched(false)
@@ -202,7 +206,7 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
           {/* <span className='my-auto pl-1 font-medium'>Back</span> */}
         </div>
 
-        <div className='my-auto text-base italic flex gap-10'>
+        <div className='my-auto text-base flex gap-10'>
           {/* cart icon */}
           <i className='cursor-pointer'
             onClick={() => {
@@ -215,10 +219,23 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
           </i>
 
           {/* back icon */}
-          <i className='cursor-pointer my-auto' onClick={closeButtonAction}>
-            {/* <AiOutlineClose color='red' size={20} /> */}
-            <span className='text-red-600 text-sm font-semibold'>Cancel Booking</span>
-          </i>
+          {/* <i className='cursor-pointer my-auto' onClick={closeButtonAction}> */}
+          {/* <AiOutlineClose color='red' size={20} /> */}
+          {/* <span className='text-red-600 text-sm font-semibold'>Cancel Booking</span> */}
+          {/* </i> */}
+          {cancelBookingLoader === true ?
+            <ButtonLoader
+              classes='text-red-600 text-sm font-semibold cursor-pointer my-auto'
+              text={'Cancel Booking'}
+            />
+            : <span className='text-red-600  italic text-sm font-semibold cursor-pointer my-auto'
+              onClick={() => {
+                setCancelBookingLoader(true);
+                closeButtonAction();
+              }}>Cancel Booking</span>
+          }
+
+
         </div>
       </div>
 
