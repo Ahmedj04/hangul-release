@@ -376,16 +376,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         });
     }
 
-    // function linkInvoiceWithBooking(invoiceForThisBooking) {
-    //     let invoiceLinkUrl = "/api/booking_invoice_link";
-    //     axios.post(invoiceLinkUrl, invoiceForThisBooking).then((responseFromInvoiceLinkUrl) => {
-    //         // handle the third post response
-
-    //     }).catch((err) => {
-    //         console.log(err)
-    //     })
-    // }
-
     function linkInvoiceWithBooking(invoiceForThisBooking) {
         let invoiceLinkUrl = "/api/booking_invoice_link";
         axios.post(invoiceLinkUrl, invoiceForThisBooking).then((responseFromInvoiceLinkUrl) => {
@@ -397,6 +387,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             console.log(err)
         })
     }
+
     //function to add payemtn gateway logic
     function PaymentGateway(booking_id, total_price) {
         let refrenceNumber = uuidv4(); // generating random id to replicate payment gateway response.
@@ -416,13 +407,36 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         }).then((responseFromInvoiceLinkUrl) => {
             // handle the third post response
             console.log('payment sucessful')
+            //change state of reservation in reservation table 
+            // changeReservationState() 
             setDisplay(3)
         }).catch((err) => {
             console.log(err)
         })
     }
 
-
+    function changeReservationState() {
+        let data = {
+            "reserved_rooms":
+                [
+                    {
+                        // "reservation_id": "res001", room_id, reservation time--> composite primary key
+                        "reservation_state": "paid"
+                    }
+                ]
+        }
+        let url = '/api/reserve_rooms';
+        axios.put(url, data, {
+            header: { "content-type": "application/json" },
+        }).then((responseFromInvoiceLinkUrl) => {
+            // handle the third post response
+            console.log('reservation state changed')
+            //change state of reservation in reservation table 
+            setDisplay(3)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
 
     // this function resets the values
     function closeButtonAction() {
@@ -575,7 +589,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                             Guest Details
                         </h6>
                         <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-700 hover:bg-cyan-900 rounded-md text-white'>Add Guests</button>
-
                     </div>
                     <div className="pt-6 pb-4">
                         <div className="md:px-4 mx-auto w-full">
