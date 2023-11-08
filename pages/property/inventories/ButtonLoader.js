@@ -1,4 +1,4 @@
-export function ButtonLoader({ classes, style, text }) {
+export default function ButtonLoader({ classes, style, text }) {
     return <button
         style={style}
         className={classes}

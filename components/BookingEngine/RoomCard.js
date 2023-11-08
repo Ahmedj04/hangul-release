@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setRoomsSelected, setReserveRoom, setReservationIdentity, addInventoryDetail } from '../redux/hangulSlice';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
-import { ButtonLoader } from './ButtonLoader';
+import  ButtonLoader  from './ButtonLoader';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

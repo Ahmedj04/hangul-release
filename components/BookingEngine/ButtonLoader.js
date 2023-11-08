@@ -1,4 +1,4 @@
-export function ButtonLoader({ classes, style, text }) {
+ function ButtonLoader({ classes, style, text }) {
     return <button
         style={style}
         className={classes}
@@ -10,3 +10,4 @@ export function ButtonLoader({ classes, style, text }) {
         {text}
     </button>
 }
+export default ButtonLoader
