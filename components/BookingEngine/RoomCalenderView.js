@@ -155,9 +155,11 @@ function RoomCalenderView({ roomsLoader, rooms, allRoomRateDetails, dataOfRoomsA
 
     return (
         <div id="main-content" className={`${color?.light} px-4 `}>
-            <div className={`${color?.light} shadow rounded-lg px-12  sm:p-6 lg:p-6 `}>
-                <div className='flex justify-between pb-6'>
-                    <h6 className={`text-xl flex leading-none lg:pt-2 pt-6  font-bold`}>
+            <div className={`${color?.light} shadow rounded-lg lg:px-12 lg:py-3 `}>
+
+                {/* app bar */}
+                <div className='flex justify-between py-6'>
+                    <h6 className={`text-xl my-auto flex leading-none font-bold`}>
                         Rooms For Booking
                     </h6>
                     <div className='my-auto'>

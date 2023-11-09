@@ -85,6 +85,11 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
                     setLang={setLang}
                     hotelDetailLoader={hotelDetailLoader}
                     setShowContactUs={(e) => setShowContactUs(e)}
+
+                    color={Color?.light}
+                    rooms={rooms}
+                    searched={searched}
+                    setSearched={(e) => setSearched(e)}
                 />
             </div>
 
@@ -126,7 +131,13 @@ function Hotel({ language, HotelDetails, allRooms, allPackages, services, phone,
             />
 
             <div id="booking_engine" className={`hidden lg:flex  lg:sticky lg:bottom-0 ${searched === false ? 'z-0' : 'z-50'}`}>
-                <BookingForm color={Color?.light} rooms={rooms} allHotelDetails={allHotelDetails} searched={searched} setSearched={(e) => setSearched(e)} />
+                <BookingForm
+                    color={Color?.light}
+                    rooms={rooms}
+                    allHotelDetails={allHotelDetails}
+                    searched={searched}
+                    setSearched={(e) => setSearched(e)}
+                />
             </div>
 
             {/* Toast Container */}

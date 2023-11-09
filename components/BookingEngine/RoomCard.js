@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setRoomsSelected, setReserveRoom, setReservationIdentity, addInventoryDetail } from '../redux/hangulSlice';
 import axios from 'axios';
 import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
-import  ButtonLoader  from './ButtonLoader';
+import ButtonLoader from './ButtonLoader';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -151,35 +151,40 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
   }
 
   return (
-    <div className=' w-100 h-1/4 text-black border border-gray-500 bg-white rounded-2xl p-4 m-4 flex flex-wrap justify-center items-center lg:flex-row md:flex-row flex-col'>
-      <div className='lg:w-1/6 md:w-1/6'>
+    <div className=' w-100 h-1/4 text-black border border-gray-500 bg-white rounded-2xl p-4 mx-2 my-4 lg:m-4 flex flex-wrap justify-center items-center md:flex-row flex-col'>
+
+      {/* room image */}
+      <div className=' md:w-1/6'>
         <img
-          className='lg:h-44 lg:w-44 w-fit'
+          className='md:h-36 md:w-36 lg:h-44 lg:w-44 w-fit'
           src={roomImage}
           alt="room-image" />
       </div>
-      <div className='md:w-4/6 lg:w-4/6 w-fit md:px-3'>
-        <h3 className='font-bold text-2xl'>{filteredRoomData?.room_name}</h3>
+
+      {/* room name and description */}
+      <div className='md:w-4/6 md:text-start w-fit md:px-5 lg:px-3'>
+        <h3 className='font-bold text-2xl my-5 md:my-1'>{filteredRoomData?.room_name}</h3>
         <p className='text-base text-slate-500 font-semibold'>
           {filteredRoomData?.room_description}
         </p>
       </div>
 
+      {/* additional information */}
       <div className='flex flex-col items-center justify-center w-fit lg:w-1/6 md:w-1/6'>
-        <div className='py-2'>
+        <div className='py-4 md:py-2'>
           <h3 className='text-3xl font-bold  text-center'>₹ {roomRates.total_final_rate}</h3>
           <p className='text-xs py-1 text-center'>+ tax For {numberOfDays} Day{numberOfDays === 1 ? '' : 's'}</p>
         </div>
 
         {searchBookingInventory === true ?
           <ButtonLoader
-            style={{ fontSize: '14px' }}
-            classes="px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold"
+            // style={{ fontSize: '14px' }}
+            classes="px-5 py-3 mb-2 text-base md:text-sm md:mb-0 md:px-3 md:py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold"
             text="Book Now"
           /> :
           <button
-            style={{ fontSize: "14px" }}
-            className='px-3 py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'
+            // style={{ fontSize: "14px" }}
+            className='px-5 py-3 mb-2 text-base md:text-sm md:mb-0 md:px-3 md:py-2 rounded-md  bg-green-700 hover:bg-green-900 text-white font-bold'
             onClick={() => {
               setSearchBookingInventory(true)
               getInventoryDetail("bookNow") // this method will check the inventory available for the selected room and if the inventory is available then the rest of the methods will be called inside it.
@@ -192,7 +197,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
         {searchInventory === true ?
           <ButtonLoader
             style={{ fontSize: '11px' }}
-            classes=" mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white"
+            classes=" mt-2 px-3 py-2 md:px-2 md:py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white"
             text="Learn More"
           /> :
           <button
@@ -202,7 +207,7 @@ function RoomCard({ filteredRoomData, roomImage, setDisplay, roomRates, checkinD
 
             }}
             style={{ fontSize: "11px" }}
-            className='mt-2 px-2 py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white'
+            className=' mt-2 px-3 py-2 md:px-2 md:py-1 rounded-md  bg-cyan-700 hover:bg-cyan-900 text-white'
           >
             Learn More
           </button>

@@ -1,7 +1,4 @@
 import React from 'react'
-
-import { AiOutlineClose } from "react-icons/ai";
-
 import { useDispatch, useSelector } from 'react-redux';
 import { clearRoomsSelected, clearReservationIdentity, setAddMoreRoom, clearGuestDetails, clearInventoryDetail } from '../redux/hangulSlice';
 
@@ -10,14 +7,14 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
     let dispatch = useDispatch();
 
     const guestdetails = useSelector(state => state.guestDetails)
-    console.log("guest details stored in redux state", guestdetails)
+    // console.log("guest details stored in redux state", guestdetails)
 
     const roomsSelected = useSelector(state => new Set(state.roomsSelected))
-    console.log("this is roomSelected set using redux", roomsSelected)
+    // console.log("this is roomSelected set using redux", roomsSelected)
 
     // Create an array of rooms that match the room_ids in roomsSelected
     const selectedRoomsArray = rooms.filter((room) => roomsSelected.has(room.room_id));
-    console.log("Selected rooms:", selectedRoomsArray);
+    // console.log("Selected rooms:", selectedRoomsArray);
 
 
     // Function to delete room_rates and room_data from local storage
@@ -53,11 +50,11 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
             </div> */}
 
             <div className='h-screen flex'>
-                <div className='my-auto w-6/12'>
-                    <div className='pl-32 pr-10 '>
+                <div className='my-auto text-left w-7/12 lg:w-6/12'>
+                    <div className='pl-8 md:pl-20  lg:pl-32 lg:pr-10 '>
                         <div>
-                            <h2 className='text-5xl text-cyan-700'> BOOKING SUCCESSFULL</h2>
-                            <p className='pt-8 text-lg'>The hotel booking has been successfully completed for :</p>
+                            <h2 className=' text-3xl md:text-5xl lg:text-5xl text-cyan-700'> BOOKING SUCCESSFULL</h2>
+                            <p className='pt-8 md:text-lg lg:text-lg'>The hotel booking has been successfully completed for :</p>
                             <div className='pt-5 capitalize font-medium text-lg'>
                                 {guestdetails.length > 1 ? <p>{guestdetails[0]?.guest_name + " +" + (guestdetails.length - 1)}</p> : <p>{guestdetails[0]?.guest_name}</p>}
                             </div>
@@ -67,13 +64,13 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
                                 })}</p>
                             </div>
                             <div className='flex pt-5'>
-                                <div className='pr-20'>
-                                    <p> Check-In date</p>
-                                    <p className='font-medium text-lg'>{checkinDate}</p>
+                                <div className='pr-10 md:pr-20'>
+                                    <p className='text-xs md:text-base'> Check-In date</p>
+                                    <p className='font-medium  md:text-lg'>{checkinDate}</p>
                                 </div>
                                 <div>
-                                    <p> Check-Out date</p>
-                                    <p className='font-medium text-lg'>{checkoutDate}</p>
+                                    <p className='text-xs md:text-base'> Check-Out date</p>
+                                    <p className='font-medium md:text-lg'>{checkoutDate}</p>
                                 </div>
 
                             </div>
@@ -91,13 +88,13 @@ function BookingSuccess({ setDisplay, setShowModal, setSearched, rooms, checkinD
                                         dispatch(clearGuestDetails())
                                         deleteRoomDetails()
                                     }}
-                                    className='bg-blue-600 py-3 px-2 text-white rounded-xl'> Go to Home</button>
+                                    className='bg-blue-600 py-3 px-2 text-white rounded-lg'> Go to Home</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className='my-auto w-6/12'>
-                    <img src='/payment_done.jpg' className='h-96 mx-auto'></img>
+                <div className='my-auto w-5/12 lg:w-6/12'>
+                    <img src='/payment_done.png' className='h-36 md:h-72 lg:h-96 mx-auto'></img>
                 </div>
             </div>
         </section>

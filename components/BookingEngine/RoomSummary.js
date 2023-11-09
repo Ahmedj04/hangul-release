@@ -151,7 +151,7 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
 
   function Booknow() {
     return (<>
-      <div className='flex justify-end'>
+      <div className='flex justify-center lg:justify-end'>
         <div className='w-96 h-full mr-3 py-6 px-5 flex flex-col bg-slate-100 shadow-2xl rounded-xl text-slate-600 font-semibold'>
           <h1 className='text-black-900 py-2 text-xl'>Price for {selectedRoom?.room_name}</h1>
           <h2 className='text-red-800 flex gap-2 py-3 items-center text-lg'>For {selectedRoom?.maximum_number_of_occupants} <BsFillPeopleFill /> <span className='text-xs'>Per Night</span></h2>
@@ -206,7 +206,7 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
           {/* <span className='my-auto pl-1 font-medium'>Back</span> */}
         </div>
 
-        <div className='my-auto text-base flex gap-10'>
+        <div className='my-auto text-base flex gap-5 md:gap-10'>
           {/* cart icon */}
           <i className='cursor-pointer'
             onClick={() => {
@@ -240,14 +240,14 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
       </div>
 
       {/* room details div */}
-      <div className='px-20 flex'>
+      <div className='px-5 lg:px-20 md:flex'>
         {/* left div */}
-        <div className='w-7/12'>
+        <div className='md:w-7/12'>
           {/* brief property overview div */}
-          <div className=' mt-5 mb-12'>
-            <h1 className='text-4xl text-black'>{selectedRoom?.room_name}</h1>
+          <div className=' mt-8 md:mt-5 mb-12'>
+            <h1 className='text-4xl  text-black'>{selectedRoom?.room_name}</h1>
             <div className='mt-6'>
-              <ul className='flex gap-10'>
+              <ul className='flex justify-center lg:justify-normal gap-10'>
                 <li className='text-slate-500 pb-2'><SquareFootIcon /> &nbsp; {selectedRoom.carpet_area} SQ.FT</li>
                 <li className='text-slate-500 pb-2'><GroupsIcon />  &nbsp; {selectedRoom.room_capacity} Adults</li>
                 <li className='text-slate-500 pb-2'>{selectedRoom?.views?.map((item, index) => {
@@ -280,17 +280,17 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
 
           {/* room description */}
           <div>
-            <p className='pt-10 pb-5 px-3 text-slate-800 leading-7 tracking-wide text-left'>{selectedRoom.room_description}</p>
+            <p className='pt-10 pb-5 px-3 text-slate-800 leading-7 tracking-wide lg:text-left'>{selectedRoom.room_description}</p>
           </div>
 
-          {/* room amenities div */}
-          <div>
+          {/* room amenities div for large screen*/}
+          <div className='md:hidden lg:block '>
             <div className='mb-10'>
               <div className='mt-10 mb-2'>
                 <h4 className='text-3xl text-black font-light'>Room Amenities</h4>
               </div>
               {Object.keys(selectedRoom).includes("room_facilities") ?
-                <div className="grid grid-flow-row-dense px-5 pt-6 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 gap-3">
+                <div className="grid grid-flow-row-dense px-5 pt-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-2 gap-3">
                   {selectedRoom?.room_facilities?.map((item, index) => {
                     return (
                       <span className='text-gray-700' key={index}>
@@ -309,8 +309,32 @@ function RoomSummary({ setDisplay, setShowModal, setSearched, checkinDate, check
         </div>
 
         {/* right div with price details */}
-        <div className='w-5/12'>
-          <div className='my-36 hidden lg:block md:hidden lg:w-full md:w-full'><Booknow /></div>
+        <div className='md:w-5/12'>
+          <div className=' pb-20 lg:pb-0 md:mt-20 lg:my-36 lg:block lg:w-full md:w-full'><Booknow /></div>
+        </div>
+      </div>
+
+
+      {/* room amenities div for medium screen*/}
+      <div className='hidden md:block lg:hidden'>
+        <div className='pb-10'>
+          <div className='mt-10 mb-2'>
+            <h4 className='text-3xl text-black font-light'>Room Amenities</h4>
+          </div>
+          {Object.keys(selectedRoom).includes("room_facilities") ?
+            <div className="grid grid-flow-row-dense px-5 pt-6 lg:grid-cols-3 md:grid-cols-3 grid-cols-2 gap-3">
+              {selectedRoom?.room_facilities?.map((item, index) => {
+                return (
+                  <span className='text-gray-700' key={index}>
+                    {/* &#10004 is code for tick mark  */}
+                    <span>&#10004;
+                      {item?.service_name.replaceAll("_", " ")}
+                    </span>
+                  </span>
+                );
+              })}
+            </div>
+            : <></>}
         </div>
       </div>
 

@@ -464,47 +464,68 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         <div className='min-h-screen'>
 
             {/* app bar  */}
-            <div className='flex justify-between w-full py-5 px-5 border-b-2  bg-slate-100'>
-                <div className='flex'>
-                    <i className='my-auto'
-                        onClick={() => {
-                            if (localStorage.getItem("temp_room_rate") === null) {
-                                setDisplay(0)
+            <div>
+                {/* <div className='flex justify-between w-full py-5 px-3 md:px-5 border-b-2  bg-slate-100'> */}
+                <div className='flex justify-between w-full py-5 px-3 md:px-5   bg-slate-100'>
+                    <div className='flex'>
+                        <i className='my-auto'
+                            onClick={() => {
+                                if (localStorage.getItem("temp_room_rate") === null) {
+                                    setDisplay(0)
 
-                            } else {
-                                setDisplay(1)
+                                } else {
+                                    setDisplay(1)
 
-                            }
-                        }}
-                    ><BiArrowBack size={30} />
-                    </i>
-                    <h1 className='text-xl my-auto font-bold ml-5'>Review Booking</h1>
+                                }
+                            }}
+                        ><BiArrowBack size={30} />
+                        </i>
+                        <h1 className='text-xl my-auto font-bold ml-2 md:ml-5'>Review Booking</h1>
+                    </div>
+
+                    {/* timer for medium and large screen */}
+                    <div className='hidden md:block'>
+                        <CountdownTimer
+                            minutes={15}
+                            onTimerComplete={closeButtonAction}
+
+                        />
+                    </div>
+
+                    {cancelBookingLoader === true ?
+                        <ButtonLoader
+                            classes='text-red-600 text-sm font-semibold cursor-pointer my-auto'
+                            text={'Cancel Booking'}
+                        />
+                        : <span className='text-red-600  italic text-sm font-semibold cursor-pointer my-auto'
+                            onClick={() => {
+                                setCancelBookingLoader(true);
+                                closeButtonAction();
+                            }}>Cancel Booking</span>
+                    }
+
                 </div>
-                <CountdownTimer minutes={15} onTimerComplete={closeButtonAction} />
 
-                {cancelBookingLoader === true ?
-                    <ButtonLoader
-                        classes='text-red-600 text-sm font-semibold cursor-pointer my-auto'
-                        text={'Cancel Booking'}
+                {/* timer for mobile screen */}
+                <div className='block md:hidden bg-slate-100 border-b-2 pb-2'>
+                    <CountdownTimer
+                        minutes={15}
+                        onTimerComplete={closeButtonAction}
+
                     />
-                    : <span className='text-red-600  italic text-sm font-semibold cursor-pointer my-auto'
-                        onClick={() => {
-                            setCancelBookingLoader(true);
-                            closeButtonAction();
-                        }}>Cancel Booking</span>
-                }
+                </div>
 
             </div>
 
             <div id="main-content" className='h-fit text-white flex flex-wrap justify-around gap-2 mx-4 py-10'>
 
                 {/* left side div  */}
-                <div id="guest-detail-review" className='bg-white border border-gray-300 text-black h-fit w-full lg:w-6/12  rounded-2xl'>
+                <div id="guest-detail-review" className='bg-white border border-gray-300 text-black h-fit w-full md:w-6/12  rounded-2xl'>
 
                     {/* rooms summary section */}
-                    <div className=' border-b-2 border-gray justify-start mt-2 p-4'>
-                        <div className='flex justify-between'>
-                            <h6 className={`text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}>
+                    <div className=' border-b-2 border-gray justify-start p-2 md:p-4'>
+                        <div className='flex  justify-between'>
+                            <h6 className={`text-xl my-auto flex pl-2 leading-none font-bold`}>
                                 Rooms Summary
                             </h6>
                             <button
@@ -518,7 +539,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                         </div>
 
-                        <table className='mx-4 w-full' cellPadding={15}>
+                        <table className='px-4 w-full' cellPadding={15}>
                             <thead>
                                 <th className='text-start'>Room Name</th>
                                 <th className='text-start'>Room Type</th>
@@ -584,13 +605,13 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                     {/* guests summary section */}
                     <div className='flex justify-start mt-2 p-4'>
                         <h6
-                            className={` text-xl flex leading-none pl-6 lg:pt-2 pt-6  font-bold`}
+                            className={` text-xl flex my-auto leading-none pl-2 font-bold`}
                         >
                             Guest Details
                         </h6>
                         <button onClick={() => { addGuest() }} className='ml-auto px-4 py-1 bg-cyan-700 hover:bg-cyan-900 rounded-md text-white'>Add Guests</button>
                     </div>
-                    <div className="pt-6 pb-4">
+                    <div className="pt-1 pb-4">
                         <div className="md:px-4 mx-auto w-full">
                             {guest.map((i, loopIndex) => (
                                 <div className='border-2 border-white rounded-xl p-2 m-2' key={i.index}>
@@ -728,7 +749,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                 </div>
 
                 {/* right side div  */}
-                <div id="price-breakup" className='border border-gray-300 bg-white p-4 text-black h-fit w-full lg:w-4/12  rounded-2xl' >
+                <div id="price-breakup" className='border border-gray-300 bg-white p-4 mt-10 md:mt-0 text-black h-fit w-full text-start  md:w-5/12 lg:w-4/12  rounded-2xl' >
                     <div className='border-b border-gray rounded-lgg w-full h-1/2 my-2'>
                         <h1 className="font-extrabold p-2 text-xl">Price Breakup</h1>
                         <div className='flex justify-start items-start my-4  border-b-2'> <div className='p-2 w-4/5 font-semibold'>{totalSelectedQuantities} Room for {numberOfNights === 0 ? '1 Day' : numberOfNights === 1 ? '1 Night' : `${numberOfNights} Nights`}<br /> <div className='text-sm font-normal px-3'>base price</div></div> <div className='mx-2 my-auto flex justify-end w-full'>₹ {totalFinalRate}</div></div>
