@@ -134,7 +134,7 @@ function BookingForm({ color, rooms, allHotelDetails, searched, setSearched }) {
 
 
                     </div>
-                    <div className='flex justify-center items-center'>
+                    <div className='py-2 lg:py-0 flex justify-center items-center'>
                         <button disabled={err === true} className='bg-cyan-700  hover:bg-cyan-900 h-8 w-2/6 md:w-1/6 text-white border rounded-2xl border-none '
                             onClick={() => {
                                 if (enquiry.checkin === "" && enquiry.checkout === "") {

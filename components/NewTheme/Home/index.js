@@ -66,11 +66,11 @@ function Home({ allHotelDetails, menu, setMenu, hotelDetailLoader, lang, setLang
                 </div>
 
                 {showModalBooking === 1 ?
-                    <div className={` block h-2 lg:hidden `}>
+                    <div className={`block h-2 lg:hidden`}>
                         <Modal
                             title='Booking Form'
                             description={
-                                <div className={`${searched === false ? 'z-0' : 'z-50'}`}>
+                                <div className={`${searched === false ? 'z-0' : 'z-50 '}`}>
                                     <BookingForm
                                         color={Color?.light}
                                         allHotelDetails={allHotelDetails}
@@ -83,6 +83,7 @@ function Home({ allHotelDetails, menu, setMenu, hotelDetailLoader, lang, setLang
                             }
                             setShowModal={(e) => setShowModalBooking(e)}
                         />
+
                         {/* <Modal
                         description={<Contactus color={Color?.light} language={lang} />}
                         setShowModal={(e) => setShowModalBooking(e)}
@@ -128,7 +129,7 @@ function Home({ allHotelDetails, menu, setMenu, hotelDetailLoader, lang, setLang
                 `}
             </style>
 
-        </section >
+        </section>
     )
 }
 
