@@ -408,23 +408,19 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             // handle the third post response
             console.log('payment sucessful')
             //change state of reservation in reservation table 
-            // changeReservationState() 
-            setDisplay(3)
+            changeReservationState()
+            // setDisplay(3)
         }).catch((err) => {
             console.log(err)
         })
     }
 
     function changeReservationState() {
-        let data = {
-            "reserved_rooms":
-                [
-                    {
-                        // "reservation_id": "res001", room_id, reservation time--> composite primary key
-                        "reservation_state": "paid"
-                    }
-                ]
-        }
+        let reservedRooms = reservationIdentity.map((data, index) => {
+            return ({ ...data, "reservation_state": "paid" })
+        })
+        let data = { "reserved_rooms": reservedRooms }
+        console.log(JSON.stringify(data));
         let url = '/api/reserve_rooms';
         axios.put(url, data, {
             header: { "content-type": "application/json" },
@@ -437,6 +433,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             console.log(err)
         })
     }
+
 
     // this function resets the values
     function closeButtonAction() {
@@ -636,7 +633,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                                         {/* guest email  */}
                                         <InputText
-                                            label={'Guest Email'}
+                                            // label={'Guest Email'}
+                                            label={loopIndex === 0 ? 'Main Guest Email' : 'Guest Email'}
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) => {
@@ -652,7 +650,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                                         {/* guest phone  */}
                                         <InputText
-                                            label={'Guest Phone'}
+                                            // label={'Guest Phone'}
+                                            label={loopIndex === 0 ? 'Main Guest Phone' : 'Guest Phone'}
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) => {
@@ -665,7 +664,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
                                             tooltip={true}
                                         />
                                         <InputText
-                                            label={'Guest Age [in years] '}
+                                            // label={'Guest Age [in years] '}
+                                            label={loopIndex === 0 ? 'Main Guest Age [in years]' : 'Guest Age [in years]'}
                                             visible={1}
                                             defaultValue={``}
                                             onChangeAction={(e) => {

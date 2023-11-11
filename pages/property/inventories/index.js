@@ -1,56 +1,37 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Router from 'next/router';
 import axios from "axios";
-import { ButtonLoader } from './ButtonLoader'
+import ButtonLoader from './ButtonLoader'
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
-import InventoryModal from "./inventory";
-
+import InventoryModal from "./InventoryModal";
 import Title from "../../../components/title";
 import colorFile from "../../../components/colors/Color";
 import LoaderDarkTable from "../../../components/loaders/darktableloader";
-import validateContact from "../../../components/validation/contact/contactadd";
-import validateContactEdit from "../../../components/validation/contact/contactedit";
 import Sidebar from "../../../components/Sidebar";
-import Button from "../../../components/Button";
-import Table from "../../../components/Table";
 import { ToastContainer, toast } from "react-toastify";
 import Header from "../../../components/Header";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
-import objChecker from "lodash";
 import { english, french, arabic } from "../../../components/Languages/Languages";
 var language;
 var currentProperty;
 var propertyName;
 import Headloader from "../../../components/loaders/headloader";
 import LoaderTable from "../../../components/loadertable";
-import GenericTable from "../../../components/utils/Tables/GenericTable";
-import InventoryTable from "./InventoryTable";
-import { response } from "msw";
 const logger = require("../../../services/logger");
 var currentLogged;
-var i = 0;
 let colorToggle;
 
 function Inventory() {
     const [gen, setGen] = useState([])
     const [error, setError] = useState({})
     const [color, setColor] = useState({})
-    const [spinner, setSpinner] = useState(0)
-    const [spin, setSpin] = useState(0)
     const [visible, setVisible] = useState(0)
-    const [deleteContact, setDeleteContact] = useState(0);
-    const [contacts, setContacts] = useState([]);
     const [mode, setMode] = useState()
-    const [countryCode, setCountryCode] = useState({});
     const [view, setView] = useState(0);
-    const [flag, setFlag] = useState([]);
-    const [contact, setContact] = useState([]);
-    const [deleteMultiple, setDeleteMultiple] = useState(0);
-
     const [inventories, setInventories] = useState([]);
+    const [editInventory, setEditInventory] = useState({})
     const [edit, setEdit] = useState({
         'value': 0,
         'idx': undefined
@@ -59,49 +40,25 @@ function Inventory() {
         'value': 0,
         'idx': undefined
     })
-
-    const [editInventory, setEditInventory] = useState({})
+    // loaders
     const [saveLoader, setSaveLoader] = useState(false)
     const [deleteLoader, setDeleteLoader] = useState(false)
-
-    const [itemsPerPage, setItemsPerPage] = useState(1);
+    // state for pagination
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [page, setPage] = useState(1);
-
-    function searchFunction() {
-        // Declare variables
-        let input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("myInput");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("myTable");
-        tr = table.getElementsByTagName("tr");
-
-        // Loop through all table rows, and hide those who don't match the search query
-        for (i = 1; i < tr.length; i++) {
-            td = tr[i];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
-    }
-
-    const displayData = useMemo(() => {
-        const start = (page - 1) * itemsPerPage;
-        return inventories.slice(start, start + itemsPerPage);
-    }, [page, inventories, itemsPerPage]);
-
-
-    function ItemShow(event) {
-        setItemsPerPage(event.target.value);
-    }
 
     useEffect(() => {
         firstfun();
     }, [])
+
+    useEffect(() => {
+        if (JSON.stringify(currentLogged) === 'null') {
+            Router.push(window.location.origin)
+        }
+        else {
+            fetchHotelDetails();
+        }
+    }, []);
 
     const firstfun = () => {
         if (typeof window !== 'undefined') {
@@ -129,16 +86,6 @@ function Inventory() {
             currentLogged = JSON.parse(localStorage.getItem("Signin Details"));
         }
     }
-
-
-    useEffect(() => {
-        if (JSON.stringify(currentLogged) === 'null') {
-            Router.push(window.location.origin)
-        }
-        else {
-            fetchHotelDetails();
-        }
-    }, []);
 
     const colorToggler = (newColor) => {
         if (newColor === 'system') {
@@ -175,6 +122,38 @@ function Inventory() {
             });
 
 
+    }
+
+    function searchFunction() {
+        // Declare variables
+        let input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    const displayData = useMemo(() => {
+        const start = (page - 1) * itemsPerPage;
+        return inventories.slice(start, start + itemsPerPage);
+    }, [page, inventories, itemsPerPage]);
+
+
+    function ItemShow(event) {
+        setItemsPerPage(event.target.value);
     }
 
     function updateInventory(inventorydata) {
@@ -473,6 +452,7 @@ function Inventory() {
                                                                                 className="bg-gradient-to-r bg-green-600 hover:bg-green-700 text-white sm:inline-flex font-semibold rounded-lg text-sm px-5 py-2 text-center items-center ease-linear transition-all duration-150"
                                                                                 onClick={() => {
                                                                                     setSaveLoader(true)
+
                                                                                     updateInventory({ "inventory": [{ ...editInventory, "room_id": inv.room_id }] })
                                                                                 }}
                                                                             >{'Save'}
@@ -604,15 +584,10 @@ function Inventory() {
                         <span className={`text-sm font-normal ${color?.textgray}`}>Entries per page</span>
                         <select onChange={(e) => ItemShow(e)} className={`shadow-sm ${color?.greybackground} border border-gray-300 ${color?.text} sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block mr-2 w-12 px-3  py-1`}>
                             <option selected disabled>{itemsPerPage}</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
                             <option value="5">5</option>
-                            {/* <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
-                            <option value="20">20</option> */}
+                            <option value="20">20</option>
                         </select>
 
                     </div>
@@ -660,10 +635,7 @@ function Inventory() {
                                     setError={(e) => setError(e)}
                                     color={color}
                                     language={language}
-                                    // fetchHotelDetail={(e) => fetchHotelDetails(e)}
                                     setInventories={(e) => { setInventories(e) }}
-                                    setVisibility={(e) => { setVisible(e) }}
-
                                 />
 
                             </div>

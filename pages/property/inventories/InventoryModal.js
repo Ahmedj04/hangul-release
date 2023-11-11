@@ -27,7 +27,7 @@ var currentLogged;
 var days_of_week = 'mtwtfsu';
 const logger = require("../../../services/logger");
 
-function InventoryModal({ error, setError, setView, setInventories, setVisibility, view, color, language }) {
+function InventoryModal({ error, setError, setView, setInventories, view, color, language }) {
   const [darkModeSwitcher, setDarkModeSwitcher] = useState()
   const [inventory, setInventory] = useState([])
   // const [gen, setGen] = useState([])
@@ -122,8 +122,6 @@ function InventoryModal({ error, setError, setView, setInventories, setVisibilit
           fetchInventoryRooms()
 
         }
-        // setVisible(1);
-        // setVisibility(1);
       })
       .catch((error) => {
         logger.error("url to fetch property details, failed")
