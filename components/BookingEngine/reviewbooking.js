@@ -15,6 +15,7 @@ import formatDateToCustomFormat from '../generalUtility/timeStampMaker'
 import CountdownTimer from './CountDownTimer';
 import ButtonLoader from './ButtonLoader';
 import { v4 as uuidv4 } from 'uuid';
+import { result } from 'lodash';
 
 function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDate, checkoutDate }) {
 
@@ -34,7 +35,9 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     const [rate, setRate] = useState({})
     const [selectedRoom, setSelectedRoom] = useState({})
     const [disabled, setDisabled] = useState(false)
+    // loaders
     const [cancelBookingLoader, setCancelBookingLoader] = useState(false)
+    const [payNowLoader, setpayNowLoader] = useState(false)
 
     const [totals, setTotals] = useState({
         totalFinalRate: 0,
@@ -145,15 +148,19 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         setGuest([...guest, { ...guestTemplate, index: guestIndex + 1 }])
     }
 
+
     // to handle changes in data
     const handleChangeInGuest = (e, index, i) => {
-        setGuest(guest?.map((item, id) => {
-            if (item.index === index) {
-                item[i] = e.target.value
-            }
-            return item
-        }))
+        let dataNotToBeChanged = guest?.filter((item, id) => item.index != index);
+        let dataToBeChanged = guest?.filter((item, id) => item.index === index)[0];
+
+        //  'i' is a variable holding the key to be changed
+        dataToBeChanged = { ...dataToBeChanged, [i]: e.target.value };
+
+        // Updating the guest array
+        dataNotToBeChanged?.length === 0 ? setGuest([dataToBeChanged]) : setGuest([...dataNotToBeChanged, dataToBeChanged].sort((a, b) => a.index - b.index));
     }
+
 
     // to remove guest from ui
     const removeGuest = (indexToRemove) => {
@@ -235,19 +242,19 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
     }
 
     function SubmitGuestDetails() {
+        let validationResults = [];
         let isGuestDetailsValid = GuestDetailValidation(guest);
 
         // isGuestDetailsValid can be either true or an error object
         if (isGuestDetailsValid !== true) {
             // Guest details are invalid, you can handle the error here
             setGuestDetailError(isGuestDetailsValid);
+            validationResults.push(false)
         }
         else {
+            validationResults.push(true)
             setGuestDetailError({})
             dispatch(setGuestDetails(guest))
-            //network call
-            bookingRoom()
-
         }
 
         if (addGst) {
@@ -256,11 +263,18 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             if (isGstDetailsValid !== true) {
                 // GST details are invalid, you can handle the error here
                 setGstDetailError(isGstDetailsValid);
+                validationResults.push(false)
 
             } else {
+                validationResults.push(true)
                 setGstDetailError({})
-                //network call
             }
+        }
+
+        // checks if all the results are true only then this block will work.
+        if (validationResults.every(result => result === true)) {
+            bookingRoom()
+            setpayNowLoader(true)
         }
     }
 
@@ -409,7 +423,6 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
             console.log('payment sucessful')
             //change state of reservation in reservation table 
             changeReservationState()
-            // setDisplay(3)
         }).catch((err) => {
             console.log(err)
         })
@@ -427,7 +440,8 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
         }).then((responseFromInvoiceLinkUrl) => {
             // handle the third post response
             console.log('reservation state changed')
-            //change state of reservation in reservation table 
+            //change state of reservation in reservation table
+            setpayNowLoader(false)
             setDisplay(3)
         }).catch((err) => {
             console.log(err)
@@ -683,7 +697,7 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
 
 
-                            <input type="checkbox" name="add_gst" onClick={() => setAddGst(!addGst)} />
+                            <input type="checkbox" name="add_gst" onClick={() => { setAddGst(!addGst); setGstDetails({}) }} />
                             <span className='font-semibold text-base mx-2'>Add GST Details (optional)</span>
                             {addGst === true ?
                                 <div className="flex flex-wrap border-2 border-white rounded-xl p-2 m-2">
@@ -769,12 +783,32 @@ function Reviewbooking({ setDisplay, rooms, setShowModal, setSearched, checkinDa
 
                     </div> */}
 
-                    <button
-                        disabled={reserveRoom || disabled}
-                        onClick={() => {
-                            SubmitGuestDetails()
-                        }}
-                        className={`px-4 py-2 ${reserveRoom === true ? "bg-gray-500" : disabled === true ? 'bg-gray-500' : 'bg-green-700 hover:bg-green-900'}   text-white rounded-lg w-full`}>Pay Now</button>
+                    {payNowLoader === true ?
+                        <ButtonLoader
+                            classes={`px-4 py-2 bg-green-700 hover:bg-green-900 text-white rounded-lg w-full`}
+                            text={'Pay Now'}
+                        />
+                        :
+                        <button
+                            disabled={reserveRoom || disabled || totalFinalRate + totalTaxAmount + totalOtherFees === 0}
+                            onClick={() => {
+                                SubmitGuestDetails();
+                            }}
+                            className={`px-4 py-2 ${totalFinalRate + totalTaxAmount + totalOtherFees === 0
+                                ? "bg-gray-500"
+                                : reserveRoom === true || disabled === true
+                                    ? "bg-gray-500"
+                                    : "bg-green-700 hover:bg-green-900"
+                                } text-white rounded-lg w-full`}
+                        >
+                            Pay Now
+                        </button>
+
+
+
+
+                    }
+
                 </div>
             </div>
 
